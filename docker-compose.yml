@@ -8,7 +8,8 @@ services:
       POSTGRES_PASSWORD: qrforge
       POSTGRES_DB: qrforge
     ports:
-      - "5432:5432"
+      # 5433 en el host para no chocar con instalaciones nativas de Postgres
+      - "5433:5432"
     volumes:
       - qrforge_pgdata:/var/lib/postgresql/data
     healthcheck:

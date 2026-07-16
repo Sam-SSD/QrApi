@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- better-auth ----------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  apiKeys       ApiKey[]
+  qrCodes       QrCode[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String // "credential" | "github" | "google"
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  password              String? // hash scrypt — solo providerId = "credential"
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// ---------- Dominio QRForge ----------
+
+model ApiKey {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  prefix       String // primeros 12 chars visibles: "qrf_a1B2c3D4"
+  keyHash      String    @unique // SHA-256 hex del token completo
+  scopes       String[]  @default(["qr:generate"])
+  expiresAt    DateTime?
+  lastUsedAt   DateTime?
+  revokedAt    DateTime?
+  requestCount BigInt    @default(0)
+  createdAt    DateTime  @default(now())
+
+  @@index([userId])
+  @@map("api_key")
+}
+
+enum QrContentType {
+  TEXT
+  URL
+  EMAIL
+  PHONE
+  SMS
+  WIFI
+  VCARD
+  CRYPTO
+}
+
+model QrCode {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  type      QrContentType
+  data      String        @db.Text // payload final codificado
+  config    Json // QrConfig validado por zod (lib/qr/schema.ts)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("qr_code")
+}
+
+model RateLimitWindow {
+  id          String   @id @default(cuid())
+  apiKeyId    String
+  kind        String // "minute" | "day"
+  windowStart DateTime
+  count       Int      @default(0)
+
+  @@unique([apiKeyId, kind, windowStart])
+  @@map("rate_limit_window")
+}

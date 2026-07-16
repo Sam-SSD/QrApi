@@ -45,6 +45,48 @@
     "ctaPrimary": "Crear QR gratis",
     "ctaSecondary": "Ver la API"
   },
+  "auth": {
+    "login": {
+      "title": "Bienvenido de nuevo",
+      "subtitle": "Inicia sesión para gestionar tus QRs y claves de API",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "submit": "Iniciar sesión",
+      "submitting": "Iniciando sesión…",
+      "noAccount": "¿No tienes cuenta?",
+      "registerLink": "Crear cuenta",
+      "orContinueWith": "o continúa con",
+      "invalidCredentials": "Correo o contraseña incorrectos.",
+      "emailNotVerified": "Verifica tu correo antes de iniciar sesión. Revisa tu bandeja de entrada."
+    },
+    "register": {
+      "title": "Crea tu cuenta",
+      "subtitle": "Guarda tus QRs y genera claves para la API",
+      "name": "Nombre",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "passwordHint": "Mínimo 8 caracteres",
+      "submit": "Crear cuenta",
+      "submitting": "Creando cuenta…",
+      "haveAccount": "¿Ya tienes cuenta?",
+      "loginLink": "Iniciar sesión",
+      "orContinueWith": "o continúa con",
+      "emailTaken": "Ya existe una cuenta con ese correo."
+    },
+    "verifyEmail": {
+      "title": "Revisa tu correo",
+      "description": "Te enviamos un enlace de verificación a {email}. Ábrelo para activar tu cuenta.",
+      "descriptionGeneric": "Te enviamos un enlace de verificación. Ábrelo para activar tu cuenta.",
+      "verifiedTitle": "Cuenta verificada",
+      "verifiedDescription": "Tu correo fue verificado correctamente. Ya puedes usar tu cuenta.",
+      "goDashboard": "Ir al panel",
+      "goLogin": "Iniciar sesión"
+    }
+  },
+  "dashboard": {
+    "greeting": "Hola, {name}",
+    "comingSoon": "Aquí verás tus QRs guardados y tus claves de API."
+  },
   "notFound": {
     "title": "Página no encontrada",
     "description": "La página que buscas no existe o fue movida.",
