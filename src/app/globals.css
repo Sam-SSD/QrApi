@@ -218,6 +218,61 @@
   animation: shimmer 1.6s linear infinite;
 }
 
+/* Shiki: tema dual claro/oscuro */
+.shiki {
+  background: transparent !important;
+}
+.dark .shiki,
+.dark .shiki span {
+  color: var(--shiki-dark) !important;
+}
+
+/* Hero: módulos del QR aparecen con stagger radial (CSS puro, LCP-safe) */
+@keyframes hero-module-in {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.hero-qr rect,
+.hero-qr path {
+  opacity: 0;
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: hero-module-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Scroll reveal (activado por IntersectionObserver) */
+.reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.5s ease-out,
+    transform 0.5s ease-out;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-qr rect,
+  .hero-qr path {
+    animation: none;
+    opacity: 1;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

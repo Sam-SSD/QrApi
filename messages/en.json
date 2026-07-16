@@ -43,7 +43,50 @@
     "heroTitle": "Forge QR codes that don't look like QR codes.",
     "heroSubtitle": "Visual editor with gradients, logos and frames. Vector export. Developer API. Free and open source.",
     "ctaPrimary": "Create a free QR",
-    "ctaSecondary": "Explore the API"
+    "ctaSecondary": "Explore the API",
+    "features": {
+      "title": "Everything you need, for free",
+      "subtitle": "The features others hide behind a paywall are free here, forever.",
+      "customization": {
+        "title": "Full customization",
+        "description": "5 dot styles, configurable corners, linear and radial gradients, frames with text and your logo in the center."
+      },
+      "types": {
+        "title": "8 content types",
+        "description": "URL, text, email, phone, SMS, WiFi, vCard and crypto — with dedicated forms that generate the correct standard format."
+      },
+      "vector": {
+        "title": "True vector export",
+        "description": "Pure scalable SVG, PNG and JPG up to 4096 px, and print-ready PDF."
+      },
+      "history": {
+        "title": "History and templates",
+        "description": "Your latest QRs saved in the browser, ready-made templates and your personal library with a free account."
+      },
+      "api": {
+        "title": "REST API for developers",
+        "description": "Generate styled QRs from your code with one HTTP request. Sign up, create your token and go."
+      },
+      "privacy": {
+        "title": "100% private",
+        "description": "The editor generates everything in your browser: your data never leaves your machine. Self-host in 5 minutes with Docker."
+      }
+    },
+    "showcase": {
+      "title": "A QR for every brand",
+      "subtitle": "Click any example to open it in the editor."
+    },
+    "developer": {
+      "title": "One endpoint. Any style.",
+      "subtitle": "Authenticate with your token and get PNG, SVG or JPEG with every editor style. Generous rate limits and clear JSON errors.",
+      "cta": "Read the docs"
+    },
+    "openSource": {
+      "title": "Truly open source",
+      "subtitle": "MIT licensed, no telemetry, self-hosted in 5 minutes with Docker Compose. If it helps you, leave a star.",
+      "cta": "View on GitHub",
+      "selfHost": "docker compose up -d && npm run dev"
+    }
   },
   "auth": {
     "login": {
@@ -317,6 +360,99 @@
       "revokedBadge": "Revoked",
       "delete": "Delete",
       "limitReached": "Maximum 10 active keys"
+    }
+  },
+  "docs": {
+    "title": "API documentation",
+    "subtitle": "Generate styled QR codes from your code with one HTTP request.",
+    "nav": {
+      "intro": "Introduction",
+      "auth": "Authentication",
+      "generate": "Generate a QR",
+      "params": "Parameters",
+      "styles": "Styles",
+      "errors": "Errors",
+      "rateLimits": "Rate limits",
+      "tryIt": "Try it"
+    },
+    "intro": {
+      "body": "The QRForge API exposes a single endpoint that generates QR codes with every editor style: gradients, dot shapes, custom corners, logos and frames. It returns the image directly (PNG, SVG or JPEG), ready to use.",
+      "baseUrl": "Base URL"
+    },
+    "auth": {
+      "body": "Every request requires an API key in the Authorization header. Create yours for free from the dashboard: sign up, go to API keys and generate one. The full key is shown only once.",
+      "getKey": "Create my key",
+      "warning": "Treat your key like a password: don't commit it to repositories or use it from the browser in production."
+    },
+    "generate": {
+      "getTitle": "GET — simple case",
+      "getBody": "For basic QRs, pass parameters in the query string. Great for quick testing.",
+      "postTitle": "POST — full control",
+      "postBody": "For gradients, custom corners, logos and frames, send a JSON body. You can pass `data` (raw text) or `payload` (a typed object that builds the standard format for you: WiFi, vCard, email…)."
+    },
+    "params": {
+      "getTitle": "GET parameters (query string)",
+      "postTitle": "POST body (JSON)",
+      "name": "Parameter",
+      "type": "Type",
+      "default": "Default",
+      "description": "Description",
+      "rows": {
+        "data": "Content to encode (max 2953 characters)",
+        "payload": "Typed object alternative to data, with type: wifi | vcard | email | url | text | phone | sms | crypto, plus each type's fields",
+        "format": "Output format: png, svg or jpeg",
+        "size": "Width in pixels (64–2048). Ignored for svg",
+        "ecLevel": "Error correction: L (7%), M (15%), Q (25%), H (30%)",
+        "margin": "Quiet zone in modules (0–10)",
+        "dotsStyle": "Dot shape",
+        "dotsColor": "Dot hex color",
+        "bgColor": "Background hex color",
+        "cornersSquareStyle": "Corner frame style",
+        "cornersDotStyle": "Corner center style",
+        "transparent": "Transparent background (png/svg only)",
+        "style": "Full style object: dots (with gradient), cornersSquare, cornersDot, background",
+        "logo": "Centered logo: dataUri (base64, max 500 KB), sizeRatio (0.1–0.35), margin, background",
+        "frame": "Decorative frame: style, text, color, optional textColor",
+        "effects": "Effects: invert, glow, opacity"
+      }
+    },
+    "styles": {
+      "body": "Available values for each style:",
+      "dots": "dots.style",
+      "cornersSquare": "cornersSquare.style",
+      "cornersDot": "cornersDot.style",
+      "frames": "frame.style"
+    },
+    "errors": {
+      "body": "Errors are returned as JSON with this shape:",
+      "status": "Status",
+      "code": "Code",
+      "meaning": "Meaning",
+      "rows": {
+        "invalid_params": "Invalid query parameters (the details field tells you which)",
+        "invalid_body": "Invalid JSON body",
+        "missing_token": "Missing Authorization header",
+        "invalid_token": "The key does not exist",
+        "revoked_token": "The key was revoked",
+        "expired_token": "The key has expired",
+        "body_too_large": "Body exceeds 1 MB",
+        "invalid_json": "Body is not valid JSON",
+        "data_too_long": "The content does not fit in a QR at that correction level",
+        "rate_limited": "Rate limit exceeded (check Retry-After)"
+      }
+    },
+    "rateLimits": {
+      "body": "Each API key has these limits. Every response includes the X-RateLimit-Limit, X-RateLimit-Remaining and X-RateLimit-Reset headers; a 429 adds Retry-After in seconds.",
+      "perMinute": "requests per minute",
+      "perDay": "requests per day"
+    },
+    "tryIt": {
+      "body": "Paste your API key and generate a real QR against this instance. The key is never stored anywhere.",
+      "tokenLabel": "Your API key",
+      "dataLabel": "Content",
+      "run": "Generate",
+      "running": "Generating…",
+      "error": "The request failed"
     }
   },
   "notFound": {

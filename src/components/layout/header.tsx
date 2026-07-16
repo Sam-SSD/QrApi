@@ -19,7 +19,7 @@ import { LocaleSwitcher } from "./locale-switcher";
 import { UserMenu } from "./user-menu";
 import { cn } from "@/lib/utils";
 
-export const GITHUB_URL = "https://github.com/qrforge/qrforge";
+import { GITHUB_URL } from "@/lib/constants";
 
 function NavLink({
   href,
