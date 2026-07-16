@@ -45,6 +45,48 @@
     "ctaPrimary": "Create a free QR",
     "ctaSecondary": "Explore the API"
   },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to manage your QR codes and API keys",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Sign up",
+      "orContinueWith": "or continue with",
+      "invalidCredentials": "Invalid email or password.",
+      "emailNotVerified": "Verify your email before signing in. Check your inbox."
+    },
+    "register": {
+      "title": "Create your account",
+      "subtitle": "Save your QR codes and generate API keys",
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "passwordHint": "At least 8 characters",
+      "submit": "Sign up",
+      "submitting": "Creating account…",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Sign in",
+      "orContinueWith": "or continue with",
+      "emailTaken": "An account with that email already exists."
+    },
+    "verifyEmail": {
+      "title": "Check your inbox",
+      "description": "We sent a verification link to {email}. Open it to activate your account.",
+      "descriptionGeneric": "We sent you a verification link. Open it to activate your account.",
+      "verifiedTitle": "Account verified",
+      "verifiedDescription": "Your email was verified successfully. You can now use your account.",
+      "goDashboard": "Go to dashboard",
+      "goLogin": "Sign in"
+    }
+  },
+  "dashboard": {
+    "greeting": "Hello, {name}",
+    "comingSoon": "Your saved QR codes and API keys will appear here."
+  },
   "notFound": {
     "title": "Page not found",
     "description": "The page you are looking for does not exist or has been moved.",
