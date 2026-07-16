@@ -1,0 +1,287 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* shadcn semantic tokens */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-geist-sans);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 26px;
+  --radius-3xl: 32px;
+  --radius-4xl: 40px;
+
+  /* QRForge design tokens */
+  --color-canvas: var(--background);
+  --color-canvas-subtle: var(--canvas-subtle);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--foreground);
+  --color-ink-muted: var(--muted-foreground);
+  --color-ink-faint: var(--ink-faint);
+  --color-brand: var(--primary);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-cyan: var(--brand-cyan);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--destructive);
+}
+
+:root {
+  /* ---- Light ---- */
+  --background: #fafafa;
+  --canvas-subtle: #f4f4f5;
+  --foreground: #18181b;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --line: #e4e4e7;
+  --line-strong: #d4d4d8;
+  --ink-faint: #8e8e99;
+  --brand-soft: rgba(79, 70, 229, 0.08);
+  --brand-cyan: #0891b2;
+  --success: #059669;
+  --warning: #b45309;
+
+  --card: #ffffff;
+  --card-foreground: #18181b;
+  --popover: #ffffff;
+  --popover-foreground: #18181b;
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #52525b;
+  --accent: #f0f0f2;
+  --accent-foreground: #18181b;
+  --destructive: #dc2626;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #4f46e5;
+  --radius: 0.625rem;
+
+  --gradient-brand: linear-gradient(135deg, #4f46e5 0%, #0891b2 100%);
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-blur: 16px;
+  --shadow-raised:
+    0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.08);
+  --glow-accent:
+    0 0 0 1px rgba(79, 70, 229, 0.25), 0 4px 16px rgba(79, 70, 229, 0.12);
+  --aura: radial-gradient(
+    ellipse 80% 50% at 50% -20%,
+    rgba(79, 70, 229, 0.06),
+    transparent
+  );
+}
+
+.dark {
+  /* ---- Dark (identidad) ---- */
+  --background: #09090b;
+  --canvas-subtle: #0e0e12;
+  --foreground: #f4f4f5;
+  --surface: #141419;
+  --surface-raised: #1a1a21;
+  --line: rgba(255, 255, 255, 0.07);
+  --line-strong: rgba(255, 255, 255, 0.13);
+  --ink-faint: #6b6b76;
+  --brand-soft: rgba(129, 140, 248, 0.12);
+  --brand-cyan: #22d3ee;
+  --success: #34d399;
+  --warning: #fbbf24;
+
+  --card: #141419;
+  --card-foreground: #f4f4f5;
+  --popover: #1a1a21;
+  --popover-foreground: #f4f4f5;
+  --primary: #818cf8;
+  --primary-foreground: #0b0b14;
+  --secondary: #1a1a21;
+  --secondary-foreground: #f4f4f5;
+  --muted: #1a1a21;
+  --muted-foreground: #a1a1aa;
+  --accent: #1e1e26;
+  --accent-foreground: #f4f4f5;
+  --destructive: #f87171;
+  --border: rgba(255, 255, 255, 0.07);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #818cf8;
+
+  --gradient-brand: linear-gradient(135deg, #818cf8 0%, #22d3ee 100%);
+  --glass-bg: rgba(20, 20, 25, 0.66);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --shadow-raised: 0 0 0 1px var(--line), 0 8px 24px rgba(0, 0, 0, 0.5);
+  --glow-accent:
+    0 0 0 1px rgba(129, 140, 248, 0.35), 0 0 24px rgba(129, 140, 248, 0.18);
+  --aura: radial-gradient(
+    ellipse 80% 50% at 50% -20%,
+    rgba(129, 140, 248, 0.08),
+    transparent
+  );
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-image: var(--aura);
+    background-repeat: no-repeat;
+  }
+  :focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--background),
+      0 0 0 4px var(--ring);
+    border-radius: var(--radius-sm);
+  }
+  ::selection {
+    background: var(--brand-soft);
+  }
+}
+
+@utility glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  border: 1px solid var(--glass-border);
+}
+
+@utility text-gradient-brand {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility bg-gradient-brand {
+  background: var(--gradient-brand);
+}
+
+@utility shadow-raised {
+  box-shadow: var(--shadow-raised);
+}
+
+@utility glow-accent {
+  box-shadow: var(--glow-accent);
+}
+
+/* Shimmer para skeletons y overlays de carga */
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@utility animate-shimmer {
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    var(--brand-soft) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+/* Shiki: tema dual claro/oscuro */
+.shiki {
+  background: transparent !important;
+}
+.dark .shiki,
+.dark .shiki span {
+  color: var(--shiki-dark) !important;
+}
+
+/* Hero: módulos del QR aparecen con stagger radial (CSS puro, LCP-safe) */
+@keyframes hero-module-in {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.hero-qr rect,
+.hero-qr path {
+  opacity: 0;
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: hero-module-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Scroll reveal (activado por IntersectionObserver) */
+.reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.5s ease-out,
+    transform 0.5s ease-out;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-qr rect,
+  .hero-qr path {
+    animation: none;
+    opacity: 1;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

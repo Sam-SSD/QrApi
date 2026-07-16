@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: qrforge-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: qrforge
+      POSTGRES_PASSWORD: qrforge
+      POSTGRES_DB: qrforge
+    ports:
+      # 5433 en el host para no chocar con instalaciones nativas de Postgres
+      - "5433:5432"
+    volumes:
+      - qrforge_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qrforge"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: qrforge-mailpit
+    restart: unless-stopped
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
+
+volumes:
+  qrforge_pgdata:
