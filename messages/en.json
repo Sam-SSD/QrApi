@@ -83,6 +83,179 @@
       "goLogin": "Sign in"
     }
   },
+  "editor": {
+    "title": "QR code generator",
+    "subtitle": "Design, customize and export your QR in seconds",
+    "content": {
+      "title": "Content",
+      "types": {
+        "text": "Text",
+        "url": "URL",
+        "email": "Email",
+        "phone": "Phone",
+        "sms": "SMS",
+        "wifi": "WiFi",
+        "vcard": "vCard",
+        "crypto": "Crypto"
+      },
+      "charCount": "{count} / {max} characters",
+      "fields": {
+        "text": "Text",
+        "textPlaceholder": "Type any text…",
+        "url": "Web address",
+        "urlPlaceholder": "https://example.com",
+        "emailTo": "To",
+        "emailSubject": "Subject (optional)",
+        "emailBody": "Message (optional)",
+        "phoneNumber": "Phone number",
+        "smsNumber": "Phone number",
+        "smsMessage": "Message (optional)",
+        "wifiSsid": "Network name (SSID)",
+        "wifiPassword": "Password",
+        "wifiSecurity": "Security",
+        "wifiHidden": "Hidden network",
+        "wifiNoPass": "No password",
+        "vcardFirstName": "First name",
+        "vcardLastName": "Last name (optional)",
+        "vcardOrganization": "Company (optional)",
+        "vcardTitle": "Job title (optional)",
+        "vcardPhone": "Phone (optional)",
+        "vcardEmail": "Email (optional)",
+        "vcardWebsite": "Website (optional)",
+        "vcardAddress": "Address (optional)",
+        "cryptoCurrency": "Cryptocurrency",
+        "cryptoAddress": "Wallet address",
+        "cryptoAmount": "Amount (optional)"
+      }
+    },
+    "style": {
+      "title": "Colors",
+      "dotColor": "QR color",
+      "bgColor": "Background color",
+      "transparentBg": "Transparent background",
+      "useGradient": "Gradient",
+      "gradientEnd": "End color",
+      "gradientType": "Type",
+      "gradientLinear": "Linear",
+      "gradientRadial": "Radial",
+      "gradientAngle": "Angle",
+      "presets": "Presets"
+    },
+    "shape": {
+      "title": "Shape",
+      "dotStyle": "Dot style",
+      "dotStyles": {
+        "square": "Square",
+        "dots": "Dots",
+        "rounded": "Rounded",
+        "classy": "Classy",
+        "extra-rounded": "Extra rounded"
+      },
+      "cornerSquareStyle": "Corner frames",
+      "cornerDotStyle": "Corner centers",
+      "cornerStyles": {
+        "square": "Square",
+        "rounded": "Rounded",
+        "extra-rounded": "Extra rounded",
+        "dot": "Circle"
+      }
+    },
+    "logo": {
+      "title": "Logo",
+      "upload": "Upload image",
+      "change": "Change image",
+      "remove": "Remove logo",
+      "size": "Size",
+      "margin": "Margin",
+      "background": "Background behind logo",
+      "dropHint": "PNG, JPG or SVG · max 500 KB",
+      "tooBig": "Image exceeds 500 KB",
+      "eccHint": "With a logo, high error correction (H) is recommended"
+    },
+    "frame": {
+      "title": "Frame",
+      "enable": "Add frame",
+      "style": "Style",
+      "styles": {
+        "modern": "Modern",
+        "classic": "Classic",
+        "neon": "Neon",
+        "minimal": "Minimal",
+        "elegant": "Elegant"
+      },
+      "text": "Frame text",
+      "textPlaceholder": "SCAN ME",
+      "color": "Frame color"
+    },
+    "advanced": {
+      "title": "Advanced",
+      "ecLevel": "Error correction",
+      "ecHint": "Higher correction = denser QR but more resistant to damage and logos",
+      "margin": "Margin (quiet zone)",
+      "invert": "Invert colors",
+      "glow": "Glow",
+      "opacity": "Opacity"
+    },
+    "preview": {
+      "empty": "Type something to forge your QR",
+      "emptyHint": "Try an example:",
+      "exampleUrl": "Web link",
+      "exampleWifi": "WiFi",
+      "exampleVcard": "Contact",
+      "invalid": "Check the highlighted fields",
+      "ariaLabel": "QR code preview",
+      "updated": "QR updated"
+    },
+    "scan": {
+      "good": "High readability",
+      "warning": "Medium readability",
+      "bad": "Hard to scan",
+      "lowContrast": "Low contrast between QR and background",
+      "bigLogo": "Large logo: use error correction H",
+      "invertedNote": "Some readers fail with inverted colors"
+    },
+    "export": {
+      "download": "Download",
+      "downloading": "Preparing…",
+      "copy": "Copy image",
+      "copied": "Image copied to clipboard",
+      "format": "Format",
+      "size": "Size",
+      "success": "Download ready",
+      "error": "Export failed"
+    },
+    "templates": {
+      "title": "Templates",
+      "subtitle": "Ready-made starting points to customize",
+      "apply": "Use template",
+      "names": {
+        "business": "Business card",
+        "wifi": "Guest WiFi",
+        "social": "Social profile",
+        "payment": "Crypto payment",
+        "event": "Event",
+        "email": "Email contact"
+      }
+    },
+    "history": {
+      "title": "History",
+      "subtitle": "Your latest QRs in this browser",
+      "empty": "You haven't generated any QR yet",
+      "load": "Load",
+      "clearAll": "Clear all",
+      "deleted": "Removed from history",
+      "saved": "Saved to history"
+    },
+    "shortcuts": {
+      "title": "Keyboard shortcuts",
+      "download": "Download PNG",
+      "copy": "Copy image",
+      "history": "Open history",
+      "templates": "Open templates",
+      "help": "Show shortcuts"
+    },
+    "reset": "Reset"
+  },
   "dashboard": {
     "greeting": "Hello, {name}",
     "comingSoon": "Your saved QR codes and API keys will appear here."
