@@ -83,6 +83,179 @@
       "goLogin": "Iniciar sesión"
     }
   },
+  "editor": {
+    "title": "Generador de códigos QR",
+    "subtitle": "Diseña, personaliza y exporta tu QR en segundos",
+    "content": {
+      "title": "Contenido",
+      "types": {
+        "text": "Texto",
+        "url": "URL",
+        "email": "Email",
+        "phone": "Teléfono",
+        "sms": "SMS",
+        "wifi": "WiFi",
+        "vcard": "vCard",
+        "crypto": "Crypto"
+      },
+      "charCount": "{count} / {max} caracteres",
+      "fields": {
+        "text": "Texto",
+        "textPlaceholder": "Escribe cualquier texto…",
+        "url": "Dirección web",
+        "urlPlaceholder": "https://ejemplo.com",
+        "emailTo": "Para",
+        "emailSubject": "Asunto (opcional)",
+        "emailBody": "Mensaje (opcional)",
+        "phoneNumber": "Número de teléfono",
+        "smsNumber": "Número de teléfono",
+        "smsMessage": "Mensaje (opcional)",
+        "wifiSsid": "Nombre de la red (SSID)",
+        "wifiPassword": "Contraseña",
+        "wifiSecurity": "Seguridad",
+        "wifiHidden": "Red oculta",
+        "wifiNoPass": "Sin contraseña",
+        "vcardFirstName": "Nombre",
+        "vcardLastName": "Apellidos (opcional)",
+        "vcardOrganization": "Empresa (opcional)",
+        "vcardTitle": "Cargo (opcional)",
+        "vcardPhone": "Teléfono (opcional)",
+        "vcardEmail": "Email (opcional)",
+        "vcardWebsite": "Web (opcional)",
+        "vcardAddress": "Dirección (opcional)",
+        "cryptoCurrency": "Criptomoneda",
+        "cryptoAddress": "Dirección de la wallet",
+        "cryptoAmount": "Cantidad (opcional)"
+      }
+    },
+    "style": {
+      "title": "Colores",
+      "dotColor": "Color del QR",
+      "bgColor": "Color de fondo",
+      "transparentBg": "Fondo transparente",
+      "useGradient": "Degradado",
+      "gradientEnd": "Color final",
+      "gradientType": "Tipo",
+      "gradientLinear": "Lineal",
+      "gradientRadial": "Radial",
+      "gradientAngle": "Ángulo",
+      "presets": "Presets"
+    },
+    "shape": {
+      "title": "Forma",
+      "dotStyle": "Estilo de puntos",
+      "dotStyles": {
+        "square": "Cuadrado",
+        "dots": "Puntos",
+        "rounded": "Redondeado",
+        "classy": "Elegante",
+        "extra-rounded": "Extra redondeado"
+      },
+      "cornerSquareStyle": "Marcos de esquina",
+      "cornerDotStyle": "Centros de esquina",
+      "cornerStyles": {
+        "square": "Cuadrado",
+        "rounded": "Redondeado",
+        "extra-rounded": "Extra redondeado",
+        "dot": "Círculo"
+      }
+    },
+    "logo": {
+      "title": "Logo",
+      "upload": "Subir imagen",
+      "change": "Cambiar imagen",
+      "remove": "Quitar logo",
+      "size": "Tamaño",
+      "margin": "Margen",
+      "background": "Fondo detrás del logo",
+      "dropHint": "PNG, JPG o SVG · máx. 500 KB",
+      "tooBig": "La imagen supera los 500 KB",
+      "eccHint": "Con logo conviene corrección de errores alta (H)"
+    },
+    "frame": {
+      "title": "Marco",
+      "enable": "Añadir marco",
+      "style": "Estilo",
+      "styles": {
+        "modern": "Moderno",
+        "classic": "Clásico",
+        "neon": "Neón",
+        "minimal": "Minimal",
+        "elegant": "Elegante"
+      },
+      "text": "Texto del marco",
+      "textPlaceholder": "ESCANÉAME",
+      "color": "Color del marco"
+    },
+    "advanced": {
+      "title": "Avanzado",
+      "ecLevel": "Corrección de errores",
+      "ecHint": "Mayor corrección = QR más denso pero más resistente a daños y logos",
+      "margin": "Margen (zona de silencio)",
+      "invert": "Invertir colores",
+      "glow": "Resplandor",
+      "opacity": "Opacidad"
+    },
+    "preview": {
+      "empty": "Escribe algo para forjar tu QR",
+      "emptyHint": "Prueba con un ejemplo:",
+      "exampleUrl": "Enlace web",
+      "exampleWifi": "WiFi",
+      "exampleVcard": "Contacto",
+      "invalid": "Revisa los campos marcados",
+      "ariaLabel": "Vista previa del código QR",
+      "updated": "QR actualizado"
+    },
+    "scan": {
+      "good": "Alta legibilidad",
+      "warning": "Legibilidad media",
+      "bad": "Difícil de escanear",
+      "lowContrast": "Poco contraste entre QR y fondo",
+      "bigLogo": "El logo es grande: usa corrección H",
+      "invertedNote": "Algunos lectores fallan con colores invertidos"
+    },
+    "export": {
+      "download": "Descargar",
+      "downloading": "Preparando…",
+      "copy": "Copiar imagen",
+      "copied": "Imagen copiada al portapapeles",
+      "format": "Formato",
+      "size": "Tamaño",
+      "success": "Descarga lista",
+      "error": "No se pudo exportar"
+    },
+    "templates": {
+      "title": "Plantillas",
+      "subtitle": "Puntos de partida listos para personalizar",
+      "apply": "Usar plantilla",
+      "names": {
+        "business": "Tarjeta de visita",
+        "wifi": "WiFi para invitados",
+        "social": "Perfil social",
+        "payment": "Pago crypto",
+        "event": "Evento",
+        "email": "Contacto por email"
+      }
+    },
+    "history": {
+      "title": "Historial",
+      "subtitle": "Tus últimos QRs en este navegador",
+      "empty": "Todavía no has generado ningún QR",
+      "load": "Cargar",
+      "clearAll": "Borrar todo",
+      "deleted": "Eliminado del historial",
+      "saved": "Guardado en el historial"
+    },
+    "shortcuts": {
+      "title": "Atajos de teclado",
+      "download": "Descargar PNG",
+      "copy": "Copiar imagen",
+      "history": "Abrir historial",
+      "templates": "Abrir plantillas",
+      "help": "Mostrar atajos"
+    },
+    "reset": "Reiniciar"
+  },
   "dashboard": {
     "greeting": "Hola, {name}",
     "comingSoon": "Aquí verás tus QRs guardados y tus claves de API."

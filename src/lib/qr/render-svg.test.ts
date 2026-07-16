@@ -19,7 +19,8 @@ async function decodeSvg(svg: string, size = 512): Promise<string | null> {
       data: new Uint8ClampedArray(data.buffer, data.byteOffset, data.byteLength),
       width: info.width,
       height: info.height,
-    },
+      colorSpace: "srgb",
+    } as ImageData,
     { formats: ["QRCode"], tryHarder: true },
   );
   return results[0]?.text ?? null;
