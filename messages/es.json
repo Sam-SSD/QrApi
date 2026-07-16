@@ -43,7 +43,50 @@
     "heroTitle": "Forja códigos QR que no parecen códigos QR.",
     "heroSubtitle": "Editor visual con gradientes, logos y marcos. Export vectorial. API para developers. Gratis y open source.",
     "ctaPrimary": "Crear QR gratis",
-    "ctaSecondary": "Ver la API"
+    "ctaSecondary": "Ver la API",
+    "features": {
+      "title": "Todo lo que necesitas, sin pagar nada",
+      "subtitle": "Las funciones que otros esconden tras un plan de pago, aquí son gratis y para siempre.",
+      "customization": {
+        "title": "Personalización total",
+        "description": "5 estilos de puntos, esquinas configurables, gradientes lineales y radiales, marcos con texto y tu logo en el centro."
+      },
+      "types": {
+        "title": "8 tipos de contenido",
+        "description": "URL, texto, email, teléfono, SMS, WiFi, vCard y crypto — con formularios dedicados que generan el formato estándar correcto."
+      },
+      "vector": {
+        "title": "Export vectorial real",
+        "description": "SVG puro escalable a cualquier tamaño, PNG y JPG hasta 4096 px, y PDF listo para imprimir."
+      },
+      "history": {
+        "title": "Historial y plantillas",
+        "description": "Tus últimos QRs guardados en el navegador, plantillas prediseñadas y tu biblioteca personal con una cuenta gratis."
+      },
+      "api": {
+        "title": "API REST para developers",
+        "description": "Genera QRs estilizados desde tu código con una petición HTTP. Regístrate, crea tu token y listo."
+      },
+      "privacy": {
+        "title": "100% privado",
+        "description": "El editor genera todo en tu navegador: tus datos nunca salen de tu máquina. Self-host en 5 minutos con Docker."
+      }
+    },
+    "showcase": {
+      "title": "Un QR para cada marca",
+      "subtitle": "Haz clic en cualquier ejemplo para abrirlo en el editor."
+    },
+    "developer": {
+      "title": "Un endpoint. Cualquier estilo.",
+      "subtitle": "Autentícate con tu token y recibe PNG, SVG o JPEG con todos los estilos del editor. Rate limits generosos y errores JSON claros.",
+      "cta": "Leer la documentación"
+    },
+    "openSource": {
+      "title": "Open source de verdad",
+      "subtitle": "Licencia MIT, sin telemetría y self-host en 5 minutos con Docker Compose. Si te sirve, deja una estrella.",
+      "cta": "Ver en GitHub",
+      "selfHost": "docker compose up -d && npm run dev"
+    }
   },
   "auth": {
     "login": {
@@ -317,6 +360,99 @@
       "revokedBadge": "Revocada",
       "delete": "Eliminar",
       "limitReached": "Máximo 10 claves activas"
+    }
+  },
+  "docs": {
+    "title": "Documentación de la API",
+    "subtitle": "Genera códigos QR estilizados desde tu código con una petición HTTP.",
+    "nav": {
+      "intro": "Introducción",
+      "auth": "Autenticación",
+      "generate": "Generar un QR",
+      "params": "Parámetros",
+      "styles": "Estilos",
+      "errors": "Errores",
+      "rateLimits": "Límites",
+      "tryIt": "Pruébala"
+    },
+    "intro": {
+      "body": "La API de QRForge expone un único endpoint que genera códigos QR con todos los estilos del editor: gradientes, formas de puntos, esquinas personalizadas, logos y marcos. Devuelve la imagen directamente (PNG, SVG o JPEG), lista para usar.",
+      "baseUrl": "URL base"
+    },
+    "auth": {
+      "body": "Todas las peticiones requieren una clave de API en el header Authorization. Crea la tuya gratis en el panel: regístrate, ve a Claves API y genera una. La clave completa solo se muestra una vez.",
+      "getKey": "Crear mi clave",
+      "warning": "Trata tu clave como una contraseña: no la publiques en repositorios ni la uses desde el navegador en producción."
+    },
+    "generate": {
+      "getTitle": "GET — caso simple",
+      "getBody": "Para QRs básicos, pasa los parámetros en la query string. Ideal para probar rápido.",
+      "postTitle": "POST — control total",
+      "postBody": "Para gradientes, esquinas personalizadas, logos y marcos, envía un body JSON. Puedes pasar `data` (texto crudo) o `payload` (objeto tipado que construye el formato estándar por ti: WiFi, vCard, email…)."
+    },
+    "params": {
+      "getTitle": "Parámetros GET (query string)",
+      "postTitle": "Body POST (JSON)",
+      "name": "Parámetro",
+      "type": "Tipo",
+      "default": "Default",
+      "description": "Descripción",
+      "rows": {
+        "data": "Contenido a codificar (máx. 2953 caracteres)",
+        "payload": "Objeto tipado alternativo a data, con type: wifi | vcard | email | url | text | phone | sms | crypto, más los campos de cada tipo",
+        "format": "Formato de salida: png, svg o jpeg",
+        "size": "Ancho en píxeles (64–2048). Ignorado en svg",
+        "ecLevel": "Corrección de errores: L (7%), M (15%), Q (25%), H (30%)",
+        "margin": "Zona de silencio en módulos (0–10)",
+        "dotsStyle": "Forma de los puntos",
+        "dotsColor": "Color hex de los puntos",
+        "bgColor": "Color hex del fondo",
+        "cornersSquareStyle": "Estilo del marco de las esquinas",
+        "cornersDotStyle": "Estilo del centro de las esquinas",
+        "transparent": "Fondo transparente (solo png/svg)",
+        "style": "Objeto de estilo completo: dots (con gradient), cornersSquare, cornersDot, background",
+        "logo": "Logo centrado: dataUri (base64, máx. 500 KB), sizeRatio (0.1–0.35), margin, background",
+        "frame": "Marco decorativo: style, text, color, textColor opcional",
+        "effects": "Efectos: invert, glow, opacity"
+      }
+    },
+    "styles": {
+      "body": "Valores disponibles para cada estilo:",
+      "dots": "dots.style",
+      "cornersSquare": "cornersSquare.style",
+      "cornersDot": "cornersDot.style",
+      "frames": "frame.style"
+    },
+    "errors": {
+      "body": "Los errores se devuelven como JSON con esta forma:",
+      "status": "Status",
+      "code": "Código",
+      "meaning": "Significado",
+      "rows": {
+        "invalid_params": "Parámetros de query inválidos (el campo details indica cuáles)",
+        "invalid_body": "Body JSON inválido",
+        "missing_token": "Falta el header Authorization",
+        "invalid_token": "La clave no existe",
+        "revoked_token": "La clave fue revocada",
+        "expired_token": "La clave expiró",
+        "body_too_large": "El body supera 1 MB",
+        "invalid_json": "El body no es JSON válido",
+        "data_too_long": "El contenido no cabe en un QR con ese nivel de corrección",
+        "rate_limited": "Límite de peticiones superado (mira Retry-After)"
+      }
+    },
+    "rateLimits": {
+      "body": "Cada clave de API tiene estos límites. Toda respuesta incluye los headers X-RateLimit-Limit, X-RateLimit-Remaining y X-RateLimit-Reset; un 429 añade Retry-After en segundos.",
+      "perMinute": "peticiones por minuto",
+      "perDay": "peticiones por día"
+    },
+    "tryIt": {
+      "body": "Pega tu clave de API y genera un QR real contra esta instancia. La clave no se guarda en ningún sitio.",
+      "tokenLabel": "Tu clave de API",
+      "dataLabel": "Contenido",
+      "run": "Generar",
+      "running": "Generando…",
+      "error": "La petición falló"
     }
   },
   "notFound": {

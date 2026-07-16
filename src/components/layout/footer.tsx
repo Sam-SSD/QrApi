@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Logo } from "@/components/brand/logo";
-import { GITHUB_URL } from "./header";
+import { GITHUB_URL } from "@/lib/constants";
 
 export function Footer() {
   const t = useTranslations("footer");

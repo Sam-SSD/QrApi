@@ -189,14 +189,31 @@ function renderFrame(
 ): { defs: string; body: string } {
   const text = escapeXml(frame.text);
   const bandCenterY = totalH - FRAME_BAND / 2;
-  const fontSize = 3;
   const textColor = frame.textColor ?? getContrastColor(frame.color);
-  const spacing = frame.style === "elegant" ? 0.9 : 0.45;
+  let spacing = frame.style === "elegant" ? 0.9 : 0.45;
+  // Auto-ajuste: reducir la fuente si el texto no cabe en el ancho disponible
+  const maxTextWidth = totalW - 10;
+  const estimateWidth = (size: number) =>
+    frame.text.length * (size * 0.62 + spacing);
+  let fontSize = 3;
+  if (estimateWidth(fontSize) > maxTextWidth) {
+    fontSize = Math.max(
+      1.5,
+      (maxTextWidth / Math.max(1, frame.text.length) - spacing) / 0.62,
+    );
+    if (estimateWidth(fontSize) > maxTextWidth) {
+      spacing = 0.15;
+      fontSize = Math.max(
+        1.3,
+        (maxTextWidth / Math.max(1, frame.text.length) - spacing) / 0.62,
+      );
+    }
+  }
   const textAttrs = `x="${round(totalW / 2)}" y="${round(bandCenterY)}" text-anchor="middle" dominant-baseline="central" font-family="'Geist', 'Segoe UI', Arial, sans-serif" font-size="${fontSize}" font-weight="600" letter-spacing="${spacing}"`;
 
   switch (frame.style) {
     case "modern": {
-      const bannerW = Math.min(totalW - 8, text.length * 2.2 + 8);
+      const bannerW = Math.min(totalW - 6, estimateWidth(fontSize) + 7);
       return {
         defs: "",
         body:
@@ -229,12 +246,15 @@ function renderFrame(
       };
     case "elegant": {
       const lineY = round(bandCenterY);
+      const halfText = estimateWidth(fontSize) / 2 + 2.5;
+      const lineStart = round(Math.max(4, totalW / 2 - halfText));
+      const lineEnd = round(Math.min(totalW - 4, totalW / 2 + halfText));
       return {
         defs: "",
         body:
           `<rect x="0.6" y="0.6" width="${round(totalW - 1.2)}" height="${round(totalH - FRAME_BAND - 0.2)}" rx="4" fill="none" stroke="${frame.color}" stroke-width="0.5"/>` +
-          `<line x1="6" y1="${lineY}" x2="${round(totalW / 2 - text.length * 1.1 - 3)}" y2="${lineY}" stroke="${frame.color}" stroke-width="0.35"/>` +
-          `<line x1="${round(totalW / 2 + text.length * 1.1 + 3)}" y1="${lineY}" x2="${round(totalW - 6)}" y2="${lineY}" stroke="${frame.color}" stroke-width="0.35"/>` +
+          `<line x1="4" y1="${lineY}" x2="${lineStart}" y2="${lineY}" stroke="${frame.color}" stroke-width="0.35"/>` +
+          `<line x1="${lineEnd}" y1="${lineY}" x2="${round(totalW - 4)}" y2="${lineY}" stroke="${frame.color}" stroke-width="0.35"/>` +
           `<text ${textAttrs} fill="${frame.color}">${text}</text>`,
       };
     }
