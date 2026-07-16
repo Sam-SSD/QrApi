@@ -34,6 +34,7 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "common" });
 
   return {
+    metadataBase: new URL(process.env.BETTER_AUTH_URL ?? "http://localhost:3000"),
     title: {
       default: `QRForge — ${t("tagline")}`,
       template: "%s | QRForge",

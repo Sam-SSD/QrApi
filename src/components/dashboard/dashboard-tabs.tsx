@@ -11,6 +11,7 @@ export function DashboardTabs({ className }: { className?: string }) {
   const tabs = [
     { href: "/dashboard", label: t("qrCodes"), exact: true },
     { href: "/dashboard/api-keys", label: t("apiKeys"), exact: false },
+    { href: "/dashboard/settings", label: t("settings"), exact: false },
   ];
 
   return (

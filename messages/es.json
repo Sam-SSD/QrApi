@@ -303,7 +303,25 @@
     "greeting": "Hola, {name}",
     "tabs": {
       "qrCodes": "Mis QRs",
-      "apiKeys": "Claves API"
+      "apiKeys": "Claves API",
+      "settings": "Cuenta"
+    },
+    "settings": {
+      "passwordTitle": "Cambiar contraseña",
+      "currentPassword": "Contraseña actual",
+      "newPassword": "Nueva contraseña",
+      "passwordHint": "Mínimo 8 caracteres",
+      "changePassword": "Actualizar contraseña",
+      "passwordChanged": "Contraseña actualizada",
+      "passwordError": "La contraseña actual no es correcta",
+      "revokeOthers": "Cerrar sesión en los demás dispositivos",
+      "dangerTitle": "Zona de peligro",
+      "deleteAccount": "Eliminar mi cuenta",
+      "deleteTitle": "¿Eliminar tu cuenta?",
+      "deleteDescription": "Se eliminarán permanentemente tu cuenta, tus QRs guardados y tus claves de API. Esta acción no se puede deshacer.",
+      "deletePasswordLabel": "Confirma con tu contraseña",
+      "deleteConfirm": "Eliminar definitivamente",
+      "deleteError": "Contraseña incorrecta"
     },
     "qr": {
       "empty": "Aún no has guardado ningún QR",

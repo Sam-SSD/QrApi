@@ -303,7 +303,25 @@
     "greeting": "Hello, {name}",
     "tabs": {
       "qrCodes": "My QRs",
-      "apiKeys": "API keys"
+      "apiKeys": "API keys",
+      "settings": "Account"
+    },
+    "settings": {
+      "passwordTitle": "Change password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "passwordHint": "At least 8 characters",
+      "changePassword": "Update password",
+      "passwordChanged": "Password updated",
+      "passwordError": "The current password is incorrect",
+      "revokeOthers": "Sign out on other devices",
+      "dangerTitle": "Danger zone",
+      "deleteAccount": "Delete my account",
+      "deleteTitle": "Delete your account?",
+      "deleteDescription": "Your account, saved QRs and API keys will be permanently deleted. This cannot be undone.",
+      "deletePasswordLabel": "Confirm with your password",
+      "deleteConfirm": "Delete permanently",
+      "deleteError": "Incorrect password"
     },
     "qr": {
       "empty": "You haven't saved any QR yet",
