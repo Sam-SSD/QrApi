@@ -258,7 +258,66 @@
   },
   "dashboard": {
     "greeting": "Hello, {name}",
-    "comingSoon": "Your saved QR codes and API keys will appear here."
+    "tabs": {
+      "qrCodes": "My QRs",
+      "apiKeys": "API keys"
+    },
+    "qr": {
+      "empty": "You haven't saved any QR yet",
+      "emptyHint": "Create one in the generator and save it to your account",
+      "emptyCta": "Create my first QR",
+      "download": "Download PNG",
+      "duplicate": "Duplicate",
+      "openInEditor": "Open in editor",
+      "deleteTitle": "Delete this QR?",
+      "deleteDescription": "\"{name}\" will be permanently deleted.",
+      "renamed": "Name updated",
+      "deleted": "QR deleted",
+      "duplicated": "QR duplicated",
+      "saved": "QR saved to your account",
+      "limitReached": "You have reached the limit of 100 saved QRs"
+    },
+    "save": {
+      "button": "Save",
+      "title": "Save to your account",
+      "nameLabel": "Name",
+      "namePlaceholder": "My QR",
+      "submit": "Save QR",
+      "loginRequired": "Sign in to save your QRs"
+    },
+    "migrate": {
+      "title": "You have {count} guest QRs in this browser",
+      "action": "Import them to my account",
+      "done": "{count} QRs imported",
+      "dismiss": "Dismiss"
+    },
+    "keys": {
+      "title": "API keys",
+      "subtitle": "Use these keys to generate QRs from your code with the public API",
+      "docsLink": "View API documentation",
+      "empty": "Generate a key to use the API",
+      "create": "New key",
+      "createTitle": "Create API key",
+      "nameLabel": "Key name",
+      "namePlaceholder": "My integration",
+      "createSubmit": "Generate key",
+      "tokenTitle": "Your API key",
+      "tokenWarning": "Save it now. For security reasons you won't see it again.",
+      "tokenCopied": "Key copied",
+      "confirmSaved": "I saved it",
+      "done": "Done",
+      "created": "Created",
+      "lastUsed": "Last used",
+      "never": "Never",
+      "requests": "{count} requests",
+      "revoke": "Revoke",
+      "revokeTitle": "Revoke this key?",
+      "revokeDescription": "\"{name}\" will stop working immediately. This cannot be undone.",
+      "revoked": "Key revoked",
+      "revokedBadge": "Revoked",
+      "delete": "Delete",
+      "limitReached": "Maximum 10 active keys"
+    }
   },
   "notFound": {
     "title": "Page not found",

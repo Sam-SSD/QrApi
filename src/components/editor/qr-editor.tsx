@@ -25,6 +25,7 @@ import { AdvancedSection } from "./sections/advanced-section";
 import { QrPreview } from "./preview/qr-preview";
 import { ScanCheck } from "./preview/scan-check";
 import { ExportBar } from "./preview/export-bar";
+import { SaveQrButton } from "./save-qr-button";
 import { TemplatesGallery } from "./templates-gallery";
 import { HistoryDrawer } from "./history-drawer";
 import { ShortcutsDialog } from "./shortcuts-dialog";
@@ -119,12 +120,17 @@ export function QrEditor({ initialTemplateId }: { initialTemplateId?: string }) 
       {!payload.empty && Object.keys(payload.issues).length > 0 && (
         <p className="text-center text-xs text-warning">{t("preview.invalid")}</p>
       )}
-      <div id="qr-export-bar">
+      <div id="qr-export-bar" className="flex flex-col gap-2">
         <ExportBar
           getSvg={getSvg}
           filename={`qrforge-${type}`}
           disabled={!payload.data}
           onExported={saveToHistory}
+        />
+        <SaveQrButton
+          payload={payload.payload}
+          config={config}
+          disabled={!payload.data}
         />
       </div>
     </div>

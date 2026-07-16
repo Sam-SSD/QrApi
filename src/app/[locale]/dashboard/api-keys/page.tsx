@@ -2,10 +2,12 @@ import { headers } from "next/headers";
 import { setRequestLocale } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { QrGrid, type SavedQr } from "@/components/dashboard/qr-grid";
-import { MigrateHistoryBanner } from "@/components/dashboard/migrate-history-banner";
+import {
+  ApiKeysSection,
+  type ApiKeyRow,
+} from "@/components/dashboard/api-keys-section";
 
-export default async function DashboardPage({
+export default async function ApiKeysPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
@@ -13,26 +15,22 @@ export default async function DashboardPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) return null; // el layout ya redirige
+  if (!session) return null;
 
-  const rows = await prisma.qrCode.findMany({
+  const rows = await prisma.apiKey.findMany({
     where: { userId: session.user.id },
     orderBy: { createdAt: "desc" },
   });
 
-  const items: SavedQr[] = rows.map((row) => ({
+  const keys: ApiKeyRow[] = rows.map((row) => ({
     id: row.id,
     name: row.name,
-    type: row.type,
-    data: row.data,
-    config: row.config as SavedQr["config"],
+    prefix: row.prefix,
     createdAt: row.createdAt.getTime(),
+    lastUsedAt: row.lastUsedAt?.getTime() ?? null,
+    revoked: Boolean(row.revokedAt),
+    requestCount: Number(row.requestCount),
   }));
 
-  return (
-    <>
-      <MigrateHistoryBanner />
-      <QrGrid items={items} />
-    </>
-  );
+  return <ApiKeysSection keys={keys} />;
 }

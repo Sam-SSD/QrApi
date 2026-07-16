@@ -258,7 +258,66 @@
   },
   "dashboard": {
     "greeting": "Hola, {name}",
-    "comingSoon": "Aquí verás tus QRs guardados y tus claves de API."
+    "tabs": {
+      "qrCodes": "Mis QRs",
+      "apiKeys": "Claves API"
+    },
+    "qr": {
+      "empty": "Aún no has guardado ningún QR",
+      "emptyHint": "Crea uno en el generador y guárdalo en tu cuenta",
+      "emptyCta": "Crear mi primer QR",
+      "download": "Descargar PNG",
+      "duplicate": "Duplicar",
+      "openInEditor": "Abrir en el editor",
+      "deleteTitle": "¿Eliminar este QR?",
+      "deleteDescription": "\"{name}\" se eliminará permanentemente.",
+      "renamed": "Nombre actualizado",
+      "deleted": "QR eliminado",
+      "duplicated": "QR duplicado",
+      "saved": "QR guardado en tu cuenta",
+      "limitReached": "Has alcanzado el límite de 100 QRs guardados"
+    },
+    "save": {
+      "button": "Guardar",
+      "title": "Guardar en tu cuenta",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Mi QR",
+      "submit": "Guardar QR",
+      "loginRequired": "Inicia sesión para guardar tus QRs"
+    },
+    "migrate": {
+      "title": "Tienes {count} QRs de invitado en este navegador",
+      "action": "Importarlos a mi cuenta",
+      "done": "{count} QRs importados",
+      "dismiss": "Descartar"
+    },
+    "keys": {
+      "title": "Claves de API",
+      "subtitle": "Usa estas claves para generar QRs desde tu código con la API pública",
+      "docsLink": "Ver documentación de la API",
+      "empty": "Genera una clave para usar la API",
+      "create": "Nueva clave",
+      "createTitle": "Crear clave de API",
+      "nameLabel": "Nombre de la clave",
+      "namePlaceholder": "Mi integración",
+      "createSubmit": "Generar clave",
+      "tokenTitle": "Tu clave de API",
+      "tokenWarning": "Guárdala ahora. Por seguridad no volverás a verla.",
+      "tokenCopied": "Clave copiada",
+      "confirmSaved": "La he guardado",
+      "done": "Listo",
+      "created": "Creada",
+      "lastUsed": "Último uso",
+      "never": "Nunca",
+      "requests": "{count} peticiones",
+      "revoke": "Revocar",
+      "revokeTitle": "¿Revocar esta clave?",
+      "revokeDescription": "\"{name}\" dejará de funcionar inmediatamente. Esta acción no se puede deshacer.",
+      "revoked": "Clave revocada",
+      "revokedBadge": "Revocada",
+      "delete": "Eliminar",
+      "limitReached": "Máximo 10 claves activas"
+    }
   },
   "notFound": {
     "title": "Página no encontrada",

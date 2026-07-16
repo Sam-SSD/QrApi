@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sheet";
 import { ThemeToggle } from "./theme-toggle";
 import { LocaleSwitcher } from "./locale-switcher";
+import { UserMenu } from "./user-menu";
 import { cn } from "@/lib/utils";
 
 export const GITHUB_URL = "https://github.com/qrforge/qrforge";
@@ -86,13 +87,8 @@ export function Header() {
           </Button>
           <ThemeToggle />
           <LocaleSwitcher />
-          <div className="ml-2 flex items-center gap-2">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/login">{t("login")}</Link>
-            </Button>
-            <Button size="sm" asChild>
-              <Link href="/register">{t("register")}</Link>
-            </Button>
+          <div className="ml-2">
+            <UserMenu />
           </div>
         </div>
 
