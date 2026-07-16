@@ -1,0 +1,31 @@
+{
+  "name": "qr-generator-web3",
+  "version": "1.0.0",
+  "description": "Advanced QR Code Generator with Web3 design and visual editor",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "qr",
+    "qr-code",
+    "generator",
+    "web3",
+    "visual-editor"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "canvas": "^3.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "pdfkit": "^0.18.0",
+    "qr-code-styling": "^1.9.2",
+    "qrcode": "^1.5.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
