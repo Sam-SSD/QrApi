@@ -1,0 +1,53 @@
+{
+  "common": {
+    "appName": "QRForge",
+    "tagline": "Forja códigos QR que no parecen códigos QR.",
+    "loading": "Cargando…",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "download": "Descargar",
+    "close": "Cerrar",
+    "back": "Volver",
+    "confirm": "Confirmar",
+    "search": "Buscar",
+    "error": "Algo salió mal. Inténtalo de nuevo."
+  },
+  "nav": {
+    "generator": "Generador",
+    "docs": "API",
+    "dashboard": "Panel",
+    "login": "Iniciar sesión",
+    "register": "Crear cuenta",
+    "logout": "Cerrar sesión",
+    "github": "GitHub",
+    "toggleTheme": "Cambiar tema",
+    "toggleLocale": "Cambiar idioma",
+    "openMenu": "Abrir menú"
+  },
+  "footer": {
+    "description": "Generador de códigos QR open source con editor visual y API para developers.",
+    "product": "Producto",
+    "developers": "Developers",
+    "apiDocs": "Documentación de la API",
+    "selfHost": "Self-hosting",
+    "license": "Licencia MIT",
+    "language": "Idioma",
+    "theme": "Tema"
+  },
+  "landing": {
+    "badge": "Open source · MIT",
+    "heroTitle": "Forja códigos QR que no parecen códigos QR.",
+    "heroSubtitle": "Editor visual con gradientes, logos y marcos. Export vectorial. API para developers. Gratis y open source.",
+    "ctaPrimary": "Crear QR gratis",
+    "ctaSecondary": "Ver la API"
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "description": "La página que buscas no existe o fue movida.",
+    "cta": "Ir al inicio"
+  }
+}
