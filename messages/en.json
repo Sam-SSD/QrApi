@@ -1,0 +1,53 @@
+{
+  "common": {
+    "appName": "QRForge",
+    "tagline": "Forge QR codes that don't look like QR codes.",
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "copy": "Copy",
+    "copied": "Copied",
+    "download": "Download",
+    "close": "Close",
+    "back": "Back",
+    "confirm": "Confirm",
+    "search": "Search",
+    "error": "Something went wrong. Please try again."
+  },
+  "nav": {
+    "generator": "Generator",
+    "docs": "API",
+    "dashboard": "Dashboard",
+    "login": "Sign in",
+    "register": "Sign up",
+    "logout": "Sign out",
+    "github": "GitHub",
+    "toggleTheme": "Toggle theme",
+    "toggleLocale": "Change language",
+    "openMenu": "Open menu"
+  },
+  "footer": {
+    "description": "Open source QR code generator with a visual editor and a developer API.",
+    "product": "Product",
+    "developers": "Developers",
+    "apiDocs": "API documentation",
+    "selfHost": "Self-hosting",
+    "license": "MIT License",
+    "language": "Language",
+    "theme": "Theme"
+  },
+  "landing": {
+    "badge": "Open source · MIT",
+    "heroTitle": "Forge QR codes that don't look like QR codes.",
+    "heroSubtitle": "Visual editor with gradients, logos and frames. Vector export. Developer API. Free and open source.",
+    "ctaPrimary": "Create a free QR",
+    "ctaSecondary": "Explore the API"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist or has been moved.",
+    "cta": "Go home"
+  }
+}
