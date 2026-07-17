@@ -123,7 +123,7 @@ export function QrEditor({ initialTemplateId }: { initialTemplateId?: string }) 
       <div id="qr-export-bar" className="flex flex-col gap-2">
         <ExportBar
           getSvg={getSvg}
-          filename={`qrforge-${type}`}
+          filename={`qrapi-${type}`}
           disabled={!payload.data}
           onExported={saveToHistory}
         />

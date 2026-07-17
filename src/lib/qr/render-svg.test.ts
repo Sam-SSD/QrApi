@@ -26,7 +26,7 @@ async function decodeSvg(svg: string, size = 512): Promise<string | null> {
   return results[0]?.text ?? null;
 }
 
-const DATA = "https://qrforge.dev/test";
+const DATA = "https://qrapi.dev/test";
 
 function config(overrides: Record<string, unknown> = {}): QrConfig {
   return qrConfigSchema.parse(overrides);

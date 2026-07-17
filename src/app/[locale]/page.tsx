@@ -22,7 +22,7 @@ export default async function HomePage({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "QRForge",
+    name: "QrAPI",
     applicationCategory: "DesignApplication",
     operatingSystem: "Web",
     description: t("heroSubtitle"),

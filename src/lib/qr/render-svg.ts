@@ -232,10 +232,10 @@ function renderFrame(
       };
     case "neon":
       return {
-        defs: `<filter id="qrf-neon" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="1.1" flood-color="${frame.color}" flood-opacity="0.9"/></filter>`,
+        defs: `<filter id="qra-neon" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="1.1" flood-color="${frame.color}" flood-opacity="0.9"/></filter>`,
         body:
-          `<rect x="1" y="1" width="${round(totalW - 2)}" height="${round(totalH - FRAME_BAND - 1)}" rx="3" fill="none" stroke="${frame.color}" stroke-width="0.9" filter="url(#qrf-neon)"/>` +
-          `<text ${textAttrs} fill="${frame.color}" filter="url(#qrf-neon)">${text}</text>`,
+          `<rect x="1" y="1" width="${round(totalW - 2)}" height="${round(totalH - FRAME_BAND - 1)}" rx="3" fill="none" stroke="${frame.color}" stroke-width="0.9" filter="url(#qra-neon)"/>` +
+          `<text ${textAttrs} fill="${frame.color}" filter="url(#qra-neon)">${text}</text>`,
       };
     case "minimal":
       return {
@@ -304,9 +304,9 @@ export function renderMatrixSvg(
   let dotsFill = dotColor;
   if (gradient) {
     defs.push(
-      gradientDef("qrf-dots", gradient, { x: qrX, y: qrY, size: qrUnits }),
+      gradientDef("qra-dots", gradient, { x: qrX, y: qrY, size: qrUnits }),
     );
-    dotsFill = "url(#qrf-dots)";
+    dotsFill = "url(#qra-dots)";
   }
   const cornerSquareFill = style.cornersSquare.color ?? dotsFill;
   const cornerDotFill = style.cornersDot.color ?? dotsFill;
@@ -384,9 +384,9 @@ export function renderMatrixSvg(
   let dotsFilter = "";
   if (effects?.glow) {
     defs.push(
-      `<filter id="qrf-glow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="0" stdDeviation="0.7" flood-color="${gradient ? gradient.stops[0].color : dotColor}" flood-opacity="0.55"/></filter>`,
+      `<filter id="qra-glow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="0" stdDeviation="0.7" flood-color="${gradient ? gradient.stops[0].color : dotColor}" flood-opacity="0.55"/></filter>`,
     );
-    dotsFilter = ` filter="url(#qrf-glow)"`;
+    dotsFilter = ` filter="url(#qra-glow)"`;
   }
   const groupOpacity =
     effects && effects.opacity < 1 ? ` opacity="${effects.opacity}"` : "";

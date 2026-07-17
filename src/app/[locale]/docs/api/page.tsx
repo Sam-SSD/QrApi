@@ -27,11 +27,11 @@ export async function generateMetadata({
 // ---------- Ejemplos de código ----------
 
 const CURL_GET = `curl "https://tu-dominio.com/api/v1/qr?data=https://ejemplo.com&format=png&size=512&dotsStyle=rounded&dotsColor=%236366f1" \\
-  -H "Authorization: Bearer qrf_TU_TOKEN" \\
+  -H "Authorization: Bearer qra_TU_TOKEN" \\
   -o qr.png`;
 
 const CURL_POST = `curl "https://tu-dominio.com/api/v1/qr" \\
-  -H "Authorization: Bearer qrf_TU_TOKEN" \\
+  -H "Authorization: Bearer qra_TU_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
     "payload": { "type": "wifi", "ssid": "MiRed", "password": "clave123", "security": "WPA" },
@@ -59,7 +59,7 @@ const CURL_POST = `curl "https://tu-dominio.com/api/v1/qr" \\
 const JS_EXAMPLE = `const response = await fetch("https://tu-dominio.com/api/v1/qr", {
   method: "POST",
   headers: {
-    Authorization: \`Bearer \${process.env.QRFORGE_API_KEY}\`,
+    Authorization: \`Bearer \${process.env.QRAPI_API_KEY}\`,
     "Content-Type": "application/json",
   },
   body: JSON.stringify({
@@ -83,7 +83,7 @@ import requests
 
 response = requests.post(
     "https://tu-dominio.com/api/v1/qr",
-    headers={"Authorization": f"Bearer {os.environ['QRFORGE_API_KEY']}"},
+    headers={"Authorization": f"Bearer {os.environ['QRAPI_API_KEY']}"},
     json={
         "data": "https://ejemplo.com",
         "format": "png",
@@ -281,7 +281,7 @@ export default async function ApiDocsPage({
           <CodeBlock
             lang="http"
             label="HTTP"
-            code={`Authorization: Bearer qrf_TU_TOKEN`}
+            code={`Authorization: Bearer qra_TU_TOKEN`}
           />
           <p className="rounded-lg border border-warning/30 bg-warning/5 px-4 py-3 text-xs text-warning">
             {t("auth.warning")}

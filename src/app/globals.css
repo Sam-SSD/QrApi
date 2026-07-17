@@ -35,7 +35,7 @@
   --radius-3xl: 32px;
   --radius-4xl: 40px;
 
-  /* QRForge design tokens */
+  /* QrAPI design tokens */
   --color-canvas: var(--background);
   --color-canvas-subtle: var(--canvas-subtle);
   --color-surface: var(--surface);

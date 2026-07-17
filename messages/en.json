@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "QRForge",
+    "appName": "QrAPI",
     "tagline": "Forge QR codes that don't look like QR codes.",
     "loading": "Loading…",
     "save": "Save",
@@ -394,7 +394,7 @@
       "tryIt": "Try it"
     },
     "intro": {
-      "body": "The QRForge API exposes a single endpoint that generates QR codes with every editor style: gradients, dot shapes, custom corners, logos and frames. It returns the image directly (PNG, SVG or JPEG), ready to use.",
+      "body": "The QrAPI API exposes a single endpoint that generates QR codes with every editor style: gradients, dot shapes, custom corners, logos and frames. It returns the image directly (PNG, SVG or JPEG), ready to use.",
       "baseUrl": "Base URL"
     },
     "auth": {

@@ -34,11 +34,11 @@ Engine tests (`render-svg.test.ts`) assert real scanability: SVG → sharp raste
 
 ### Editor
 
-State in `src/stores/qr-store.ts` (Zustand, granular selectors; ~30 controls). `computePayload(type, fields)` returns `{data, payload, empty, issues}` — forms show zod issues inline. Preview (`components/editor/preview/qr-preview.tsx`) debounces 120ms with an incrementing token to discard stale renders, and crossfades via Motion `AnimatePresence`. Anonymous history: localStorage key `qrforge:history` (max 20); logged-in users get DB persistence (`actions/qr-codes.ts`) plus a one-time localStorage→DB migration banner in the dashboard.
+State in `src/stores/qr-store.ts` (Zustand, granular selectors; ~30 controls). `computePayload(type, fields)` returns `{data, payload, empty, issues}` — forms show zod issues inline. Preview (`components/editor/preview/qr-preview.tsx`) debounces 120ms with an incrementing token to discard stale renders, and crossfades via Motion `AnimatePresence`. Anonymous history: localStorage key `qrapi:history` (max 20); logged-in users get DB persistence (`actions/qr-codes.ts`) plus a one-time localStorage→DB migration banner in the dashboard.
 
 ### Public API `/api/v1/qr`
 
-`src/app/api/v1/qr/route.ts`: GET (flat query params) and POST (full config; `data` XOR `payload`). Auth: `Authorization: Bearer qrf_...` — tokens are 32 random bytes; DB stores only the SHA-256 hex (`ApiKey.keyHash`), full token shown once at creation (`actions/api-keys.ts`). Rate limiting (`src/lib/rate-limit.ts`): fixed windows (minute + day) via atomic raw-SQL UPSERT on `rate_limit_window`; limits from env (60/min, 5000/day); lazy cleanup. CORS `*` only on this route (Bearer, not cookies). Errors are always `{error:{code,message,details?}}` in English. Docs page: `/[locale]/docs/api`.
+`src/app/api/v1/qr/route.ts`: GET (flat query params) and POST (full config; `data` XOR `payload`). Auth: `Authorization: Bearer qra_...` — tokens are 32 random bytes; DB stores only the SHA-256 hex (`ApiKey.keyHash`), full token shown once at creation (`actions/api-keys.ts`). Rate limiting (`src/lib/rate-limit.ts`): fixed windows (minute + day) via atomic raw-SQL UPSERT on `rate_limit_window`; limits from env (60/min, 5000/day); lazy cleanup. CORS `*` only on this route (Bearer, not cookies). Errors are always `{error:{code,message,details?}}` in English. Docs page: `/[locale]/docs/api`.
 
 ## Gotchas
 

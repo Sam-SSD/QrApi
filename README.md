@@ -1,6 +1,6 @@
 <div align="center">
 
-# QRForge
+# QrAPI
 
 **Forja códigos QR que no parecen códigos QR.**
 *Forge QR codes that don't look like QR codes.*
@@ -35,8 +35,8 @@ Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · PostgreS
 Requisitos: Node.js 20+, Docker Desktop.
 
 ```bash
-git clone https://github.com/qrforge/qrforge.git
-cd qrforge
+git clone https://github.com/Sam-SSD/QrApi.git
+cd QrApi
 npm install
 
 # 1. Copia las variables de entorno y genera un secret
@@ -73,7 +73,7 @@ npm run dev
 
 ```bash
 curl "http://localhost:3000/api/v1/qr?data=hola&format=png&size=512&dotsStyle=rounded" \
-  -H "Authorization: Bearer qrf_TU_TOKEN" -o qr.png
+  -H "Authorization: Bearer qra_TU_TOKEN" -o qr.png
 ```
 
 Regístrate, crea tu token en **Panel → Claves API** y consulta la documentación completa en `/es/docs/api` (parámetros, estilos, errores y ejemplos en curl/JavaScript/Python).
@@ -112,8 +112,8 @@ El corazón es un **motor QR SVG isomorfo** (`src/lib/qr/`): `qrcode` aporta sol
 Requirements: Node.js 20+, Docker Desktop.
 
 ```bash
-git clone https://github.com/qrforge/qrforge.git
-cd qrforge
+git clone https://github.com/Sam-SSD/QrApi.git
+cd QrApi
 npm install
 cp .env.example .env   # set BETTER_AUTH_SECRET (32+ chars)
 npm run db:up          # Postgres + Mailpit
@@ -127,7 +127,7 @@ App at http://localhost:3000 — dev verification emails at http://localhost:802
 
 ```bash
 curl "http://localhost:3000/api/v1/qr?data=hello&format=png&size=512&dotsStyle=rounded" \
-  -H "Authorization: Bearer qrf_YOUR_TOKEN" -o qr.png
+  -H "Authorization: Bearer qra_YOUR_TOKEN" -o qr.png
 ```
 
 Sign up, create a token under **Dashboard → API keys**, and read the full documentation at `/en/docs/api`.

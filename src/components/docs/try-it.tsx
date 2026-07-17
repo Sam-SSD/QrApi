@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 export function TryIt() {
   const t = useTranslations("docs.tryIt");
   const [token, setToken] = useState("");
-  const [data, setData] = useState("https://qrforge.dev");
+  const [data, setData] = useState("https://qrapi.dev");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -50,7 +50,7 @@ export function TryIt() {
             id="tryit-token"
             value={token}
             onChange={(e) => setToken(e.target.value)}
-            placeholder="qrf_…"
+            placeholder="qra_…"
             className="font-mono text-sm"
             spellCheck={false}
             required

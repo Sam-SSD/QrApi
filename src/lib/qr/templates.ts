@@ -1,7 +1,7 @@
 import type { QrConfig, QrGradient, QrPayload } from "./schema";
 import { DEFAULT_QR_CONFIG } from "./schema";
 
-/** Presets de gradiente (herederos de los del QRForge original). */
+/** Presets de gradiente (herederos de los del QrAPI original). */
 export const GRADIENT_PRESETS: Record<string, QrGradient> = {
   cyber: {
     type: "linear",
@@ -69,11 +69,11 @@ export const TEMPLATES: QrTemplate[] = [
       type: "vcard",
       firstName: "Ada",
       lastName: "Lovelace",
-      organization: "QRForge",
+      organization: "QrAPI",
       title: "Chief Analytical Engineer",
       phone: "+34600111222",
-      email: "ada@qrforge.dev",
-      website: "https://qrforge.dev",
+      email: "ada@qrapi.dev",
+      website: "https://qrapi.dev",
     },
     config: {
       ...base,
@@ -90,7 +90,7 @@ export const TEMPLATES: QrTemplate[] = [
     id: "wifi",
     payload: {
       type: "wifi",
-      ssid: "CasaForge",
+      ssid: "QrAPI Guest",
       password: "superclave123",
       security: "WPA",
       hidden: false,
@@ -144,7 +144,7 @@ export const TEMPLATES: QrTemplate[] = [
   },
   {
     id: "event",
-    payload: { type: "url", url: "https://qrforge.dev/eventos/lanzamiento" },
+    payload: { type: "url", url: "https://qrapi.dev/eventos/lanzamiento" },
     config: {
       ...base,
       style: {
@@ -164,7 +164,7 @@ export const TEMPLATES: QrTemplate[] = [
     id: "email",
     payload: {
       type: "email",
-      to: "hola@qrforge.dev",
+      to: "hola@qrapi.dev",
       subject: "Hablemos",
     },
     config: {

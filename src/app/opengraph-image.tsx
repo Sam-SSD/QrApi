@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "QRForge — Forja códigos QR que no parecen códigos QR";
+export const alt = "QrAPI — Forja códigos QR que no parecen códigos QR";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -38,7 +38,7 @@ export default function OpengraphImage() {
           </svg>
           <div style={{ display: "flex", fontSize: 72, fontWeight: 600 }}>
             <span style={{ color: "#818cf8" }}>qr</span>
-            <span style={{ color: "#f4f4f5" }}>forge</span>
+            <span style={{ color: "#f4f4f5" }}>api</span>
           </div>
         </div>
         <div
