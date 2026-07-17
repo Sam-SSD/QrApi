@@ -173,35 +173,45 @@ function diamondPath(cx: number, cy: number, r: number): string {
 
 // ---------- Finder patterns ----------
 
+type Radii = [number, number, number, number];
+
+/** Radios [exterior, interior] del anillo del finder por estilo. */
+function finderRadii(
+  style: QrConfig["style"]["cornersSquare"]["style"],
+): { out: Radii; inn: Radii } {
+  switch (style) {
+    case "square":
+      return { out: [0, 0, 0, 0], inn: [0, 0, 0, 0] };
+    case "rounded":
+      return { out: [1.9, 1.9, 1.9, 1.9], inn: [1.2, 1.2, 1.2, 1.2] };
+    case "extra-rounded":
+      return { out: [3, 3, 3, 3], inn: [2.2, 2.2, 2.2, 2.2] };
+    case "outpoint": // TL y BR en punta, TR y BL redondeadas (leaf/gota)
+      return { out: [0, 2.6, 0, 2.6], inn: [0, 1.8, 0, 1.8] };
+    case "inpoint": // espejo: TR y BL en punta
+      return { out: [2.6, 0, 2.6, 0], inn: [1.8, 0, 1.8, 0] };
+    case "classy": // una esquina en punta y la opuesta redondeada
+      return { out: [0, 1.6, 0, 1.6], inn: [0, 1.1, 0, 1.1] };
+  }
+}
+
 function cornerSquarePath(
   style: QrConfig["style"]["cornersSquare"]["style"],
   x: number,
   y: number,
 ): string {
   // anillo 7×7 con hueco 5×5 (fill-rule evenodd)
-  const ring = (
-    out: [number, number, number, number],
-    inn: [number, number, number, number],
-  ): string =>
-    roundedRectPath(x, y, 7, 7, out) + roundedRectPath(x + 1, y + 1, 5, 5, inn);
+  const { out, inn } = finderRadii(style);
+  return roundedRectPath(x, y, 7, 7, out) + roundedRectPath(x + 1, y + 1, 5, 5, inn);
+}
 
-  switch (style) {
-    case "square":
-      return ring([0, 0, 0, 0], [0, 0, 0, 0]);
-    case "rounded":
-      return ring([1.9, 1.9, 1.9, 1.9], [1.2, 1.2, 1.2, 1.2]);
-    case "extra-rounded":
-      return ring([3, 3, 3, 3], [2.2, 2.2, 2.2, 2.2]);
-    case "outpoint":
-      // esquinas TL y BR en punta, TR y BL redondeadas (leaf/gota)
-      return ring([0, 2.6, 0, 2.6], [0, 1.8, 0, 1.8]);
-    case "inpoint":
-      // espejo del anterior: TR y BL en punta
-      return ring([2.6, 0, 2.6, 0], [1.8, 0, 1.8, 0]);
-    case "classy":
-      // una esquina en punta (TL) y la opuesta redondeada
-      return ring([0, 1.6, 0, 1.6], [0, 1.1, 0, 1.1]);
-  }
+/** Placa sólida con la silueta exterior del finder (para imagen de fondo). */
+function finderPlatePath(
+  style: QrConfig["style"]["cornersSquare"]["style"],
+  x: number,
+  y: number,
+): string {
+  return roundedRectPath(x, y, 7, 7, finderRadii(style).out);
 }
 
 function cornerDotPath(
@@ -311,12 +321,26 @@ function renderFrame(
   const text = escapeXml(frame.text);
   const L = frameLayout(frame, totalH);
   const bandCenterY = L.bandCenterY;
-  const textColor = frame.textColor ?? getContrastColor(frame.color);
+  // Color del texto. Si el usuario lo define, se respeta SIEMPRE. Si no, el
+  // default depende del estilo: los que tienen banda sólida usan contraste;
+  // los "sin banda" (neon/minimal/elegant/scanner-brackets) usan el color del
+  // marco, que es lo legible sobre el fondo del QR.
+  const bandStyles = [
+    "modern",
+    "classic",
+    "banner-top",
+    "ticket",
+    "badge",
+    "speech-bubble",
+  ];
+  const textColor =
+    frame.textColor ??
+    (bandStyles.includes(frame.style)
+      ? getContrastColor(frame.color)
+      : frame.color);
   let spacing = frame.style === "elegant" ? 0.9 : 0.45;
   // Auto-ajuste: reducir la fuente si el texto no cabe en el ancho disponible.
-  // El icono (si existe) roba ~4 unidades de ancho.
-  const iconW = frame.icon !== "none" ? 4 : 0;
-  const maxTextWidth = totalW - 10 - iconW;
+  const maxTextWidth = totalW - 10;
   const estimateWidth = (size: number) =>
     frame.text.length * (size * 0.62 + spacing);
   let fontSize = 3;
@@ -333,34 +357,18 @@ function renderFrame(
       );
     }
   }
-  // Texto desplazado a la derecha si hay icono, para dejarle hueco a la izquierda.
-  const textCx = totalW / 2 + iconW / 2;
+  const textCx = totalW / 2;
   const textAttrs = `x="${round(textCx)}" y="${round(bandCenterY)}" text-anchor="middle" dominant-baseline="central" font-family="'Geist', 'Segoe UI', Arial, sans-serif" font-size="${fontSize}" font-weight="600" letter-spacing="${spacing}"`;
-
-  // Icono a la izquierda del texto (si procede).
-  const iconSvg =
-    frame.icon !== "none"
-      ? frameIcon(
-          frame.icon,
-          textCx - estimateWidth(fontSize) / 2 - 2.6,
-          bandCenterY,
-          2.4,
-          frame.style === "neon" || frame.style === "minimal"
-            ? frame.color
-            : textColor,
-        )
-      : "";
 
   switch (frame.style) {
     case "modern": {
-      const bannerW = Math.min(totalW - 6, estimateWidth(fontSize) + 7 + iconW);
+      const bannerW = Math.min(totalW - 6, estimateWidth(fontSize) + 7);
       return {
         defs: "",
         body:
           `<rect x="0.75" y="${round(L.qrBoxY + 0.75)}" width="${round(totalW - 1.5)}" height="${round(L.qrBoxH - 0.5)}" rx="3" fill="none" stroke="${frame.color}" stroke-width="1.2"/>` +
           `<rect x="${round((totalW - bannerW) / 2)}" y="${round(L.bandY + 0.5)}" width="${round(bannerW)}" height="${L.band - 1.5}" rx="2.4" fill="${frame.color}"/>` +
-          `<text ${textAttrs} fill="${textColor}">${text}</text>` +
-          iconSvg,
+          `<text ${textAttrs} fill="${textColor}">${text}</text>`,
       };
     }
     case "banner-top":
@@ -370,24 +378,21 @@ function renderFrame(
         body:
           `<rect x="0.9" y="0.9" width="${round(totalW - 1.8)}" height="${round(totalH - 1.8)}" fill="none" stroke="${frame.color}" stroke-width="1.8"/>` +
           `<rect x="0.9" y="${round(L.bandY + (L.position === "top" ? 0.9 : 0))}" width="${round(totalW - 1.8)}" height="${L.band - 0.9}" fill="${frame.color}"/>` +
-          `<text ${textAttrs} fill="${textColor}">${text}</text>` +
-          iconSvg,
+          `<text ${textAttrs} fill="${textColor}">${text}</text>`,
       };
     case "neon":
       return {
         defs: `<filter id="qra-neon" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="1.1" flood-color="${frame.color}" flood-opacity="0.9"/></filter>`,
         body:
           `<rect x="1" y="${round(L.qrBoxY + 1)}" width="${round(totalW - 2)}" height="${round(L.qrBoxH - 1)}" rx="3" fill="none" stroke="${frame.color}" stroke-width="0.9" filter="url(#qra-neon)"/>` +
-          `<text ${textAttrs} fill="${frame.color}" filter="url(#qra-neon)">${text}</text>` +
-          iconSvg,
+          `<text ${textAttrs} fill="${textColor}" filter="url(#qra-neon)">${text}</text>`,
       };
     case "minimal":
       return {
         defs: "",
         body:
           `<line x1="${round(totalW / 2 - 10)}" y1="${round(L.bandY + (L.position === "top" ? L.band - 1 : 1))}" x2="${round(totalW / 2 + 10)}" y2="${round(L.bandY + (L.position === "top" ? L.band - 1 : 1))}" stroke="${frame.color}" stroke-width="0.35"/>` +
-          `<text ${textAttrs} fill="${frame.color}">${text}</text>` +
-          iconSvg,
+          `<text ${textAttrs} fill="${textColor}">${text}</text>`,
       };
     case "elegant": {
       const lineY = round(bandCenterY);
@@ -400,13 +405,12 @@ function renderFrame(
           `<rect x="0.6" y="${round(L.qrBoxY + 0.6)}" width="${round(totalW - 1.2)}" height="${round(L.qrBoxH - 0.2)}" rx="4" fill="none" stroke="${frame.color}" stroke-width="0.5"/>` +
           `<line x1="4" y1="${lineY}" x2="${lineStart}" y2="${lineY}" stroke="${frame.color}" stroke-width="0.35"/>` +
           `<line x1="${lineEnd}" y1="${lineY}" x2="${round(totalW - 4)}" y2="${lineY}" stroke="${frame.color}" stroke-width="0.35"/>` +
-          `<text ${textAttrs} fill="${frame.color}">${text}</text>` +
-          iconSvg,
+          `<text ${textAttrs} fill="${textColor}">${text}</text>`,
       };
     }
     case "speech-bubble": {
       // Bocadillo: rect redondeado que encierra el QR + banda inferior con cola.
-      const bannerW = Math.min(totalW - 6, estimateWidth(fontSize) + 8 + iconW);
+      const bannerW = Math.min(totalW - 6, estimateWidth(fontSize) + 8);
       const bx = (totalW - bannerW) / 2;
       const by = L.bandY + 0.5;
       const bh = L.band - 1.5;
@@ -419,8 +423,7 @@ function renderFrame(
           `<rect x="0.75" y="${round(L.qrBoxY + 0.75)}" width="${round(totalW - 1.5)}" height="${round(L.qrBoxH - 0.5)}" rx="3.5" fill="none" stroke="${frame.color}" stroke-width="1.1"/>` +
           `<rect x="${round(bx)}" y="${round(by)}" width="${round(bannerW)}" height="${round(bh)}" rx="${round(bh / 2)}" fill="${frame.color}"/>` +
           tail +
-          `<text ${textAttrs} fill="${textColor}">${text}</text>` +
-          iconSvg,
+          `<text ${textAttrs} fill="${textColor}">${text}</text>`,
       };
     }
     case "badge": {
@@ -448,8 +451,7 @@ function renderFrame(
           `<rect x="1" y="${round(L.qrBoxY + 1)}" width="${round(totalW - 2)}" height="${round(L.qrBoxH - 1)}" rx="3" fill="none" stroke="${frame.color}" stroke-width="1"/>` +
           `<rect x="${round(ribX)}" y="${round(ribY)}" width="${round(ribW)}" height="${round(ribH)}" rx="1" fill="${frame.color}"/>` +
           scallops +
-          `<text ${badgeTextAttrs} fill="${textColor}">${text}</text>` +
-          iconSvg,
+          `<text ${badgeTextAttrs} fill="${textColor}">${text}</text>`,
       };
     }
     case "ticket": {
@@ -467,8 +469,7 @@ function renderFrame(
           `<line x1="2.5" y1="${round(notchY)}" x2="${round(totalW - 2.5)}" y2="${round(notchY)}" stroke="${bg}" stroke-width="0.4" stroke-dasharray="1.2 1"/>` +
           `<circle cx="0.9" cy="${round(notchY)}" r="${notchR}" fill="${bg}"/>` +
           `<circle cx="${round(totalW - 0.9)}" cy="${round(notchY)}" r="${notchR}" fill="${bg}"/>` +
-          `<text ${textAttrs} fill="${textColor}">${text}</text>` +
-          iconSvg,
+          `<text ${textAttrs} fill="${textColor}">${text}</text>`,
       };
     }
     case "scanner-brackets": {
@@ -489,51 +490,10 @@ function renderFrame(
           corner(m, totalH - m, 1, -1) +
           corner(totalW - m, totalH - m, -1, -1) +
           (frame.text
-            ? `<text x="${round(textCx)}" y="${round(totalH - m - 0.5)}" text-anchor="middle" dominant-baseline="central" font-family="'Geist', 'Segoe UI', Arial, sans-serif" font-size="${round(Math.min(fontSize, 2.4))}" font-weight="600" letter-spacing="${spacing}" fill="${c}">${text}</text>`
-            : "") +
-          iconSvg,
+            ? `<text x="${round(textCx)}" y="${round(totalH - m - 0.5)}" text-anchor="middle" dominant-baseline="central" font-family="'Geist', 'Segoe UI', Arial, sans-serif" font-size="${round(Math.min(fontSize, 2.4))}" font-weight="600" letter-spacing="${spacing}" fill="${textColor}">${text}</text>`
+            : ""),
       };
     }
-  }
-}
-
-/** Icono SVG built-in centrado en (cx,cy) con radio `r`. */
-function frameIcon(
-  icon: NonNullable<QrConfig["frame"]>["icon"],
-  cx: number,
-  cy: number,
-  r: number,
-  color: string,
-): string {
-  const s = r; // media-anchura
-  switch (icon) {
-    case "none":
-      return "";
-    case "arrow-down":
-      return `<path d="M${round(cx)},${round(cy - s)} V${round(cy + s * 0.4)} M${round(cx - s * 0.7)},${round(cy - s * 0.2)} L${round(cx)},${round(cy + s * 0.6)} L${round(cx + s * 0.7)},${round(cy - s * 0.2)}" fill="none" stroke="${color}" stroke-width="${round(s * 0.4)}" stroke-linecap="round" stroke-linejoin="round"/>`;
-    case "camera":
-      return (
-        `<rect x="${round(cx - s)}" y="${round(cy - s * 0.55)}" width="${round(s * 2)}" height="${round(s * 1.4)}" rx="${round(s * 0.3)}" fill="none" stroke="${color}" stroke-width="${round(s * 0.28)}"/>` +
-        `<circle cx="${round(cx)}" cy="${round(cy + s * 0.15)}" r="${round(s * 0.4)}" fill="none" stroke="${color}" stroke-width="${round(s * 0.28)}"/>` +
-        `<rect x="${round(cx - s * 0.35)}" y="${round(cy - s * 0.85)}" width="${round(s * 0.7)}" height="${round(s * 0.35)}" fill="${color}"/>`
-      );
-    case "gift":
-      return (
-        `<rect x="${round(cx - s)}" y="${round(cy - s * 0.3)}" width="${round(s * 2)}" height="${round(s * 1.3)}" rx="${round(s * 0.2)}" fill="none" stroke="${color}" stroke-width="${round(s * 0.26)}"/>` +
-        `<line x1="${round(cx)}" y1="${round(cy - s * 0.3)}" x2="${round(cx)}" y2="${round(cy + s)}" stroke="${color}" stroke-width="${round(s * 0.26)}"/>` +
-        `<path d="M${round(cx)},${round(cy - s * 0.3)} C${round(cx - s * 0.9)},${round(cy - s * 1.1)} ${round(cx - s * 0.3)},${round(cy - s * 1.1)} ${round(cx)},${round(cy - s * 0.3)} C${round(cx + s * 0.3)},${round(cy - s * 1.1)} ${round(cx + s * 0.9)},${round(cy - s * 1.1)} ${round(cx)},${round(cy - s * 0.3)}" fill="none" stroke="${color}" stroke-width="${round(s * 0.26)}"/>`
-      );
-    case "wifi":
-      return (
-        `<path d="M${round(cx - s)},${round(cy - s * 0.3)} A${round(s * 1.3)},${round(s * 1.3)} 0 0 1 ${round(cx + s)},${round(cy - s * 0.3)}" fill="none" stroke="${color}" stroke-width="${round(s * 0.28)}" stroke-linecap="round"/>` +
-        `<path d="M${round(cx - s * 0.55)},${round(cy + s * 0.1)} A${round(s * 0.72)},${round(s * 0.72)} 0 0 1 ${round(cx + s * 0.55)},${round(cy + s * 0.1)}" fill="none" stroke="${color}" stroke-width="${round(s * 0.28)}" stroke-linecap="round"/>` +
-        `<circle cx="${round(cx)}" cy="${round(cy + s * 0.6)}" r="${round(s * 0.22)}" fill="${color}"/>`
-      );
-    case "pin":
-      return (
-        `<path d="M${round(cx)},${round(cy + s)} C${round(cx - s * 0.9)},${round(cy - s * 0.2)} ${round(cx - s * 0.7)},${round(cy - s)} ${round(cx)},${round(cy - s)} C${round(cx + s * 0.7)},${round(cy - s)} ${round(cx + s * 0.9)},${round(cy - s * 0.2)} ${round(cx)},${round(cy + s)}z" fill="none" stroke="${color}" stroke-width="${round(s * 0.26)}"/>` +
-        `<circle cx="${round(cx)}" cy="${round(cy - s * 0.3)}" r="${round(s * 0.3)}" fill="${color}"/>`
-      );
   }
 }
 
@@ -740,13 +700,13 @@ export function renderMatrixSvg(
       bgImageLayers += `<rect x="${round(qrX)}" y="${round(qrY)}" width="${round(qrUnits)}" height="${round(qrUnits)}" rx="1.5" fill="${bgColor}"/>`;
     }
     // Placas "sagradas" bajo los 3 finder patterns, solo si NO hay ya placa
-    // global (esa cubre todo el QR). Ajustadas al finder 7×7 exacto para tapar
-    // lo mínimo de la imagen manteniendo el alto contraste de las esquinas.
+    // global. Toman la SILUETA del estilo de esquina (mismos radios) para no
+    // sobresalir como cuadros blancos por los lados del anillo redondeado.
     if (!bgImage.plate) {
       finderPlates = finders
         .map(
           (f) =>
-            `<rect x="${round(qrX + margin + f.x)}" y="${round(qrY + margin + f.y)}" width="7" height="7" rx="0.5" fill="${bgColor}"/>`,
+            `<path d="${finderPlatePath(style.cornersSquare.style, qrX + margin + f.x, qrY + margin + f.y)}" fill="${bgColor}"/>`,
         )
         .join("");
     }

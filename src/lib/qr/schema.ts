@@ -134,14 +134,6 @@ export const FRAME_STYLES = [
   "banner-top",
 ] as const;
 export const FRAME_POSITIONS = ["bottom", "top"] as const;
-export const FRAME_ICONS = [
-  "none",
-  "arrow-down",
-  "camera",
-  "gift",
-  "wifi",
-  "pin",
-] as const;
 export const EC_LEVELS = ["L", "M", "Q", "H"] as const;
 
 export const qrStyleSchema = z.object({
@@ -217,8 +209,6 @@ export const frameSchema = z.object({
   color: hexColor.default("#4f46e5"),
   textColor: hexColor.optional(), // por defecto contraste automático
   position: z.enum(FRAME_POSITIONS).default("bottom"),
-  // Iconos SVG built-in (NO emoji: se rasterizan como tofu en el PNG).
-  icon: z.enum(FRAME_ICONS).default("none"),
 });
 
 export type QrFrame = z.infer<typeof frameSchema>;

@@ -74,7 +74,6 @@ const GROUPS: SampleGroup[] = [
           text: "QRAPI",
           color: "#4f46e5",
           position: "bottom",
-          icon: "none",
         },
       }),
     })),
