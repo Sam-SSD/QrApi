@@ -5,13 +5,19 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CodeBlock } from "@/components/docs/code-block";
+import { DocsNav } from "@/components/docs/docs-nav";
+import { ErrorsTable } from "@/components/docs/errors-table";
 import { LanguageTabs } from "@/components/docs/language-tabs";
+import { ParamsTable, type ParamRow } from "@/components/docs/params-table";
+import { SectionHeading } from "@/components/docs/section-heading";
+import { StyleSamples } from "@/components/docs/style-samples";
 import { TryIt } from "@/components/docs/try-it";
+import { SITE_URL } from "@/lib/constants";
+import { env } from "@/env";
 import {
   DOT_STYLES,
   CORNER_SQUARE_STYLES,
   CORNER_DOT_STYLES,
-  FRAME_STYLES,
 } from "@/lib/qr/schema";
 
 export async function generateMetadata({
@@ -26,11 +32,11 @@ export async function generateMetadata({
 
 // ---------- Ejemplos de código ----------
 
-const CURL_GET = `curl "https://tu-dominio.com/api/v1/qr?data=https://ejemplo.com&format=png&size=512&dotsStyle=rounded&dotsColor=%236366f1" \\
+const CURL_GET = `curl "${SITE_URL}/api/v1/qr?data=https://ejemplo.com&format=png&size=512&dotsStyle=rounded&dotsColor=%236366f1" \\
   -H "Authorization: Bearer qra_TU_TOKEN" \\
   -o qr.png`;
 
-const CURL_POST = `curl "https://tu-dominio.com/api/v1/qr" \\
+const CURL_POST = `curl "${SITE_URL}/api/v1/qr" \\
   -H "Authorization: Bearer qra_TU_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -56,14 +62,14 @@ const CURL_POST = `curl "https://tu-dominio.com/api/v1/qr" \\
     "frame": { "style": "modern", "text": "WIFI GRATIS", "color": "#4f46e5" }
   }' -o qr.png`;
 
-const JS_EXAMPLE = `const response = await fetch("https://tu-dominio.com/api/v1/qr", {
+const JS_EXAMPLE = `const response = await fetch("${SITE_URL}/api/v1/qr", {
   method: "POST",
   headers: {
     Authorization: \`Bearer \${process.env.QRAPI_API_KEY}\`,
     "Content-Type": "application/json",
   },
   body: JSON.stringify({
-    data: "https://ejemplo.com",
+    payload: { type: "url", url: "https://ejemplo.com" },
     format: "svg",
     style: {
       dots: { style: "rounded", color: "#6366f1" },
@@ -82,9 +88,10 @@ const PYTHON_EXAMPLE = `import os
 import requests
 
 response = requests.post(
-    "https://tu-dominio.com/api/v1/qr",
+    "${SITE_URL}/api/v1/qr",
     headers={"Authorization": f"Bearer {os.environ['QRAPI_API_KEY']}"},
     json={
+        # "data" acepta contenido crudo; usa "payload" para tipos estructurados (ver POST)
         "data": "https://ejemplo.com",
         "format": "png",
         "size": 1024,
@@ -106,13 +113,6 @@ const ERROR_SHAPE = `{
 }`;
 
 // ---------- Tablas ----------
-
-interface ParamRow {
-  name: string;
-  type: string;
-  def: string;
-  key: string;
-}
 
 const GET_PARAMS: ParamRow[] = [
   { name: "data", type: "string", def: "—", key: "data" },
@@ -156,57 +156,6 @@ const ERRORS: Array<{ status: number; code: string }> = [
 
 // ---------- Página ----------
 
-function SectionHeading({ id, children }: { id: string; children: React.ReactNode }) {
-  return (
-    <h2 id={id} className="scroll-mt-24 text-xl font-semibold tracking-tight">
-      {children}
-    </h2>
-  );
-}
-
-function ParamsTable({
-  rows,
-  labels,
-  descriptions,
-}: {
-  rows: ParamRow[];
-  labels: { name: string; type: string; def: string; description: string };
-  descriptions: (key: string) => string;
-}) {
-  return (
-    <div className="overflow-x-auto rounded-xl border border-line">
-      <table className="w-full min-w-130 text-left text-sm">
-        <thead className="border-b border-line bg-canvas-subtle text-xs text-muted-foreground">
-          <tr>
-            <th className="px-4 py-2.5 font-medium">{labels.name}</th>
-            <th className="px-4 py-2.5 font-medium">{labels.type}</th>
-            <th className="px-4 py-2.5 font-medium">{labels.def}</th>
-            <th className="px-4 py-2.5 font-medium">{labels.description}</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-line">
-          {rows.map((row) => (
-            <tr key={row.name}>
-              <td className="px-4 py-2.5 font-mono text-xs text-primary">
-                {row.name}
-              </td>
-              <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">
-                {row.type}
-              </td>
-              <td className="px-4 py-2.5 font-mono text-xs text-ink-faint">
-                {row.def}
-              </td>
-              <td className="px-4 py-2.5 text-xs text-muted-foreground">
-                {descriptions(row.key)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
 export default async function ApiDocsPage({
   params,
 }: {
@@ -218,6 +167,7 @@ export default async function ApiDocsPage({
 
   const navItems = [
     "intro",
+    "quickstart",
     "auth",
     "generate",
     "params",
@@ -227,6 +177,8 @@ export default async function ApiDocsPage({
     "tryIt",
   ] as const;
 
+  const numberFormat = new Intl.NumberFormat(locale);
+
   const paramLabels = {
     name: t("params.name"),
     type: t("params.type"),
@@ -234,22 +186,18 @@ export default async function ApiDocsPage({
     description: t("params.description"),
   };
 
+  const quickstartSteps = [
+    { title: t("quickstart.step1Title"), body: t("quickstart.step1Body") },
+    { title: t("quickstart.step2Title"), body: t("quickstart.step2Body") },
+    { title: t("quickstart.step3Title"), body: t("quickstart.step3Body") },
+  ];
+
   return (
-    <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[220px_1fr]">
-      {/* Sidebar */}
-      <aside className="top-24 hidden self-start lg:sticky lg:block">
-        <nav aria-label={t("title")} className="flex flex-col gap-1">
-          {navItems.map((item) => (
-            <a
-              key={item}
-              href={`#${item}`}
-              className="rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            >
-              {t(`nav.${item}`)}
-            </a>
-          ))}
-        </nav>
-      </aside>
+    <div className="mx-auto grid max-w-7xl gap-x-10 gap-y-6 px-4 py-12 sm:px-6 lg:grid-cols-[220px_1fr]">
+      <DocsNav
+        items={navItems.map((item) => ({ id: item, label: t(`nav.${item}`) }))}
+        ariaLabel={t("title")}
+      />
 
       {/* Contenido */}
       <div className="flex min-w-0 flex-col gap-12">
@@ -270,6 +218,27 @@ export default async function ApiDocsPage({
             <Badge className="bg-success/15 font-mono text-success">GET · POST</Badge>
             <code className="font-mono text-sm">/api/v1/qr</code>
           </div>
+        </section>
+
+        {/* Inicio rápido */}
+        <section className="flex flex-col gap-4">
+          <SectionHeading id="quickstart">{t("nav.quickstart")}</SectionHeading>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {t("quickstart.body")}
+          </p>
+          <ol className="flex flex-col gap-4">
+            {quickstartSteps.map((step, index) => (
+              <li key={step.title} className="flex items-start gap-4">
+                <span className="bg-gradient-brand flex size-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-semibold text-white">
+                  {index + 1}
+                </span>
+                <div className="flex min-w-0 flex-col gap-1">
+                  <p className="text-sm font-medium">{step.title}</p>
+                  <p className="text-sm text-muted-foreground">{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </section>
 
         {/* Autenticación */}
@@ -356,29 +325,7 @@ export default async function ApiDocsPage({
         <section className="flex flex-col gap-4">
           <SectionHeading id="styles">{t("nav.styles")}</SectionHeading>
           <p className="text-sm text-muted-foreground">{t("styles.body")}</p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {(
-              [
-                ["dots", DOT_STYLES],
-                ["cornersSquare", CORNER_SQUARE_STYLES],
-                ["cornersDot", CORNER_DOT_STYLES],
-                ["frames", FRAME_STYLES],
-              ] as const
-            ).map(([key, values]) => (
-              <div key={key} className="rounded-xl border border-line bg-surface p-4">
-                <p className="mb-2 font-mono text-xs text-primary">
-                  {t(`styles.${key}`)}
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {values.map((value) => (
-                    <Badge key={value} variant="outline" className="font-mono text-[11px]">
-                      {value}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+          <StyleSamples labels={(key) => t(`styles.${key}`)} />
         </section>
 
         {/* Errores */}
@@ -386,41 +333,15 @@ export default async function ApiDocsPage({
           <SectionHeading id="errors">{t("nav.errors")}</SectionHeading>
           <p className="text-sm text-muted-foreground">{t("errors.body")}</p>
           <CodeBlock lang="json" label="JSON" code={ERROR_SHAPE} />
-          <div className="overflow-x-auto rounded-xl border border-line">
-            <table className="w-full min-w-100 text-left text-sm">
-              <thead className="border-b border-line bg-canvas-subtle text-xs text-muted-foreground">
-                <tr>
-                  <th className="px-4 py-2.5 font-medium">{t("errors.status")}</th>
-                  <th className="px-4 py-2.5 font-medium">{t("errors.code")}</th>
-                  <th className="px-4 py-2.5 font-medium">{t("errors.meaning")}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-line">
-                {ERRORS.map(({ status, code }) => (
-                  <tr key={code}>
-                    <td className="px-4 py-2.5 font-mono text-xs">
-                      <Badge
-                        variant="outline"
-                        className={
-                          status >= 429
-                            ? "text-warning"
-                            : status >= 400
-                              ? "text-destructive"
-                              : ""
-                        }
-                      >
-                        {status}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-2.5 font-mono text-xs text-primary">{code}</td>
-                    <td className="px-4 py-2.5 text-xs text-muted-foreground">
-                      {t(`errors.rows.${code}`)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ErrorsTable
+            errors={ERRORS}
+            labels={{
+              status: t("errors.status"),
+              code: t("errors.code"),
+              meaning: t("errors.meaning"),
+            }}
+            meanings={(code) => t(`errors.rows.${code}`)}
+          />
         </section>
 
         {/* Rate limits */}
@@ -430,14 +351,18 @@ export default async function ApiDocsPage({
             {t("rateLimits.body")}
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl border border-line bg-surface p-5 text-center">
-              <p className="text-3xl font-semibold text-primary">60</p>
+            <div className="rounded-xl border border-line bg-surface p-5 text-center transition-colors hover:border-primary/40">
+              <p className="text-3xl font-semibold text-primary">
+                {numberFormat.format(env.RATE_LIMIT_PER_MINUTE)}
+              </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 {t("rateLimits.perMinute")}
               </p>
             </div>
-            <div className="rounded-xl border border-line bg-surface p-5 text-center">
-              <p className="text-3xl font-semibold text-primary">5.000</p>
+            <div className="rounded-xl border border-line bg-surface p-5 text-center transition-colors hover:border-primary/40">
+              <p className="text-3xl font-semibold text-primary">
+                {numberFormat.format(env.RATE_LIMIT_PER_DAY)}
+              </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 {t("rateLimits.perDay")}
               </p>
