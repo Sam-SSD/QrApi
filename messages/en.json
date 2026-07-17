@@ -183,7 +183,9 @@
       "gradientLinear": "Linear",
       "gradientRadial": "Radial",
       "gradientAngle": "Angle",
-      "presets": "Presets"
+      "presets": "Presets",
+      "useBgGradient": "Background gradient",
+      "bgGradientPresets": "Background presets"
     },
     "shape": {
       "title": "Shape",
@@ -193,7 +195,12 @@
         "dots": "Dots",
         "rounded": "Rounded",
         "classy": "Classy",
-        "extra-rounded": "Extra rounded"
+        "extra-rounded": "Extra rounded",
+        "vertical-line": "Vertical line",
+        "horizontal-line": "Horizontal line",
+        "star": "Star",
+        "plus": "Plus",
+        "diamond": "Diamond"
       },
       "cornerSquareStyle": "Corner frames",
       "cornerDotStyle": "Corner centers",
@@ -201,7 +208,11 @@
         "square": "Square",
         "rounded": "Rounded",
         "extra-rounded": "Extra rounded",
-        "dot": "Circle"
+        "dot": "Circle",
+        "outpoint": "Outer point",
+        "inpoint": "Inner point",
+        "classy": "Classy",
+        "diamond": "Diamond"
       }
     },
     "logo": {
@@ -216,6 +227,17 @@
       "tooBig": "Image exceeds 500 KB",
       "eccHint": "With a logo, high error correction (H) is recommended"
     },
+    "backgroundImage": {
+      "title": "Background image",
+      "upload": "Upload image",
+      "change": "Change image",
+      "remove": "Remove image",
+      "opacity": "Dimming",
+      "plate": "Plate under the QR",
+      "dropHint": "PNG, JPG or WEBP · max 500 KB",
+      "tooBig": "Image exceeds 500 KB",
+      "ecWarning": "Maximum error correction (H) is enforced so the QR stays scannable"
+    },
     "frame": {
       "title": "Frame",
       "enable": "Add frame",
@@ -225,11 +247,32 @@
         "classic": "Classic",
         "neon": "Neon",
         "minimal": "Minimal",
-        "elegant": "Elegant"
+        "elegant": "Elegant",
+        "speech-bubble": "Speech bubble",
+        "badge": "Badge",
+        "ticket": "Coupon",
+        "scanner-brackets": "Scanner",
+        "banner-top": "Top banner"
       },
       "text": "Frame text",
       "textPlaceholder": "SCAN ME",
-      "color": "Frame color"
+      "color": "Frame color",
+      "textColor": "Text color",
+      "autoContrast": "Automatic text color",
+      "position": "Text position",
+      "positions": {
+        "bottom": "Bottom",
+        "top": "Top"
+      },
+      "icon": "Icon",
+      "icons": {
+        "none": "None",
+        "arrow-down": "Arrow",
+        "camera": "Camera",
+        "gift": "Gift",
+        "wifi": "WiFi",
+        "pin": "Pin"
+      }
     },
     "advanced": {
       "title": "Advanced",

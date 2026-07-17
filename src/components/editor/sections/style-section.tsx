@@ -24,8 +24,10 @@ export function StyleSection() {
   const setBgColor = useQrStore((s) => s.setBgColor);
   const setBgTransparent = useQrStore((s) => s.setBgTransparent);
   const setGradient = useQrStore((s) => s.setGradient);
+  const setBgGradient = useQrStore((s) => s.setBgGradient);
 
   const gradient = dots.gradient;
+  const bgGradient = background.gradient;
 
   return (
     <div className="flex flex-col gap-5">
@@ -122,6 +124,65 @@ export function StyleSection() {
               onChange={(rotation) => setGradient({ ...gradient, rotation })}
             />
           )}
+        </div>
+      )}
+
+      {/* Gradiente de fondo (independiente del de puntos) */}
+      <div className="flex items-center justify-between">
+        <Label htmlFor="style-bg-gradient">{t("useBgGradient")}</Label>
+        <Switch
+          id="style-bg-gradient"
+          checked={Boolean(bgGradient)}
+          onCheckedChange={(on) =>
+            setBgGradient(
+              on
+                ? {
+                    type: "linear",
+                    rotation: 135,
+                    stops: [
+                      { offset: 0, color: background.color },
+                      { offset: 1, color: "#e0e7ff" },
+                    ],
+                  }
+                : undefined,
+            )
+          }
+        />
+      </div>
+
+      {bgGradient && (
+        <div className="flex flex-col gap-2 rounded-lg border border-line bg-canvas-subtle p-3">
+          <span className="text-xs font-medium text-muted-foreground">
+            {t("bgGradientPresets")}
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(GRADIENT_PRESETS).map(([name, preset]) => {
+              const active =
+                JSON.stringify(bgGradient) === JSON.stringify(preset);
+              const angle =
+                preset.type === "radial" ? "circle" : `${preset.rotation}deg`;
+              const css = `${preset.type === "radial" ? "radial" : "linear"}-gradient(${angle}, ${preset.stops
+                .map((s) => `${s.color} ${s.offset * 100}%`)
+                .join(", ")})`;
+              return (
+                <button
+                  key={name}
+                  type="button"
+                  title={name}
+                  aria-label={`${t("bgGradientPresets")}: ${name}`}
+                  aria-pressed={active}
+                  onClick={() => setBgGradient(structuredClone(preset))}
+                  className={cn(
+                    "size-9 rounded-md border transition-all duration-150 hover:scale-105",
+                    active
+                      ? "border-primary ring-2 ring-primary/40"
+                      : "border-line",
+                  )}
+                  style={{ background: css }}
+                />
+              );
+            })}
+          </div>
         </div>
       )}
 

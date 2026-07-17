@@ -9,6 +9,23 @@ import {
 import { useQrStore } from "@/stores/qr-store";
 import { cn } from "@/lib/utils";
 
+/** Path de estrella para las miniaturas. */
+function starThumbPath(
+  cx: number,
+  cy: number,
+  outer: number,
+  inner: number,
+  points: number,
+): string {
+  const coords: string[] = [];
+  for (let i = 0; i < points * 2; i++) {
+    const r = i % 2 === 0 ? outer : inner;
+    const a = (Math.PI / points) * i - Math.PI / 2;
+    coords.push(`${cx + Math.cos(a) * r},${cy + Math.sin(a) * r}`);
+  }
+  return `M${coords.join("L")}z`;
+}
+
 /** Miniaturas SVG de cada estilo de puntos (patrón 3×3 ilustrativo). */
 function DotStyleThumb({ style }: { style: (typeof DOT_STYLES)[number] }) {
   const cells: Array<[number, number]> = [
@@ -42,6 +59,35 @@ function DotStyleThumb({ style }: { style: (typeof DOT_STYLES)[number] }) {
         return (
           <rect key={`${x}-${y}`} x={px} y={py} width={8} height={8} rx={4} />
         );
+      case "vertical-line":
+        return (
+          <rect key={`${x}-${y}`} x={px + 2} y={py} width={4} height={8} rx={2} />
+        );
+      case "horizontal-line":
+        return (
+          <rect key={`${x}-${y}`} x={px} y={py + 2} width={8} height={4} rx={2} />
+        );
+      case "star":
+        return (
+          <path
+            key={`${x}-${y}`}
+            d={starThumbPath(px + 4, py + 4, 4, 1.7, 5)}
+          />
+        );
+      case "plus":
+        return (
+          <path
+            key={`${x}-${y}`}
+            d={`M${px + 2.8},${py}h2.4v2.8h2.8v2.4h-2.8v2.8h-2.4v-2.8h-2.8v-2.4h2.8z`}
+          />
+        );
+      case "diamond":
+        return (
+          <path
+            key={`${x}-${y}`}
+            d={`M${px + 4},${py}l4,4l-4,4l-4,-4z`}
+          />
+        );
     }
   };
   return (
@@ -56,19 +102,30 @@ function CornerSquareThumb({
 }: {
   style: (typeof CORNER_SQUARE_STYLES)[number];
 }) {
-  const rx = style === "square" ? 0 : style === "rounded" ? 6 : 10;
+  // outpoint/inpoint/classy: esquinas en punta (rx=0) en dos vértices y
+  // redondeadas en los otros dos → se ilustran con un path de esquinas mixtas.
+  const strokeProps = {
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 4,
+  } as const;
+  if (style === "square" || style === "rounded" || style === "extra-rounded") {
+    const rx = style === "square" ? 0 : style === "rounded" ? 6 : 10;
+    return (
+      <svg viewBox="0 0 30 30" className="size-7" aria-hidden="true">
+        <rect x={3} y={3} width={24} height={24} rx={rx} {...strokeProps} />
+      </svg>
+    );
+  }
+  // Path con esquinas alternas redondeadas/en punta.
+  const r = style === "classy" ? 8 : 10;
+  const path =
+    style === "inpoint"
+      ? `M3,3 h24 v${24 - r} a${r},${r} 0 0 1 -${r},${r} h-${24 - r} v-${24 - r} a${r},${r} 0 0 1 ${r},-${r} z`
+      : `M${3 + r},3 h${24 - r} v24 h-${24 - r} a${r},${r} 0 0 1 -${r},-${r} v-${24 - r} a${r},${r} 0 0 1 ${r},-${r} z`;
   return (
     <svg viewBox="0 0 30 30" className="size-7" aria-hidden="true">
-      <rect
-        x={3}
-        y={3}
-        width={24}
-        height={24}
-        rx={rx}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={4}
-      />
+      <path d={path} {...strokeProps} />
     </svg>
   );
 }
@@ -82,6 +139,8 @@ function CornerDotThumb({
     <svg viewBox="0 0 30 30" className="size-7 fill-current" aria-hidden="true">
       {style === "dot" ? (
         <circle cx={15} cy={15} r={8} />
+      ) : style === "diamond" ? (
+        <path d="M15,6 L24,15 L15,24 L6,15 z" />
       ) : (
         <rect
           x={7}

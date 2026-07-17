@@ -183,7 +183,9 @@
       "gradientLinear": "Lineal",
       "gradientRadial": "Radial",
       "gradientAngle": "Ángulo",
-      "presets": "Presets"
+      "presets": "Presets",
+      "useBgGradient": "Degradado de fondo",
+      "bgGradientPresets": "Presets de fondo"
     },
     "shape": {
       "title": "Forma",
@@ -193,7 +195,12 @@
         "dots": "Puntos",
         "rounded": "Redondeado",
         "classy": "Elegante",
-        "extra-rounded": "Extra redondeado"
+        "extra-rounded": "Extra redondeado",
+        "vertical-line": "Línea vertical",
+        "horizontal-line": "Línea horizontal",
+        "star": "Estrella",
+        "plus": "Cruz",
+        "diamond": "Rombo"
       },
       "cornerSquareStyle": "Marcos de esquina",
       "cornerDotStyle": "Centros de esquina",
@@ -201,7 +208,11 @@
         "square": "Cuadrado",
         "rounded": "Redondeado",
         "extra-rounded": "Extra redondeado",
-        "dot": "Círculo"
+        "dot": "Círculo",
+        "outpoint": "Punta externa",
+        "inpoint": "Punta interna",
+        "classy": "Elegante",
+        "diamond": "Rombo"
       }
     },
     "logo": {
@@ -216,6 +227,17 @@
       "tooBig": "La imagen supera los 500 KB",
       "eccHint": "Con logo conviene corrección de errores alta (H)"
     },
+    "backgroundImage": {
+      "title": "Imagen de fondo",
+      "upload": "Subir imagen",
+      "change": "Cambiar imagen",
+      "remove": "Quitar imagen",
+      "opacity": "Oscurecido",
+      "plate": "Placa bajo el QR",
+      "dropHint": "PNG, JPG o WEBP · máx. 500 KB",
+      "tooBig": "La imagen supera los 500 KB",
+      "ecWarning": "Se fuerza la corrección de errores máxima (H) para que el QR siga siendo escaneable"
+    },
     "frame": {
       "title": "Marco",
       "enable": "Añadir marco",
@@ -225,11 +247,32 @@
         "classic": "Clásico",
         "neon": "Neón",
         "minimal": "Minimal",
-        "elegant": "Elegante"
+        "elegant": "Elegante",
+        "speech-bubble": "Bocadillo",
+        "badge": "Insignia",
+        "ticket": "Cupón",
+        "scanner-brackets": "Escáner",
+        "banner-top": "Banner superior"
       },
       "text": "Texto del marco",
       "textPlaceholder": "ESCANÉAME",
-      "color": "Color del marco"
+      "color": "Color del marco",
+      "textColor": "Color del texto",
+      "autoContrast": "Color de texto automático",
+      "position": "Posición del texto",
+      "positions": {
+        "bottom": "Abajo",
+        "top": "Arriba"
+      },
+      "icon": "Icono",
+      "icons": {
+        "none": "Ninguno",
+        "arrow-down": "Flecha",
+        "camera": "Cámara",
+        "gift": "Regalo",
+        "wifi": "WiFi",
+        "pin": "Pin"
+      }
     },
     "advanced": {
       "title": "Avanzado",

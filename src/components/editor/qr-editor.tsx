@@ -20,6 +20,7 @@ import { ContentSection } from "./panel/content-section";
 import { StyleSection } from "./sections/style-section";
 import { ShapeSection } from "./sections/shape-section";
 import { LogoSection } from "./sections/logo-section";
+import { BackgroundImageSection } from "./sections/background-image-section";
 import { FrameSection } from "./sections/frame-section";
 import { AdvancedSection } from "./sections/advanced-section";
 import { QrPreview } from "./preview/qr-preview";
@@ -202,7 +203,7 @@ export function QrEditor({ initialTemplateId }: { initialTemplateId?: string }) 
 
               <Accordion
                 type="multiple"
-                defaultValue={["style"]}
+                defaultValue={["style", "frame"]}
                 className="rounded-xl border border-line bg-surface px-5"
               >
                 <AccordionItem value="style">
@@ -221,6 +222,14 @@ export function QrEditor({ initialTemplateId }: { initialTemplateId?: string }) 
                   <AccordionTrigger>{t("logo.title")}</AccordionTrigger>
                   <AccordionContent>
                     <LogoSection />
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="backgroundImage">
+                  <AccordionTrigger>
+                    {t("backgroundImage.title")}
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <BackgroundImageSection />
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="frame">
