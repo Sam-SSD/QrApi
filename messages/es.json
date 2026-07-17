@@ -271,12 +271,24 @@
       "title": "Plantillas",
       "subtitle": "Puntos de partida listos para personalizar",
       "apply": "Usar plantilla",
+      "categories": {
+        "brand": "Identidad",
+        "dark": "Modo oscuro",
+        "business": "Negocios",
+        "marketing": "Marketing"
+      },
       "names": {
+        "qrapi": "QrAPI",
+        "aurora": "Aurora",
+        "sticker": "Sticker transparente",
+        "neon": "Neón",
+        "midnight": "Medianoche",
         "business": "Tarjeta de visita",
         "wifi": "WiFi para invitados",
         "social": "Perfil social",
         "payment": "Pago crypto",
         "event": "Evento",
+        "sunset": "Promo atardecer",
         "email": "Contacto por email"
       }
     },
