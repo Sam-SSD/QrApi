@@ -397,6 +397,7 @@
     "subtitle": "Genera códigos QR estilizados desde tu código con una petición HTTP.",
     "nav": {
       "intro": "Introducción",
+      "quickstart": "Inicio rápido",
       "auth": "Autenticación",
       "generate": "Generar un QR",
       "params": "Parámetros",
@@ -408,6 +409,15 @@
     "intro": {
       "body": "La API de QrAPI expone un único endpoint que genera códigos QR con todos los estilos del editor: gradientes, formas de puntos, esquinas personalizadas, logos y marcos. Devuelve la imagen directamente (PNG, SVG o JPEG), lista para usar.",
       "baseUrl": "URL base"
+    },
+    "quickstart": {
+      "body": "De cero a tu primer QR en menos de un minuto.",
+      "step1Title": "Crea tu clave de API",
+      "step1Body": "Regístrate gratis, entra en Panel → Claves API y genera una clave. Cópiala: solo se muestra una vez.",
+      "step2Title": "Haz tu primera petición",
+      "step2Body": "Llama a GET /api/v1/qr con tu clave en el header Authorization y el contenido en el parámetro data.",
+      "step3Title": "Guarda la imagen",
+      "step3Body": "La respuesta es la imagen directamente. Elige png, svg o jpeg con el parámetro format y el tamaño con size."
     },
     "auth": {
       "body": "Todas las peticiones requieren una clave de API en el header Authorization. Crea la tuya gratis en el panel: regístrate, ve a Claves API y genera una. La clave completa solo se muestra una vez.",
@@ -482,7 +492,14 @@
       "dataLabel": "Contenido",
       "run": "Generar",
       "running": "Generando…",
-      "error": "La petición falló"
+      "error": "La petición falló",
+      "formatLabel": "Formato",
+      "sizeLabel": "Tamaño",
+      "styleLabel": "Puntos",
+      "ecLabel": "Corrección",
+      "request": "Petición equivalente",
+      "placeholder": "El QR aparecerá aquí",
+      "quota": "{remaining} de {limit} restantes"
     }
   },
   "notFound": {

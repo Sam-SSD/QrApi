@@ -115,6 +115,7 @@ export const FRAME_STYLES = [
   "minimal",
   "elegant",
 ] as const;
+export const EC_LEVELS = ["L", "M", "Q", "H"] as const;
 
 export const qrStyleSchema = z.object({
   dots: z
@@ -181,7 +182,7 @@ export type QrEffects = z.infer<typeof effectsSchema>;
 // ---------- Config completa ----------
 
 export const qrConfigSchema = z.object({
-  ecLevel: z.enum(["L", "M", "Q", "H"]).default("M"),
+  ecLevel: z.enum(EC_LEVELS).default("M"),
   margin: z.number().int().min(0).max(10).default(2), // quiet zone en módulos
   style: qrStyleSchema.prefault({}),
   logo: logoSchema.optional(),

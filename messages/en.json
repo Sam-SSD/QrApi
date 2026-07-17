@@ -397,6 +397,7 @@
     "subtitle": "Generate styled QR codes from your code with one HTTP request.",
     "nav": {
       "intro": "Introduction",
+      "quickstart": "Quickstart",
       "auth": "Authentication",
       "generate": "Generate a QR",
       "params": "Parameters",
@@ -408,6 +409,15 @@
     "intro": {
       "body": "The QrAPI API exposes a single endpoint that generates QR codes with every editor style: gradients, dot shapes, custom corners, logos and frames. It returns the image directly (PNG, SVG or JPEG), ready to use.",
       "baseUrl": "Base URL"
+    },
+    "quickstart": {
+      "body": "From zero to your first QR in under a minute.",
+      "step1Title": "Create your API key",
+      "step1Body": "Sign up for free, go to Dashboard → API keys and generate a key. Copy it: it is shown only once.",
+      "step2Title": "Make your first request",
+      "step2Body": "Call GET /api/v1/qr with your key in the Authorization header and your content in the data parameter.",
+      "step3Title": "Save the image",
+      "step3Body": "The response is the image itself. Pick png, svg or jpeg with the format parameter and the size with size."
     },
     "auth": {
       "body": "Every request requires an API key in the Authorization header. Create yours for free from the dashboard: sign up, go to API keys and generate one. The full key is shown only once.",
@@ -482,7 +492,14 @@
       "dataLabel": "Content",
       "run": "Generate",
       "running": "Generating…",
-      "error": "The request failed"
+      "error": "The request failed",
+      "formatLabel": "Format",
+      "sizeLabel": "Size",
+      "styleLabel": "Dots",
+      "ecLabel": "Error correction",
+      "request": "Equivalent request",
+      "placeholder": "Your QR will appear here",
+      "quota": "{remaining} of {limit} left"
     }
   },
   "notFound": {
