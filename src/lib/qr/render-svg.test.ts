@@ -86,6 +86,22 @@ describe("renderQrSvg", () => {
     expect(await decodeSvg(svg)).toBe(DATA);
   });
 
+  it("gradiente de marca (brand) es escaneable", async () => {
+    const svg = renderQrSvg(
+      DATA,
+      config({
+        style: {
+          dots: {
+            style: "rounded",
+            color: "#4f46e5",
+            gradient: GRADIENT_PRESETS.brand,
+          },
+        },
+      }),
+    );
+    expect(await decodeSvg(svg)).toBe(DATA);
+  });
+
   it("estilos de esquina personalizados son escaneables", async () => {
     const svg = renderQrSvg(
       DATA,

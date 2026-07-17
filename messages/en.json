@@ -271,12 +271,24 @@
       "title": "Templates",
       "subtitle": "Ready-made starting points to customize",
       "apply": "Use template",
+      "categories": {
+        "brand": "Identity",
+        "dark": "Dark mode",
+        "business": "Business",
+        "marketing": "Marketing"
+      },
       "names": {
+        "qrapi": "QrAPI",
+        "aurora": "Aurora",
+        "sticker": "Transparent sticker",
+        "neon": "Neon",
+        "midnight": "Midnight",
         "business": "Business card",
         "wifi": "Guest WiFi",
         "social": "Social profile",
         "payment": "Crypto payment",
         "event": "Event",
+        "sunset": "Sunset promo",
         "email": "Email contact"
       }
     },
