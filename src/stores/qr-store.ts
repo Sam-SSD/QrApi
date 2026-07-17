@@ -12,6 +12,8 @@ import {
 import { buildPayload } from "@/lib/qr/payloads";
 import type { QrTemplate } from "@/lib/qr/templates";
 
+type QrBgImage = NonNullable<QrConfig["style"]["background"]["image"]>;
+
 // ---------- Campos por tipo ----------
 
 export interface FieldsMap {
@@ -138,6 +140,9 @@ interface QrEditorState {
   setBgColor: (color: string) => void;
   setBgTransparent: (transparent: boolean) => void;
   setGradient: (gradient: QrGradient | undefined) => void;
+  setBgGradient: (gradient: QrGradient | undefined) => void;
+  setBgImage: (image: QrBgImage | undefined) => void;
+  patchBgImage: (patch: Partial<QrBgImage>) => void;
   setCornersSquare: (
     patch: Partial<QrConfig["style"]["cornersSquare"]>,
   ) => void;
@@ -214,6 +219,49 @@ export const useQrStore = create<QrEditorState>((set) => ({
         },
       },
     })),
+
+  setBgGradient: (gradient) =>
+    set((s) => ({
+      config: {
+        ...s.config,
+        style: {
+          ...s.config.style,
+          background: { ...s.config.style.background, gradient },
+        },
+      },
+    })),
+
+  setBgImage: (image) =>
+    set((s) => ({
+      config: {
+        ...s.config,
+        // Al poner imagen de fondo, subir a EC=H para máxima escaneabilidad
+        // (espejo del auto-bump del logo); el render también lo fuerza.
+        ecLevel: image && s.config.ecLevel !== "H" ? "H" : s.config.ecLevel,
+        style: {
+          ...s.config.style,
+          background: { ...s.config.style.background, image },
+        },
+      },
+    })),
+
+  patchBgImage: (patch) =>
+    set((s) =>
+      s.config.style.background.image
+        ? {
+            config: {
+              ...s.config,
+              style: {
+                ...s.config.style,
+                background: {
+                  ...s.config.style.background,
+                  image: { ...s.config.style.background.image, ...patch },
+                },
+              },
+            },
+          }
+        : s,
+    ),
 
   setCornersSquare: (patch) =>
     set((s) => ({
