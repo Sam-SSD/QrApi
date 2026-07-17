@@ -180,6 +180,10 @@ export const qrStyleSchema = z.object({
           // toda la imagen, por eso va OFF por defecto (la imagen se ve; los
           // finders y el EC=H forzado mantienen la escaneabilidad).
           plate: z.boolean().default(false),
+          // Tinte de las placas de finder: tono muestreado de la imagen al
+          // subirla (cliente) pero aclarado para conservar contraste con los
+          // módulos. Si falta (plantillas/API), la placa cae a blanco.
+          tint: hexColor.optional(),
         })
         .optional(),
     })
