@@ -18,6 +18,7 @@ import {
   DOT_STYLES,
   CORNER_SQUARE_STYLES,
   CORNER_DOT_STYLES,
+  FRAME_STYLES,
 } from "@/lib/qr/schema";
 
 export async function generateMetadata({
@@ -126,6 +127,9 @@ const GET_PARAMS: ParamRow[] = [
   { name: "cornersSquareStyle", type: CORNER_SQUARE_STYLES.join(" | "), def: "square", key: "cornersSquareStyle" },
   { name: "cornersDotStyle", type: CORNER_DOT_STYLES.join(" | "), def: "square", key: "cornersDotStyle" },
   { name: "transparent", type: "boolean", def: "false", key: "transparent" },
+  { name: "frameStyle", type: FRAME_STYLES.join(" | "), def: "—", key: "frameStyle" },
+  { name: "frameText", type: "string", def: "—", key: "frameText" },
+  { name: "frameColor", type: "hex", def: "#4f46e5", key: "frameColor" },
 ];
 
 const POST_PARAMS: ParamRow[] = [
@@ -137,6 +141,7 @@ const POST_PARAMS: ParamRow[] = [
   { name: "margin", type: "number", def: "2", key: "margin" },
   { name: "style", type: "object", def: "—", key: "style" },
   { name: "logo", type: "object", def: "—", key: "logo" },
+  { name: "style.background.image", type: "object", def: "—", key: "backgroundImage" },
   { name: "frame", type: "object", def: "—", key: "frame" },
   { name: "effects", type: "object", def: "—", key: "effects" },
 ];
