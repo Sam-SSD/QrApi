@@ -265,23 +265,24 @@ describe("renderQrSvg", () => {
   });
 
   it("imagen de fondo con salvaguardas mantiene el QR escaneable", async () => {
+    // La imagen se ve entre los módulos (no hay placa global); la escaneabilidad
+    // la garantizan las placas de finder + el EC=H forzado.
     const svg = renderQrSvg(
       DATA,
       config({
         style: {
-          dots: { style: "square", color: "#18181b" },
+          dots: { style: "square", color: "#0b0b14" },
           background: {
             color: "#ffffff",
             transparent: false,
-            image: { dataUri: RED_PIXEL_PNG, opacity: 0.35, plate: true },
+            image: { dataUri: RED_PIXEL_PNG, opacity: 0.35 },
           },
         },
       }),
     );
     expect(svg).toContain("<image");
-    // Con placa global (plate:true) esta cubre todo el QR (fondo + scrim +
-    // placa); las placas de finder no se duplican bajo ella.
-    expect((svg.match(/<rect/g) ?? []).length).toBeGreaterThanOrEqual(3);
+    // 3 placas de finder como <path> con la silueta del anillo (color de fondo).
+    expect((svg.match(/<path d="[^"]+" fill="#ffffff"\/>/g) ?? []).length).toBe(3);
     expect(await decodeSvg(svg, 700)).toBe(DATA);
   });
 
@@ -296,37 +297,11 @@ describe("renderQrSvg", () => {
           background: {
             color: "#ffffff",
             transparent: false,
-            image: { dataUri: RED_PIXEL_PNG, opacity: 0.35, plate: true },
+            image: { dataUri: RED_PIXEL_PNG, opacity: 0.35 },
           },
         },
       }),
     );
-    expect(await decodeSvg(svg, 700)).toBe(DATA);
-  });
-
-  it("imagen de fondo SIN placa (default) sigue escaneable", async () => {
-    // Camino imagen-visible: sin placa global, solo scrim + placas de finder +
-    // EC=H forzado. Debe decodificar igual (la imagen NO tapa los módulos).
-    const svg = renderQrSvg(
-      DATA,
-      config({
-        style: {
-          dots: { style: "square", color: "#0b0b14" },
-          background: {
-            color: "#ffffff",
-            transparent: false,
-            image: { dataUri: RED_PIXEL_PNG, opacity: 0.35, plate: false },
-          },
-        },
-      }),
-    );
-    expect(svg).toContain("<image");
-    // Sin placa global: fondo base + scrim (2 rects) + 3 placas de finder como
-    // <path> con la silueta del anillo. Garantiza que las esquinas siguen
-    // protegidas aunque la imagen se vea.
-    expect((svg.match(/<rect/g) ?? []).length).toBeGreaterThanOrEqual(2);
-    // 3 placas de finder rellenas del color de fondo (#ffffff).
-    expect((svg.match(/<path d="[^"]+" fill="#ffffff"\/>/g) ?? []).length).toBe(3);
     expect(await decodeSvg(svg, 700)).toBe(DATA);
   });
 
@@ -342,7 +317,6 @@ describe("renderQrSvg", () => {
             image: {
               dataUri: RED_PIXEL_PNG,
               opacity: 0.35,
-              plate: false,
               tint: "#e6d4f0", // tinte pálido de ejemplo
             },
           },

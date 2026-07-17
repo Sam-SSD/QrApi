@@ -233,7 +233,6 @@
       "change": "Cambiar imagen",
       "remove": "Quitar imagen",
       "opacity": "Oscurecido",
-      "plate": "Placa bajo el QR",
       "dropHint": "PNG, JPG o WEBP · máx. 500 KB",
       "tooBig": "La imagen supera los 500 KB",
       "ecWarning": "Se fuerza la corrección de errores máxima (H) para que el QR siga siendo escaneable"
