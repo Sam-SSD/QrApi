@@ -683,8 +683,9 @@ export function renderMatrixSvg(
     }
   }
 
-  // Capas de imagen de fondo: imagen (cover) → scrim tenue → placa opaca bajo
-  // la caja del QR. Garantiza contraste sin aplicar opacidad a los módulos.
+  // Capas de imagen de fondo: imagen (cover) → scrim tenue. La escaneabilidad
+  // se garantiza con las placas de los finder + el EC=H forzado, sin cubrir
+  // toda la imagen (la foto queda visible entre los módulos).
   let bgImageLayers = "";
   let finderPlates = "";
   if (bgImage) {
@@ -694,24 +695,16 @@ export function renderMatrixSvg(
     bgImageLayers =
       `<image x="0" y="0" width="${round(totalW)}" height="${round(totalH)}" href="${bgImage.dataUri}" preserveAspectRatio="xMidYMid slice"/>` +
       `<rect x="0" y="0" width="${round(totalW)}" height="${round(totalH)}" fill="${scrimColor}" opacity="${round(bgImage.opacity)}"/>`;
-    if (bgImage.plate) {
-      // Placa opaca bajo TODO el QR + su quiet zone, para que los módulos no
-      // compitan con la foto (el sangrado en el margen es el fallo más común).
-      bgImageLayers += `<rect x="${round(qrX)}" y="${round(qrY)}" width="${round(qrUnits)}" height="${round(qrUnits)}" rx="1.5" fill="${bgColor}"/>`;
-    }
-    // Placas "sagradas" bajo los 3 finder patterns, solo si NO hay ya placa
-    // global. Toman la SILUETA del estilo de esquina (mismos radios) para no
-    // sobresalir como cuadros blancos por los lados del anillo redondeado.
+    // Placas "sagradas" bajo los 3 finder patterns: toman la SILUETA del estilo
+    // de esquina (mismos radios) para no sobresalir como cuadros por los lados.
     // Color: tinte muestreado de la imagen (aclarado) si existe; si no, blanco.
-    if (!bgImage.plate) {
-      const plateColor = bgImage.tint ?? bgColor;
-      finderPlates = finders
-        .map(
-          (f) =>
-            `<path d="${finderPlatePath(style.cornersSquare.style, qrX + margin + f.x, qrY + margin + f.y)}" fill="${plateColor}"/>`,
-        )
-        .join("");
-    }
+    const plateColor = bgImage.tint ?? bgColor;
+    finderPlates = finders
+      .map(
+        (f) =>
+          `<path d="${finderPlatePath(style.cornersSquare.style, qrX + margin + f.x, qrY + margin + f.y)}" fill="${plateColor}"/>`,
+      )
+      .join("");
   }
 
   const width = options.width;

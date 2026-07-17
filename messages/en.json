@@ -233,7 +233,6 @@
       "change": "Change image",
       "remove": "Remove image",
       "opacity": "Dimming",
-      "plate": "Plate under the QR",
       "dropHint": "PNG, JPG or WEBP · max 500 KB",
       "tooBig": "Image exceeds 500 KB",
       "ecWarning": "Maximum error correction (H) is enforced so the QR stays scannable"

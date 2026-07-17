@@ -65,14 +65,11 @@ describe("qrConfigSchema", () => {
     const PNG =
       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
 
-    it("aplica defaults seguros (opacity, plate off para que la imagen se vea)", () => {
+    it("aplica el default de opacity", () => {
       const parsed = qrConfigSchema.parse({
         style: { background: { image: { dataUri: PNG } } },
       });
       expect(parsed.style.background.image?.opacity).toBe(0.35);
-      // La placa va OFF por defecto: la imagen debe verse; la escaneabilidad
-      // la garantizan las placas de finder + el EC=H forzado.
-      expect(parsed.style.background.image?.plate).toBe(false);
     });
 
     it("rechaza un data URI svg+xml (evita <script>)", () => {

@@ -4,8 +4,6 @@ import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ImagePlus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { LabeledSlider } from "../controls/labeled-slider";
 import { useQrStore } from "@/stores/qr-store";
 import { MAX_IMAGE_BYTES } from "@/lib/constants";
@@ -32,9 +30,6 @@ export function BackgroundImageSection() {
       setBgImage({
         dataUri,
         opacity: image?.opacity ?? 0.35,
-        // Placa OFF por defecto: la imagen debe verse; los finders + EC=H la
-        // mantienen escaneable (ver default del schema).
-        plate: image?.plate ?? false,
       });
       // Muestrea el tono de la imagen (aclarado) para teñir las placas de
       // finder de forma que combinen sin perder contraste. Best-effort.
@@ -114,14 +109,6 @@ export function BackgroundImageSection() {
             format={(v) => `${v}%`}
             onChange={(v) => patchBgImage({ opacity: v / 100 })}
           />
-          <div className="flex items-center justify-between">
-            <Label htmlFor="bg-image-plate">{t("plate")}</Label>
-            <Switch
-              id="bg-image-plate"
-              checked={image.plate}
-              onCheckedChange={(v) => patchBgImage({ plate: v })}
-            />
-          </div>
           <p className="text-xs text-warning">{t("ecWarning")}</p>
         </>
       )}

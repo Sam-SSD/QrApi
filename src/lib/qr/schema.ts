@@ -176,10 +176,6 @@ export const qrStyleSchema = z.object({
             )
             .max(700_000),
           opacity: z.number().min(0.05).max(1).default(0.35),
-          // Placa opaca bajo TODO el QR: máxima escaneabilidad pero oculta casi
-          // toda la imagen, por eso va OFF por defecto (la imagen se ve; los
-          // finders y el EC=H forzado mantienen la escaneabilidad).
-          plate: z.boolean().default(false),
           // Tinte de las placas de finder: tono muestreado de la imagen al
           // subirla (cliente) pero aclarado para conservar contraste con los
           // módulos. Si falta (plantillas/API), la placa cae a blanco.
