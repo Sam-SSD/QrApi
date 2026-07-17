@@ -1,0 +1,199 @@
+import { headers } from "next/headers";
+import { notFound } from "next/navigation";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ArrowLeft } from "lucide-react";
+import { Link } from "@/i18n/navigation";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { buildRedirectUrl } from "@/lib/dynamic-qr/redirect-url";
+import { Badge } from "@/components/ui/badge";
+import {
+  ScanChart,
+  type ScanChartPoint,
+} from "@/components/dashboard/scan-chart";
+
+const DAYS = 30;
+
+/** Agrega timestamps por día (UTC) sobre los últimos `DAYS` días. */
+function aggregateByDay(
+  timestamps: Date[],
+  locale: string,
+  now: Date,
+): ScanChartPoint[] {
+  const fmt = new Intl.DateTimeFormat(locale, {
+    day: "2-digit",
+    month: "2-digit",
+  });
+  const counts = new Map<string, number>();
+  for (const ts of timestamps) {
+    const key = ts.toISOString().slice(0, 10);
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  const points: ScanChartPoint[] = [];
+  for (let i = DAYS - 1; i >= 0; i--) {
+    const day = new Date(now.getTime() - i * 86_400_000);
+    const key = day.toISOString().slice(0, 10);
+    points.push({ label: fmt.format(day), count: counts.get(key) ?? 0 });
+  }
+  return points;
+}
+
+function BreakdownTable({
+  title,
+  rows,
+  total,
+}: {
+  title: string;
+  rows: Array<{ label: string; count: number }>;
+  total: number;
+}) {
+  return (
+    <div className="rounded-xl border border-line bg-surface p-4">
+      <h3 className="mb-3 text-sm font-semibold">{title}</h3>
+      {rows.length === 0 ? (
+        <p className="text-sm text-muted-foreground">—</p>
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {rows.map((row) => {
+            const pct = total > 0 ? Math.round((row.count / total) * 100) : 0;
+            return (
+              <li key={row.label} className="flex items-center gap-3 text-sm">
+                <span className="w-24 truncate">{row.label}</span>
+                <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-canvas-subtle">
+                  <span
+                    className="block h-full rounded-full bg-primary"
+                    style={{ width: `${pct}%` }}
+                  />
+                </span>
+                <span className="w-14 text-right font-mono text-xs text-muted-foreground">
+                  {row.count} · {pct}%
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+export default async function DynamicQrDetailPage({
+  params,
+}: {
+  params: Promise<{ locale: string; id: string }>;
+}) {
+  const { locale, id } = await params;
+  setRequestLocale(locale);
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) return null; // el layout ya redirige
+  const t = await getTranslations("dashboard.dynamic");
+
+  // Ownership en la propia query: un id ajeno es un 404, no un 403.
+  const dynamic = await prisma.dynamicQr.findUnique({
+    where: { id, userId: session.user.id },
+  });
+  if (!dynamic) notFound();
+
+  const now = new Date();
+  const since = new Date(now.getTime() - (DAYS - 1) * 86_400_000);
+  since.setUTCHours(0, 0, 0, 0);
+
+  const [recentScans, byCountry, byDevice] = await Promise.all([
+    prisma.scanEvent.findMany({
+      where: { dynamicQrId: dynamic.id, timestamp: { gte: since } },
+      select: { timestamp: true },
+    }),
+    prisma.scanEvent.groupBy({
+      by: ["country"],
+      where: { dynamicQrId: dynamic.id },
+      _count: { _all: true },
+    }),
+    prisma.scanEvent.groupBy({
+      by: ["deviceType"],
+      where: { dynamicQrId: dynamic.id },
+      _count: { _all: true },
+    }),
+  ]);
+
+  const points = aggregateByDay(
+    recentScans.map((s) => s.timestamp),
+    locale,
+    now,
+  );
+  const sortRows = (
+    rows: Array<{ key: string | null; count: number }>,
+  ): Array<{ label: string; count: number }> =>
+    rows
+      .map((r) => ({ label: r.key ?? t("unknown"), count: r.count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 8);
+
+  const countryRows = sortRows(
+    byCountry.map((r) => ({ key: r.country, count: r._count._all })),
+  );
+  const deviceRows = sortRows(
+    byDevice.map((r) => ({ key: r.deviceType, count: r._count._all })),
+  );
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <Link
+          href="/dashboard/dynamic"
+          className="mb-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" strokeWidth={1.75} />
+          {t("back")}
+        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="text-xl font-semibold tracking-tight">
+            {dynamic.title}
+          </h2>
+          <Badge variant={dynamic.active ? "default" : "outline"}>
+            {dynamic.active ? t("statusActive") : t("statusPaused")}
+          </Badge>
+        </div>
+        <p className="mt-1 font-mono text-xs text-muted-foreground">
+          {buildRedirectUrl(dynamic.slug)} → {dynamic.targetUrl}
+        </p>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="rounded-xl border border-line bg-surface p-4">
+          <p className="text-sm text-muted-foreground">{t("totalScans")}</p>
+          <p className="mt-1 text-3xl font-semibold tabular-nums">
+            {dynamic.scanCount}
+          </p>
+        </div>
+        <div className="rounded-xl border border-line bg-surface p-4">
+          <p className="text-sm text-muted-foreground">
+            {t("scansLastDays", { days: DAYS })}
+          </p>
+          <p className="mt-1 text-3xl font-semibold tabular-nums">
+            {recentScans.length}
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-line bg-surface p-4">
+        <h3 className="mb-3 text-sm font-semibold">
+          {t("chartTitle", { days: DAYS })}
+        </h3>
+        <ScanChart points={points} />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <BreakdownTable
+          title={t("byCountry")}
+          rows={countryRows}
+          total={dynamic.scanCount}
+        />
+        <BreakdownTable
+          title={t("byDevice")}
+          rows={deviceRows}
+          total={dynamic.scanCount}
+        />
+      </div>
+    </div>
+  );
+}
