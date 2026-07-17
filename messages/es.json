@@ -310,7 +310,8 @@
         "brand": "Identidad",
         "dark": "Modo oscuro",
         "business": "Negocios",
-        "marketing": "Marketing"
+        "marketing": "Marketing",
+        "industry": "Por sector"
       },
       "names": {
         "qrapi": "Marca",
@@ -324,7 +325,15 @@
         "payment": "Pago crypto",
         "event": "Evento",
         "sunset": "Promo atardecer",
-        "email": "Contacto por email"
+        "email": "Contacto por email",
+        "photo": "Foto de fondo",
+        "prisma": "Prisma",
+        "restaurant": "Restaurante",
+        "eventpass": "Entrada a evento",
+        "realestate": "Inmobiliaria",
+        "retail": "Tienda",
+        "hotel": "Hotel",
+        "gym": "Gimnasio"
       }
     },
     "history": {
