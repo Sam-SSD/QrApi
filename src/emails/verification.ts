@@ -29,7 +29,7 @@ export function verificationEmail(params: { name: string; url: string }) {
             <tr>
               <td style="padding-bottom:24px;">
                 <span style="font-size:20px;font-weight:600;color:#f4f4f5;letter-spacing:-0.02em;">
-                  <span style="color:#818cf8;">qr</span>api
+                  <span style="color:#818cf8;">Qr</span>Api
                 </span>
               </td>
             </tr>
