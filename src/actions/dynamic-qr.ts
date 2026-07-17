@@ -3,11 +3,10 @@
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { qrConfigSchema } from "@/lib/qr/schema";
-import { generateSlug } from "@/lib/dynamic-qr/slug";
+import { createUniqueDynamicQr } from "@/lib/dynamic-qr/create";
 import { buildRedirectUrl } from "@/lib/dynamic-qr/redirect-url";
 
 const MAX_DYNAMIC_QRS = 100;
@@ -46,31 +45,11 @@ export async function createDynamicQr(input: z.infer<typeof createInput>) {
   });
   if (count >= MAX_DYNAMIC_QRS) throw new Error("LIMIT_REACHED");
 
-  // Inserta con reintento ante colisión de slug (índice único → P2002).
-  let dynamic;
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const slug = generateSlug();
-    try {
-      dynamic = await prisma.dynamicQr.create({
-        data: {
-          slug,
-          userId: session.user.id,
-          title: parsed.title,
-          targetUrl: parsed.targetUrl,
-        },
-      });
-      break;
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2002"
-      ) {
-        continue; // colisión de slug: reintenta
-      }
-      throw error;
-    }
-  }
-  if (!dynamic) throw new Error("SLUG_COLLISION");
+  const dynamic = await createUniqueDynamicQr({
+    userId: session.user.id,
+    title: parsed.title,
+    targetUrl: parsed.targetUrl,
+  });
 
   const data = buildRedirectUrl(dynamic.slug);
   const created = await prisma.qrCode.create({
