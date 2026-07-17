@@ -69,7 +69,13 @@ const GROUPS: SampleGroup[] = [
     samples: FRAME_STYLES.map((value) => ({
       value,
       config: sampleConfig({
-        frame: { style: value, text: "QRAPI", color: "#4f46e5" },
+        frame: {
+          style: value,
+          text: "QRAPI",
+          color: "#4f46e5",
+          position: "bottom",
+          icon: "none",
+        },
       }),
     })),
   },

@@ -1,5 +1,6 @@
+import { z } from "zod";
 import type { QrConfig, QrGradient, QrPayload } from "./schema";
-import { DEFAULT_QR_CONFIG } from "./schema";
+import { DEFAULT_QR_CONFIG, qrConfigSchema } from "./schema";
 
 /**
  * Presets de gradiente del selector de estilo.
@@ -91,6 +92,19 @@ export interface QrTemplate {
   config: QrConfig;
 }
 
+/**
+ * Forma de una plantilla al declararla: el `config` acepta la ENTRADA del
+ * schema, de modo que los defaults (frame.position/icon, etc.) son opcionales
+ * al escribir la plantilla y se aplican al normalizar. Así añadir un default
+ * nuevo al schema no obliga a tocar cada plantilla.
+ */
+interface QrTemplateInput {
+  id: string;
+  category: QrTemplateCategory;
+  payload: QrPayload;
+  config: z.input<typeof qrConfigSchema>;
+}
+
 export const TEMPLATE_CATEGORIES: QrTemplateCategory[] = [
   "brand",
   "dark",
@@ -100,8 +114,8 @@ export const TEMPLATE_CATEGORIES: QrTemplateCategory[] = [
 
 const base = DEFAULT_QR_CONFIG;
 
-/** Plantillas aplicables con un clic desde la galería, agrupadas por categoría. */
-export const TEMPLATES: QrTemplate[] = [
+/** Declaraciones sin normalizar; se parsean por el schema en TEMPLATES. */
+const TEMPLATE_DEFS: QrTemplateInput[] = [
   // ─ brand: la identidad indigo→cyan de la página ─
   {
     id: "qrapi",
@@ -342,3 +356,13 @@ export const TEMPLATES: QrTemplate[] = [
     },
   },
 ];
+
+/**
+ * Plantillas normalizadas por el schema: cada `config` pasa por
+ * `qrConfigSchema.parse` para que los defaults se apliquen y el objeto que
+ * `applyTemplate` clona al store esté completo.
+ */
+export const TEMPLATES: QrTemplate[] = TEMPLATE_DEFS.map((def) => ({
+  ...def,
+  config: qrConfigSchema.parse(def.config),
+}));

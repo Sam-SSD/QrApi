@@ -66,6 +66,9 @@ function modulePath(
   n: Neighbors,
 ): string {
   switch (style) {
+    // vertical-line/horizontal-line/star/plus/diamond se implementan en la
+    // fase del motor; hasta entonces caen a "square".
+    default:
     case "square":
       return `M${round(x)},${round(y)}h1v1h-1z`;
     case "dots":
@@ -108,12 +111,14 @@ function cornerSquarePath(
   y: number,
 ): string {
   // anillo 7×7 con hueco 5×5 (fill-rule evenodd)
+  // outpoint/inpoint/classy se implementan en la fase del motor; hasta
+  // entonces caen a un anillo redondeado.
   const radii: Record<string, [number, number]> = {
     square: [0, 0],
     rounded: [1.9, 1.2],
     "extra-rounded": [3, 2.2],
   };
-  const [rOut, rIn] = radii[style];
+  const [rOut, rIn] = radii[style] ?? radii.rounded;
   const outer = roundedRectPath(x, y, 7, 7, [rOut, rOut, rOut, rOut]);
   const inner = roundedRectPath(x + 1, y + 1, 5, 5, [rIn, rIn, rIn, rIn]);
   return outer + inner;
@@ -127,6 +132,8 @@ function cornerDotPath(
   switch (style) {
     case "square":
       return `M${round(x + 2)},${round(y + 2)}h3v3h-3z`;
+    // diamond/star se implementan en la fase del motor; hasta entonces caen a "dot".
+    default:
     case "dot":
       return circlePath(x + 3.5, y + 3.5, 1.5);
     case "rounded":
@@ -212,6 +219,9 @@ function renderFrame(
   const textAttrs = `x="${round(totalW / 2)}" y="${round(bandCenterY)}" text-anchor="middle" dominant-baseline="central" font-family="'Geist', 'Segoe UI', Arial, sans-serif" font-size="${fontSize}" font-weight="600" letter-spacing="${spacing}"`;
 
   switch (frame.style) {
+    // Los archetipos speech-bubble/badge/ticket/scanner-brackets/banner-top se
+    // implementan en la fase del motor; hasta entonces reutilizan "modern".
+    default:
     case "modern": {
       const bannerW = Math.min(totalW - 6, estimateWidth(fontSize) + 7);
       return {

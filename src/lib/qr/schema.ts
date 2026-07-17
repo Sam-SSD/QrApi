@@ -101,19 +101,47 @@ export const DOT_STYLES = [
   "rounded",
   "classy",
   "extra-rounded",
+  "vertical-line",
+  "horizontal-line",
+  "star",
+  "plus",
+  "diamond",
 ] as const;
 export const CORNER_SQUARE_STYLES = [
   "square",
   "rounded",
   "extra-rounded",
+  "outpoint",
+  "inpoint",
+  "classy",
 ] as const;
-export const CORNER_DOT_STYLES = ["square", "dot", "rounded"] as const;
+export const CORNER_DOT_STYLES = [
+  "square",
+  "dot",
+  "rounded",
+  "diamond",
+  "star",
+] as const;
 export const FRAME_STYLES = [
   "modern",
   "classic",
   "neon",
   "minimal",
   "elegant",
+  "speech-bubble",
+  "badge",
+  "ticket",
+  "scanner-brackets",
+  "banner-top",
+] as const;
+export const FRAME_POSITIONS = ["bottom", "top"] as const;
+export const FRAME_ICONS = [
+  "none",
+  "arrow-down",
+  "camera",
+  "gift",
+  "wifi",
+  "pin",
 ] as const;
 export const EC_LEVELS = ["L", "M", "Q", "H"] as const;
 
@@ -129,20 +157,39 @@ export const qrStyleSchema = z.object({
     .object({
       style: z.enum(CORNER_SQUARE_STYLES).default("square"),
       color: hexColor.optional(), // por defecto hereda dots.color
+      gradient: gradientSchema.optional(),
     })
     .default({ style: "square" }),
   cornersDot: z
     .object({
       style: z.enum(CORNER_DOT_STYLES).default("square"),
       color: hexColor.optional(),
+      gradient: gradientSchema.optional(),
     })
     .default({ style: "square" }),
   background: z
     .object({
       color: hexColor.default("#ffffff"),
       transparent: z.boolean().default(false),
+      gradient: gradientSchema.optional(),
+      // Imagen de fondo detrás del QR. Segura por defecto: scrim tenue +
+      // placa opaca bajo el QR; el motor fuerza ecLevel=H cuando existe.
+      // Excluye svg+xml a propósito (un SVG de fondo podría llevar <script>).
+      image: z
+        .object({
+          dataUri: z
+            .string()
+            .regex(
+              /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/,
+              "La imagen de fondo debe ser un data URI base64 (png, jpeg o webp)",
+            )
+            .max(700_000),
+          opacity: z.number().min(0.05).max(1).default(0.35),
+          plate: z.boolean().default(true),
+        })
+        .optional(),
     })
-    .default({ color: "#ffffff", transparent: false }),
+    .prefault({ color: "#ffffff", transparent: false }),
 });
 
 export type QrStyle = z.infer<typeof qrStyleSchema>;
@@ -167,6 +214,9 @@ export const frameSchema = z.object({
   text: z.string().max(30).default("ESCANÉAME"),
   color: hexColor.default("#4f46e5"),
   textColor: hexColor.optional(), // por defecto contraste automático
+  position: z.enum(FRAME_POSITIONS).default("bottom"),
+  // Iconos SVG built-in (NO emoji: se rasterizan como tofu en el PNG).
+  icon: z.enum(FRAME_ICONS).default("none"),
 });
 
 export type QrFrame = z.infer<typeof frameSchema>;
