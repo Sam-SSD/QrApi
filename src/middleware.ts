@@ -27,7 +27,8 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Excluir api, archivos estáticos, rutas de metadata (icon/og/manifest) e internals de Next
+  // Excluir api, la redirección de QR dinámicos (r/), archivos estáticos, rutas
+  // de metadata (icon/og/manifest) e internals de Next
   matcher:
-    "/((?!api|trpc|_next|_vercel|icon|apple-icon|opengraph-image|manifest|.*\\..*).*)",
+    "/((?!api|trpc|r/|_next|_vercel|icon|apple-icon|opengraph-image|manifest|.*\\..*).*)",
 };

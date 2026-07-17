@@ -400,7 +400,10 @@
       "nameLabel": "Nombre",
       "namePlaceholder": "Mi QR",
       "submit": "Guardar QR",
-      "loginRequired": "Inicia sesión para guardar tus QRs"
+      "loginRequired": "Inicia sesión para guardar tus QRs",
+      "dynamicLabel": "QR dinámico",
+      "dynamicHint": "Podrás cambiar el destino sin reimprimir el código y ver estadísticas de escaneo",
+      "targetUrlLabel": "URL de destino"
     },
     "migrate": {
       "title": "Tienes {count} QRs de invitado en este navegador",

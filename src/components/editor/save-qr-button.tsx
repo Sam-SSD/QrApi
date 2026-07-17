@@ -9,6 +9,7 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { saveQrCode } from "@/actions/qr-codes";
+import { createDynamicQr } from "@/actions/dynamic-qr";
 import type { QrConfig, QrPayload } from "@/lib/qr/schema";
 
 export function SaveQrButton({
@@ -32,6 +34,8 @@ export function SaveQrButton({
   const { data: session, isPending } = useSession();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
+  const [dynamic, setDynamic] = useState(false);
+  const [targetUrl, setTargetUrl] = useState("");
   const [pending, startTransition] = useTransition();
 
   if (isPending) return null;
@@ -49,13 +53,20 @@ export function SaveQrButton({
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
-    if (!payload) return;
+    const title = name.trim() || t("namePlaceholder");
     startTransition(async () => {
       try {
-        await saveQrCode({ name: name.trim() || t("namePlaceholder"), payload, config });
+        if (dynamic) {
+          await createDynamicQr({ title, targetUrl: targetUrl.trim(), config });
+        } else {
+          if (!payload) return;
+          await saveQrCode({ name: title, payload, config });
+        }
         toast.success(tQr("saved"));
         setOpen(false);
         setName("");
+        setTargetUrl("");
+        setDynamic(false);
       } catch (error) {
         toast.error(
           error instanceof Error && error.message === "LIMIT_REACHED"
@@ -65,6 +76,9 @@ export function SaveQrButton({
       }
     });
   }
+
+  // En modo dinámico basta un targetUrl válido; en estático hace falta payload.
+  const canSubmit = dynamic ? targetUrl.trim().length > 0 : Boolean(payload);
 
   return (
     <>
@@ -95,7 +109,37 @@ export function SaveQrButton({
                 autoFocus
               />
             </div>
-            <Button type="submit" disabled={pending}>
+
+            {/* Estático vs dinámico */}
+            <div className="flex items-start justify-between gap-3 rounded-lg border border-line bg-canvas-subtle p-3">
+              <div className="flex flex-col gap-0.5">
+                <Label htmlFor="save-qr-dynamic">{t("dynamicLabel")}</Label>
+                <span className="text-xs text-muted-foreground">
+                  {t("dynamicHint")}
+                </span>
+              </div>
+              <Switch
+                id="save-qr-dynamic"
+                checked={dynamic}
+                onCheckedChange={setDynamic}
+              />
+            </div>
+
+            {dynamic && (
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="save-qr-target">{t("targetUrlLabel")}</Label>
+                <Input
+                  id="save-qr-target"
+                  type="url"
+                  inputMode="url"
+                  value={targetUrl}
+                  onChange={(e) => setTargetUrl(e.target.value)}
+                  placeholder="https://ejemplo.com"
+                />
+              </div>
+            )}
+
+            <Button type="submit" disabled={pending || !canSubmit}>
               {t("submit")}
             </Button>
           </form>
