@@ -66,9 +66,6 @@ function modulePath(
   n: Neighbors,
 ): string {
   switch (style) {
-    // vertical-line/horizontal-line/star/plus/diamond se implementan en la
-    // fase del motor; hasta entonces caen a "square".
-    default:
     case "square":
       return `M${round(x)},${round(y)}h1v1h-1z`;
     case "dots":
@@ -100,7 +97,78 @@ function modulePath(
         0,
       ]);
     }
+    case "vertical-line": {
+      // Barra vertical: extremos redondeados salvo donde hay vecino contiguo,
+      // para que módulos apilados se fundan en una sola línea continua.
+      const w = 0.62;
+      const rTop = n.top ? 0 : 0.31;
+      const rBottom = n.bottom ? 0 : 0.31;
+      return roundedRectPath(x + (1 - w) / 2, y, w, 1, [
+        rTop,
+        rTop,
+        rBottom,
+        rBottom,
+      ]);
+    }
+    case "horizontal-line": {
+      const h = 0.62;
+      const rLeft = n.left ? 0 : 0.31;
+      const rRight = n.right ? 0 : 0.31;
+      return roundedRectPath(x, y + (1 - h) / 2, 1, h, [
+        rLeft,
+        rRight,
+        rRight,
+        rLeft,
+      ]);
+    }
+    case "star":
+      return starPath(x + 0.5, y + 0.5, 0.5, 0.22, 5);
+    case "plus":
+      return plusPath(x, y, 0.34);
+    case "diamond":
+      return diamondPath(x + 0.5, y + 0.5, 0.5);
   }
+}
+
+/** Estrella de `points` puntas centrada en (cx,cy). */
+function starPath(
+  cx: number,
+  cy: number,
+  outer: number,
+  inner: number,
+  points: number,
+): string {
+  const coords: string[] = [];
+  for (let i = 0; i < points * 2; i++) {
+    const r = i % 2 === 0 ? outer : inner;
+    const ang = (Math.PI / points) * i - Math.PI / 2;
+    coords.push(
+      `${round(cx + Math.cos(ang) * r)},${round(cy + Math.sin(ang) * r)}`,
+    );
+  }
+  return `M${coords.join("L")}z`;
+}
+
+/** Cruz (signo +) inscrita en la celda (x,y) con grosor de brazo `t`. */
+function plusPath(x: number, y: number, t: number): string {
+  const arm = (1 - t) / 2;
+  const x0 = round(x + arm);
+  return (
+    `M${x0},${round(y)}` +
+    `h${round(t)}v${round(arm)}h${round(arm)}v${round(t)}h${round(-arm)}` +
+    `v${round(arm)}h${round(-t)}v${round(-arm)}h${round(-arm)}v${round(-t)}` +
+    `h${round(arm)}z`
+  );
+}
+
+/** Rombo inscrito en la celda, centrado en (cx,cy) con radio `r`. */
+function diamondPath(cx: number, cy: number, r: number): string {
+  return (
+    `M${round(cx)},${round(cy - r)}` +
+    `L${round(cx + r)},${round(cy)}` +
+    `L${round(cx)},${round(cy + r)}` +
+    `L${round(cx - r)},${round(cy)}z`
+  );
 }
 
 // ---------- Finder patterns ----------
@@ -111,17 +179,29 @@ function cornerSquarePath(
   y: number,
 ): string {
   // anillo 7×7 con hueco 5×5 (fill-rule evenodd)
-  // outpoint/inpoint/classy se implementan en la fase del motor; hasta
-  // entonces caen a un anillo redondeado.
-  const radii: Record<string, [number, number]> = {
-    square: [0, 0],
-    rounded: [1.9, 1.2],
-    "extra-rounded": [3, 2.2],
-  };
-  const [rOut, rIn] = radii[style] ?? radii.rounded;
-  const outer = roundedRectPath(x, y, 7, 7, [rOut, rOut, rOut, rOut]);
-  const inner = roundedRectPath(x + 1, y + 1, 5, 5, [rIn, rIn, rIn, rIn]);
-  return outer + inner;
+  const ring = (
+    out: [number, number, number, number],
+    inn: [number, number, number, number],
+  ): string =>
+    roundedRectPath(x, y, 7, 7, out) + roundedRectPath(x + 1, y + 1, 5, 5, inn);
+
+  switch (style) {
+    case "square":
+      return ring([0, 0, 0, 0], [0, 0, 0, 0]);
+    case "rounded":
+      return ring([1.9, 1.9, 1.9, 1.9], [1.2, 1.2, 1.2, 1.2]);
+    case "extra-rounded":
+      return ring([3, 3, 3, 3], [2.2, 2.2, 2.2, 2.2]);
+    case "outpoint":
+      // esquinas TL y BR en punta, TR y BL redondeadas (leaf/gota)
+      return ring([0, 2.6, 0, 2.6], [0, 1.8, 0, 1.8]);
+    case "inpoint":
+      // espejo del anterior: TR y BL en punta
+      return ring([2.6, 0, 2.6, 0], [1.8, 0, 1.8, 0]);
+    case "classy":
+      // una esquina en punta (TL) y la opuesta redondeada
+      return ring([0, 1.6, 0, 1.6], [0, 1.1, 0, 1.1]);
+  }
 }
 
 function cornerDotPath(
@@ -132,12 +212,13 @@ function cornerDotPath(
   switch (style) {
     case "square":
       return `M${round(x + 2)},${round(y + 2)}h3v3h-3z`;
-    // diamond/star se implementan en la fase del motor; hasta entonces caen a "dot".
-    default:
     case "dot":
       return circlePath(x + 3.5, y + 3.5, 1.5);
     case "rounded":
       return roundedRectPath(x + 2, y + 2, 3, 3, [1, 1, 1, 1]);
+    case "diamond":
+      // Rombo ajustado al centro 3×3 del finder (convexo → escaneable).
+      return diamondPath(x + 3.5, y + 3.5, 1.7);
   }
 }
 
@@ -189,17 +270,53 @@ function escapeXml(text: string): string {
 
 // ---------- Marcos ----------
 
+/**
+ * Descriptor de layout del marco. `bandY` es el borde superior de la banda de
+ * texto; `qrBoxY`/`qrBoxH` delimitan la caja del QR (todo dentro de la región
+ * `pad`). Con position="bottom" los valores son byte-idénticos al layout
+ * histórico (banda abajo), preservando los 5 estilos y sus tests.
+ */
+interface FrameLayout {
+  pad: number;
+  band: number;
+  position: "bottom" | "top";
+  bandY: number;
+  bandCenterY: number;
+  /** Y del borde superior de la caja del QR (para dibujar el borde del marco). */
+  qrBoxY: number;
+  qrBoxH: number;
+}
+
+function frameLayout(
+  frame: NonNullable<QrConfig["frame"]>,
+  totalH: number,
+): FrameLayout {
+  // banner-top y scanner-brackets fuerzan su propia geometría.
+  const band = frame.style === "scanner-brackets" ? 0 : FRAME_BAND;
+  const position: "bottom" | "top" =
+    frame.style === "banner-top" ? "top" : frame.position;
+  const pad = FRAME_PAD;
+  const bandY = position === "top" ? 0 : totalH - band;
+  const bandCenterY = bandY + band / 2;
+  const qrBoxY = position === "top" ? band : 0;
+  const qrBoxH = totalH - band;
+  return { pad, band, position, bandY, bandCenterY, qrBoxY, qrBoxH };
+}
+
 function renderFrame(
   frame: NonNullable<QrConfig["frame"]>,
   totalW: number,
   totalH: number,
 ): { defs: string; body: string } {
   const text = escapeXml(frame.text);
-  const bandCenterY = totalH - FRAME_BAND / 2;
+  const L = frameLayout(frame, totalH);
+  const bandCenterY = L.bandCenterY;
   const textColor = frame.textColor ?? getContrastColor(frame.color);
   let spacing = frame.style === "elegant" ? 0.9 : 0.45;
-  // Auto-ajuste: reducir la fuente si el texto no cabe en el ancho disponible
-  const maxTextWidth = totalW - 10;
+  // Auto-ajuste: reducir la fuente si el texto no cabe en el ancho disponible.
+  // El icono (si existe) roba ~4 unidades de ancho.
+  const iconW = frame.icon !== "none" ? 4 : 0;
+  const maxTextWidth = totalW - 10 - iconW;
   const estimateWidth = (size: number) =>
     frame.text.length * (size * 0.62 + spacing);
   let fontSize = 3;
@@ -216,43 +333,61 @@ function renderFrame(
       );
     }
   }
-  const textAttrs = `x="${round(totalW / 2)}" y="${round(bandCenterY)}" text-anchor="middle" dominant-baseline="central" font-family="'Geist', 'Segoe UI', Arial, sans-serif" font-size="${fontSize}" font-weight="600" letter-spacing="${spacing}"`;
+  // Texto desplazado a la derecha si hay icono, para dejarle hueco a la izquierda.
+  const textCx = totalW / 2 + iconW / 2;
+  const textAttrs = `x="${round(textCx)}" y="${round(bandCenterY)}" text-anchor="middle" dominant-baseline="central" font-family="'Geist', 'Segoe UI', Arial, sans-serif" font-size="${fontSize}" font-weight="600" letter-spacing="${spacing}"`;
+
+  // Icono a la izquierda del texto (si procede).
+  const iconSvg =
+    frame.icon !== "none"
+      ? frameIcon(
+          frame.icon,
+          textCx - estimateWidth(fontSize) / 2 - 2.6,
+          bandCenterY,
+          2.4,
+          frame.style === "neon" || frame.style === "minimal"
+            ? frame.color
+            : textColor,
+        )
+      : "";
 
   switch (frame.style) {
-    // Los archetipos speech-bubble/badge/ticket/scanner-brackets/banner-top se
-    // implementan en la fase del motor; hasta entonces reutilizan "modern".
-    default:
     case "modern": {
-      const bannerW = Math.min(totalW - 6, estimateWidth(fontSize) + 7);
+      const bannerW = Math.min(totalW - 6, estimateWidth(fontSize) + 7 + iconW);
       return {
         defs: "",
         body:
-          `<rect x="0.75" y="0.75" width="${round(totalW - 1.5)}" height="${round(totalH - FRAME_BAND - 0.5)}" rx="3" fill="none" stroke="${frame.color}" stroke-width="1.2"/>` +
-          `<rect x="${round((totalW - bannerW) / 2)}" y="${round(totalH - FRAME_BAND + 0.5)}" width="${round(bannerW)}" height="${FRAME_BAND - 1.5}" rx="2.4" fill="${frame.color}"/>` +
-          `<text ${textAttrs} fill="${textColor}">${text}</text>`,
+          `<rect x="0.75" y="${round(L.qrBoxY + 0.75)}" width="${round(totalW - 1.5)}" height="${round(L.qrBoxH - 0.5)}" rx="3" fill="none" stroke="${frame.color}" stroke-width="1.2"/>` +
+          `<rect x="${round((totalW - bannerW) / 2)}" y="${round(L.bandY + 0.5)}" width="${round(bannerW)}" height="${L.band - 1.5}" rx="2.4" fill="${frame.color}"/>` +
+          `<text ${textAttrs} fill="${textColor}">${text}</text>` +
+          iconSvg,
       };
     }
+    case "banner-top":
     case "classic":
       return {
         defs: "",
         body:
           `<rect x="0.9" y="0.9" width="${round(totalW - 1.8)}" height="${round(totalH - 1.8)}" fill="none" stroke="${frame.color}" stroke-width="1.8"/>` +
-          `<rect x="0.9" y="${round(totalH - FRAME_BAND)}" width="${round(totalW - 1.8)}" height="${FRAME_BAND - 0.9}" fill="${frame.color}"/>` +
-          `<text ${textAttrs} fill="${textColor}">${text}</text>`,
+          `<rect x="0.9" y="${round(L.bandY + (L.position === "top" ? 0.9 : 0))}" width="${round(totalW - 1.8)}" height="${L.band - 0.9}" fill="${frame.color}"/>` +
+          `<text ${textAttrs} fill="${textColor}">${text}</text>` +
+          iconSvg,
       };
     case "neon":
       return {
         defs: `<filter id="qra-neon" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="1.1" flood-color="${frame.color}" flood-opacity="0.9"/></filter>`,
         body:
-          `<rect x="1" y="1" width="${round(totalW - 2)}" height="${round(totalH - FRAME_BAND - 1)}" rx="3" fill="none" stroke="${frame.color}" stroke-width="0.9" filter="url(#qra-neon)"/>` +
-          `<text ${textAttrs} fill="${frame.color}" filter="url(#qra-neon)">${text}</text>`,
+          `<rect x="1" y="${round(L.qrBoxY + 1)}" width="${round(totalW - 2)}" height="${round(L.qrBoxH - 1)}" rx="3" fill="none" stroke="${frame.color}" stroke-width="0.9" filter="url(#qra-neon)"/>` +
+          `<text ${textAttrs} fill="${frame.color}" filter="url(#qra-neon)">${text}</text>` +
+          iconSvg,
       };
     case "minimal":
       return {
         defs: "",
         body:
-          `<line x1="${round(totalW / 2 - 10)}" y1="${round(totalH - FRAME_BAND + 1)}" x2="${round(totalW / 2 + 10)}" y2="${round(totalH - FRAME_BAND + 1)}" stroke="${frame.color}" stroke-width="0.35"/>` +
-          `<text ${textAttrs} fill="${frame.color}">${text}</text>`,
+          `<line x1="${round(totalW / 2 - 10)}" y1="${round(L.bandY + (L.position === "top" ? L.band - 1 : 1))}" x2="${round(totalW / 2 + 10)}" y2="${round(L.bandY + (L.position === "top" ? L.band - 1 : 1))}" stroke="${frame.color}" stroke-width="0.35"/>` +
+          `<text ${textAttrs} fill="${frame.color}">${text}</text>` +
+          iconSvg,
       };
     case "elegant": {
       const lineY = round(bandCenterY);
@@ -262,12 +397,143 @@ function renderFrame(
       return {
         defs: "",
         body:
-          `<rect x="0.6" y="0.6" width="${round(totalW - 1.2)}" height="${round(totalH - FRAME_BAND - 0.2)}" rx="4" fill="none" stroke="${frame.color}" stroke-width="0.5"/>` +
+          `<rect x="0.6" y="${round(L.qrBoxY + 0.6)}" width="${round(totalW - 1.2)}" height="${round(L.qrBoxH - 0.2)}" rx="4" fill="none" stroke="${frame.color}" stroke-width="0.5"/>` +
           `<line x1="4" y1="${lineY}" x2="${lineStart}" y2="${lineY}" stroke="${frame.color}" stroke-width="0.35"/>` +
           `<line x1="${lineEnd}" y1="${lineY}" x2="${round(totalW - 4)}" y2="${lineY}" stroke="${frame.color}" stroke-width="0.35"/>` +
-          `<text ${textAttrs} fill="${frame.color}">${text}</text>`,
+          `<text ${textAttrs} fill="${frame.color}">${text}</text>` +
+          iconSvg,
       };
     }
+    case "speech-bubble": {
+      // Bocadillo: rect redondeado que encierra el QR + banda inferior con cola.
+      const bannerW = Math.min(totalW - 6, estimateWidth(fontSize) + 8 + iconW);
+      const bx = (totalW - bannerW) / 2;
+      const by = L.bandY + 0.5;
+      const bh = L.band - 1.5;
+      // Cola triangular saliendo hacia abajo desde el centro de la banda.
+      const tailCx = totalW / 2;
+      const tail = `<polygon points="${round(tailCx - 1.6)},${round(by + bh)} ${round(tailCx + 1.6)},${round(by + bh)} ${round(tailCx)},${round(by + bh + 2)}" fill="${frame.color}"/>`;
+      return {
+        defs: "",
+        body:
+          `<rect x="0.75" y="${round(L.qrBoxY + 0.75)}" width="${round(totalW - 1.5)}" height="${round(L.qrBoxH - 0.5)}" rx="3.5" fill="none" stroke="${frame.color}" stroke-width="1.1"/>` +
+          `<rect x="${round(bx)}" y="${round(by)}" width="${round(bannerW)}" height="${round(bh)}" rx="${round(bh / 2)}" fill="${frame.color}"/>` +
+          tail +
+          `<text ${textAttrs} fill="${textColor}">${text}</text>` +
+          iconSvg,
+      };
+    }
+    case "badge": {
+      // Insignia: cinta tipo sello bajo el QR con borde festoneado (fila de
+      // círculos) — firma estructural que librsvg rasteriza fiable, a
+      // diferencia de textPath. Texto recto centrado.
+      const ribY = L.bandY + (L.position === "top" ? 0.9 : 0);
+      const ribH = L.band - 1.5;
+      const ribX = 2.5;
+      const ribW = totalW - 5;
+      // Festón: círculos solapando el borde exterior de la cinta.
+      const scallopEdge = L.position === "top" ? ribY + ribH : ribY;
+      const scallopR = 0.9;
+      const nScallops = Math.max(6, Math.round(ribW / (scallopR * 2)));
+      const gap = ribW / nScallops;
+      let scallops = "";
+      for (let i = 0; i < nScallops; i++) {
+        scallops += `<circle cx="${round(ribX + gap * (i + 0.5))}" cy="${round(scallopEdge)}" r="${scallopR}" fill="${frame.color}"/>`;
+      }
+      const badgeFont = Math.min(fontSize, 2.8);
+      const badgeTextAttrs = `x="${round(textCx)}" y="${round(ribY + ribH / 2)}" text-anchor="middle" dominant-baseline="central" font-family="'Geist', 'Segoe UI', Arial, sans-serif" font-size="${round(badgeFont)}" font-weight="700" letter-spacing="0.4"`;
+      return {
+        defs: "",
+        body:
+          `<rect x="1" y="${round(L.qrBoxY + 1)}" width="${round(totalW - 2)}" height="${round(L.qrBoxH - 1)}" rx="3" fill="none" stroke="${frame.color}" stroke-width="1"/>` +
+          `<rect x="${round(ribX)}" y="${round(ribY)}" width="${round(ribW)}" height="${round(ribH)}" rx="1" fill="${frame.color}"/>` +
+          scallops +
+          `<text ${badgeTextAttrs} fill="${textColor}">${text}</text>` +
+          iconSvg,
+      };
+    }
+    case "ticket": {
+      // Cupón: borde dasheado + muescas semicirculares a los lados de la banda.
+      const notchY = L.bandY;
+      const notchR = 1.4;
+      // Las muescas "recortan" el ticket; blanco funciona sobre el fondo claro
+      // habitual de este estilo (contraste vía la línea dasheada).
+      const bg = "#ffffff";
+      return {
+        defs: "",
+        body:
+          `<rect x="0.9" y="0.9" width="${round(totalW - 1.8)}" height="${round(totalH - 1.8)}" rx="2.5" fill="none" stroke="${frame.color}" stroke-width="1"/>` +
+          `<rect x="0.9" y="${round(L.bandY + (L.position === "top" ? 0.9 : 0))}" width="${round(totalW - 1.8)}" height="${L.band - 0.9}" fill="${frame.color}"/>` +
+          `<line x1="2.5" y1="${round(notchY)}" x2="${round(totalW - 2.5)}" y2="${round(notchY)}" stroke="${bg}" stroke-width="0.4" stroke-dasharray="1.2 1"/>` +
+          `<circle cx="0.9" cy="${round(notchY)}" r="${notchR}" fill="${bg}"/>` +
+          `<circle cx="${round(totalW - 0.9)}" cy="${round(notchY)}" r="${notchR}" fill="${bg}"/>` +
+          `<text ${textAttrs} fill="${textColor}">${text}</text>` +
+          iconSvg,
+      };
+    }
+    case "scanner-brackets": {
+      // Cuatro esquinas en "L" (visor de cámara), sin borde ni banda; texto
+      // en un pie fuera de la caja del QR no aplica (band=0), así que el texto
+      // va centrado bajo la última fila, dentro del pad inferior.
+      const m = 1.2;
+      const len = Math.max(4, totalW * 0.16);
+      const sw = 1.2;
+      const c = frame.color;
+      const corner = (px: number, py: number, dx: number, dy: number) =>
+        `<path d="M${round(px + dx * len)},${round(py)} H${round(px)} V${round(py + dy * len)}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>`;
+      return {
+        defs: "",
+        body:
+          corner(m, m, 1, 1) +
+          corner(totalW - m, m, -1, 1) +
+          corner(m, totalH - m, 1, -1) +
+          corner(totalW - m, totalH - m, -1, -1) +
+          (frame.text
+            ? `<text x="${round(textCx)}" y="${round(totalH - m - 0.5)}" text-anchor="middle" dominant-baseline="central" font-family="'Geist', 'Segoe UI', Arial, sans-serif" font-size="${round(Math.min(fontSize, 2.4))}" font-weight="600" letter-spacing="${spacing}" fill="${c}">${text}</text>`
+            : "") +
+          iconSvg,
+      };
+    }
+  }
+}
+
+/** Icono SVG built-in centrado en (cx,cy) con radio `r`. */
+function frameIcon(
+  icon: NonNullable<QrConfig["frame"]>["icon"],
+  cx: number,
+  cy: number,
+  r: number,
+  color: string,
+): string {
+  const s = r; // media-anchura
+  switch (icon) {
+    case "none":
+      return "";
+    case "arrow-down":
+      return `<path d="M${round(cx)},${round(cy - s)} V${round(cy + s * 0.4)} M${round(cx - s * 0.7)},${round(cy - s * 0.2)} L${round(cx)},${round(cy + s * 0.6)} L${round(cx + s * 0.7)},${round(cy - s * 0.2)}" fill="none" stroke="${color}" stroke-width="${round(s * 0.4)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+    case "camera":
+      return (
+        `<rect x="${round(cx - s)}" y="${round(cy - s * 0.55)}" width="${round(s * 2)}" height="${round(s * 1.4)}" rx="${round(s * 0.3)}" fill="none" stroke="${color}" stroke-width="${round(s * 0.28)}"/>` +
+        `<circle cx="${round(cx)}" cy="${round(cy + s * 0.15)}" r="${round(s * 0.4)}" fill="none" stroke="${color}" stroke-width="${round(s * 0.28)}"/>` +
+        `<rect x="${round(cx - s * 0.35)}" y="${round(cy - s * 0.85)}" width="${round(s * 0.7)}" height="${round(s * 0.35)}" fill="${color}"/>`
+      );
+    case "gift":
+      return (
+        `<rect x="${round(cx - s)}" y="${round(cy - s * 0.3)}" width="${round(s * 2)}" height="${round(s * 1.3)}" rx="${round(s * 0.2)}" fill="none" stroke="${color}" stroke-width="${round(s * 0.26)}"/>` +
+        `<line x1="${round(cx)}" y1="${round(cy - s * 0.3)}" x2="${round(cx)}" y2="${round(cy + s)}" stroke="${color}" stroke-width="${round(s * 0.26)}"/>` +
+        `<path d="M${round(cx)},${round(cy - s * 0.3)} C${round(cx - s * 0.9)},${round(cy - s * 1.1)} ${round(cx - s * 0.3)},${round(cy - s * 1.1)} ${round(cx)},${round(cy - s * 0.3)} C${round(cx + s * 0.3)},${round(cy - s * 1.1)} ${round(cx + s * 0.9)},${round(cy - s * 1.1)} ${round(cx)},${round(cy - s * 0.3)}" fill="none" stroke="${color}" stroke-width="${round(s * 0.26)}"/>`
+      );
+    case "wifi":
+      return (
+        `<path d="M${round(cx - s)},${round(cy - s * 0.3)} A${round(s * 1.3)},${round(s * 1.3)} 0 0 1 ${round(cx + s)},${round(cy - s * 0.3)}" fill="none" stroke="${color}" stroke-width="${round(s * 0.28)}" stroke-linecap="round"/>` +
+        `<path d="M${round(cx - s * 0.55)},${round(cy + s * 0.1)} A${round(s * 0.72)},${round(s * 0.72)} 0 0 1 ${round(cx + s * 0.55)},${round(cy + s * 0.1)}" fill="none" stroke="${color}" stroke-width="${round(s * 0.28)}" stroke-linecap="round"/>` +
+        `<circle cx="${round(cx)}" cy="${round(cy + s * 0.6)}" r="${round(s * 0.22)}" fill="${color}"/>`
+      );
+    case "pin":
+      return (
+        `<path d="M${round(cx)},${round(cy + s)} C${round(cx - s * 0.9)},${round(cy - s * 0.2)} ${round(cx - s * 0.7)},${round(cy - s)} ${round(cx)},${round(cy - s)} C${round(cx + s * 0.7)},${round(cy - s)} ${round(cx + s * 0.9)},${round(cy - s * 0.2)} ${round(cx)},${round(cy + s)}z" fill="none" stroke="${color}" stroke-width="${round(s * 0.26)}"/>` +
+        `<circle cx="${round(cx)}" cy="${round(cy - s * 0.3)}" r="${round(s * 0.3)}" fill="${color}"/>`
+      );
   }
 }
 
@@ -283,7 +549,10 @@ export function renderQrSvg(
   config: QrConfig,
   options: RenderOptions = {},
 ): string {
-  const matrix = createMatrix(data, config.ecLevel);
+  // Con imagen de fondo se fuerza EC=H (recupera ~30%): red de seguridad de
+  // escaneabilidad independientemente del ecLevel elegido en la config.
+  const ecLevel = config.style.background.image ? "H" : config.ecLevel;
+  const matrix = createMatrix(data, ecLevel);
   return renderMatrixSvg(matrix, config, options);
 }
 
@@ -297,10 +566,18 @@ export function renderMatrixSvg(
   const qrUnits = n + 2 * margin;
 
   const hasFrame = Boolean(frame);
+  // scanner-brackets no lleva banda de texto separada (band=0).
+  const frameBand =
+    frame && frame.style !== "scanner-brackets" ? FRAME_BAND : 0;
   const totalW = qrUnits + (hasFrame ? 2 * FRAME_PAD : 0);
-  const totalH = qrUnits + (hasFrame ? 2 * FRAME_PAD + FRAME_BAND : 0);
+  const totalH = qrUnits + (hasFrame ? 2 * FRAME_PAD + frameBand : 0);
+  // La banda va arriba si position="top" (o banner-top); entonces el QR baja.
+  const bandOnTop =
+    hasFrame &&
+    frame !== undefined &&
+    (frame.style === "banner-top" || frame.position === "top");
   const qrX = hasFrame ? FRAME_PAD : 0;
-  const qrY = hasFrame ? FRAME_PAD : 0;
+  const qrY = hasFrame ? FRAME_PAD + (bandOnTop ? frameBand : 0) : 0;
 
   // Colores (con inversión opcional)
   const invert = effects?.invert ?? false;
@@ -311,15 +588,23 @@ export function renderMatrixSvg(
   const gradient = style.dots.gradient;
 
   const defs: string[] = [];
+  const qrBox = { x: qrX, y: qrY, size: qrUnits };
   let dotsFill = dotColor;
   if (gradient) {
-    defs.push(
-      gradientDef("qra-dots", gradient, { x: qrX, y: qrY, size: qrUnits }),
-    );
+    defs.push(gradientDef("qra-dots", gradient, qrBox));
     dotsFill = "url(#qra-dots)";
   }
-  const cornerSquareFill = style.cornersSquare.color ?? dotsFill;
-  const cornerDotFill = style.cornersDot.color ?? dotsFill;
+  // Gradiente en las esquinas (finders); si no, color propio o herencia de dots.
+  let cornerSquareFill = style.cornersSquare.color ?? dotsFill;
+  if (style.cornersSquare.gradient) {
+    defs.push(gradientDef("qra-corner-sq", style.cornersSquare.gradient, qrBox));
+    cornerSquareFill = "url(#qra-corner-sq)";
+  }
+  let cornerDotFill = style.cornersDot.color ?? dotsFill;
+  if (style.cornersDot.gradient) {
+    defs.push(gradientDef("qra-corner-dot", style.cornersDot.gradient, qrBox));
+    cornerDotFill = "url(#qra-corner-dot)";
+  }
 
   // Excavación para el logo
   let excavation: { min: number; max: number } | null = null;
@@ -423,9 +708,46 @@ export function renderMatrixSvg(
     frameBody = rendered.body;
   }
 
-  const background = style.background.transparent
-    ? ""
-    : `<rect x="0" y="0" width="${round(totalW)}" height="${round(totalH)}" fill="${bgColor}"/>`;
+  // ----- Fondo (color / gradiente / imagen con salvaguardas) -----
+  const bgImage = style.background.image;
+  const bgGradient = style.background.gradient;
+  let background = "";
+  if (!style.background.transparent) {
+    if (bgGradient) {
+      defs.push(
+        gradientDef("qra-bg", bgGradient, { x: 0, y: 0, size: totalW }),
+      );
+      background = `<rect x="0" y="0" width="${round(totalW)}" height="${round(totalH)}" fill="url(#qra-bg)"/>`;
+    } else {
+      background = `<rect x="0" y="0" width="${round(totalW)}" height="${round(totalH)}" fill="${bgColor}"/>`;
+    }
+  }
+
+  // Capas de imagen de fondo: imagen (cover) → scrim tenue → placa opaca bajo
+  // la caja del QR. Garantiza contraste sin aplicar opacidad a los módulos.
+  let bgImageLayers = "";
+  let finderPlates = "";
+  if (bgImage) {
+    const scrimColor = getContrastColor(dotColor) === "#ffffff"
+      ? "#000000"
+      : "#ffffff";
+    bgImageLayers =
+      `<image x="0" y="0" width="${round(totalW)}" height="${round(totalH)}" href="${bgImage.dataUri}" preserveAspectRatio="xMidYMid slice"/>` +
+      `<rect x="0" y="0" width="${round(totalW)}" height="${round(totalH)}" fill="${scrimColor}" opacity="${round(bgImage.opacity)}"/>`;
+    if (bgImage.plate) {
+      // Placa opaca bajo TODO el QR + su quiet zone, para que los módulos no
+      // compitan con la foto (el sangrado en el margen es el fallo más común).
+      bgImageLayers += `<rect x="${round(qrX)}" y="${round(qrY)}" width="${round(qrUnits)}" height="${round(qrUnits)}" rx="1.5" fill="${bgColor}"/>`;
+    }
+    // Placas "sagradas" bajo los 3 finder patterns (siempre, aunque no haya
+    // placa global), para blindar su alto contraste.
+    finderPlates = finders
+      .map(
+        (f) =>
+          `<rect x="${round(qrX + margin + f.x - 0.4)}" y="${round(qrY + margin + f.y - 0.4)}" width="7.8" height="7.8" rx="0.6" fill="${bgColor}"/>`,
+      )
+      .join("");
+  }
 
   const width = options.width;
   const sizeAttrs = width
@@ -436,7 +758,9 @@ export function renderMatrixSvg(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${round(totalW)} ${round(totalH)}"${sizeAttrs} role="img">` +
     (defs.length || frameDefs ? `<defs>${defs.join("")}${frameDefs}</defs>` : "") +
     background +
+    bgImageLayers +
     `<g${groupOpacity}>` +
+    finderPlates +
     `<path d="${parts.join("")}" fill="${dotsFill}"${dotsFilter}/>` +
     `<path d="${cornerSquares}" fill="${cornerSquareFill}" fill-rule="evenodd"/>` +
     `<path d="${cornerDots}" fill="${cornerDotFill}"/>` +
