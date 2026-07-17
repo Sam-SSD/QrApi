@@ -120,7 +120,6 @@ export const CORNER_DOT_STYLES = [
   "dot",
   "rounded",
   "diamond",
-  "star",
 ] as const;
 export const FRAME_STYLES = [
   "modern",

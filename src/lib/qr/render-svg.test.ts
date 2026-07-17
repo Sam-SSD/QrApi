@@ -2,7 +2,14 @@ import { describe, expect, it } from "vitest";
 import sharp from "sharp";
 import { readBarcodes } from "zxing-wasm/reader";
 import { renderQrSvg, getContrastColor } from "./render-svg";
-import { qrConfigSchema, DOT_STYLES, type QrConfig } from "./schema";
+import {
+  qrConfigSchema,
+  DOT_STYLES,
+  CORNER_SQUARE_STYLES,
+  CORNER_DOT_STYLES,
+  FRAME_STYLES,
+  type QrConfig,
+} from "./schema";
 import { TEMPLATES, GRADIENT_PRESETS } from "./templates";
 import { buildPayload } from "./payloads";
 
@@ -113,6 +120,172 @@ describe("renderQrSvg", () => {
         },
       }),
     );
+    expect(await decodeSvg(svg)).toBe(DATA);
+  });
+
+  for (const style of CORNER_SQUARE_STYLES) {
+    it(`estilo de esquina "${style}" es escaneable`, async () => {
+      const svg = renderQrSvg(
+        DATA,
+        config({
+          style: {
+            dots: { style: "square", color: "#18181b" },
+            cornersSquare: { style, color: "#4f46e5" },
+          },
+        }),
+      );
+      expect(await decodeSvg(svg)).toBe(DATA);
+    });
+  }
+
+  for (const style of CORNER_DOT_STYLES) {
+    it(`punto de esquina "${style}" es escaneable`, async () => {
+      const svg = renderQrSvg(
+        DATA,
+        config({
+          style: {
+            dots: { style: "square", color: "#18181b" },
+            cornersDot: { style, color: "#0891b2" },
+          },
+        }),
+      );
+      expect(await decodeSvg(svg)).toBe(DATA);
+    });
+  }
+
+  for (const style of FRAME_STYLES) {
+    it(`marco "${style}" es escaneable`, async () => {
+      const svg = renderQrSvg(
+        DATA,
+        config({ frame: { style, text: "ESCANÉAME", color: "#4f46e5" } }),
+      );
+      expect(await decodeSvg(svg, 700)).toBe(DATA);
+    });
+  }
+
+  it("marco con position=top es escaneable", async () => {
+    const svg = renderQrSvg(
+      DATA,
+      config({
+        frame: {
+          style: "classic",
+          text: "ESCANÉAME",
+          color: "#4f46e5",
+          position: "top",
+        },
+      }),
+    );
+    expect(await decodeSvg(svg, 700)).toBe(DATA);
+  });
+
+  // Aserciones de distinción: exhaustividad prueba que la rama existe; esto
+  // prueba que emite SU forma y no la de otro estilo (evita copy-paste erróneo).
+  it("cada estilo nuevo emite su primitiva distintiva", () => {
+    const square = renderQrSvg(
+      DATA,
+      config({ style: { dots: { style: "square", color: "#18181b" } } }),
+    );
+    const squarePath = square.match(/<path d="([^"]+)"/)?.[1] ?? "";
+    for (const style of ["star", "plus", "diamond", "vertical-line", "horizontal-line"] as const) {
+      const svg = renderQrSvg(
+        DATA,
+        config({ style: { dots: { style, color: "#18181b" } } }),
+      );
+      const path = svg.match(/<path d="([^"]+)"/)?.[1] ?? "";
+      expect(path, `dots ${style}`).not.toBe(squarePath);
+    }
+    // Marcos con primitivas propias
+    const bubble = renderQrSvg(
+      DATA,
+      config({ frame: { style: "speech-bubble", text: "HOLA", color: "#4f46e5" } }),
+    );
+    expect(bubble).toContain("<polygon");
+    const badge = renderQrSvg(
+      DATA,
+      config({ frame: { style: "badge", text: "HOLA", color: "#4f46e5" } }),
+    );
+    // Festón de la cinta: varios círculos (firma isomórfica, no textPath).
+    expect((badge.match(/<circle/g) ?? []).length).toBeGreaterThanOrEqual(6);
+    const ticket = renderQrSvg(
+      DATA,
+      config({ frame: { style: "ticket", text: "HOLA", color: "#4f46e5" } }),
+    );
+    expect(ticket).toContain("stroke-dasharray");
+    const brackets = renderQrSvg(
+      DATA,
+      config({ frame: { style: "scanner-brackets", text: "HOLA", color: "#4f46e5" } }),
+    );
+    expect(brackets).toContain("stroke-linecap");
+  });
+
+  it("icono del marco se dibuja cuando icon !== none", () => {
+    const withIcon = renderQrSvg(
+      DATA,
+      config({
+        frame: { style: "modern", text: "HOLA", color: "#4f46e5", icon: "camera" },
+      }),
+    );
+    const withoutIcon = renderQrSvg(
+      DATA,
+      config({
+        frame: { style: "modern", text: "HOLA", color: "#4f46e5", icon: "none" },
+      }),
+    );
+    expect(withIcon.length).toBeGreaterThan(withoutIcon.length);
+  });
+
+  it("imagen de fondo con salvaguardas mantiene el QR escaneable", async () => {
+    const svg = renderQrSvg(
+      DATA,
+      config({
+        style: {
+          dots: { style: "square", color: "#18181b" },
+          background: {
+            color: "#ffffff",
+            transparent: false,
+            image: { dataUri: RED_PIXEL_PNG, opacity: 0.35, plate: true },
+          },
+        },
+      }),
+    );
+    expect(svg).toContain("<image");
+    // 3 placas de finder + placa global bajo el QR
+    expect((svg.match(/<rect/g) ?? []).length).toBeGreaterThanOrEqual(4);
+    expect(await decodeSvg(svg, 700)).toBe(DATA);
+  });
+
+  it("imagen de fondo fuerza ecLevel H aunque la config pida L", async () => {
+    // Con EC=L y foto detrás el decode fallaría; el motor debe forzar H.
+    const svg = renderQrSvg(
+      DATA,
+      config({
+        ecLevel: "L",
+        style: {
+          dots: { style: "square", color: "#18181b" },
+          background: {
+            color: "#ffffff",
+            transparent: false,
+            image: { dataUri: RED_PIXEL_PNG, opacity: 0.35, plate: true },
+          },
+        },
+      }),
+    );
+    expect(await decodeSvg(svg, 700)).toBe(DATA);
+  });
+
+  it("gradiente en fondo y esquinas es escaneable", async () => {
+    const svg = renderQrSvg(
+      DATA,
+      config({
+        style: {
+          dots: { style: "rounded", color: "#18181b" },
+          cornersSquare: { style: "extra-rounded", gradient: GRADIENT_PRESETS.brand },
+          cornersDot: { style: "dot", gradient: GRADIENT_PRESETS.brand },
+          background: { color: "#ffffff", transparent: false },
+        },
+      }),
+    );
+    expect(svg).toContain("qra-corner-sq");
     expect(await decodeSvg(svg)).toBe(DATA);
   });
 
