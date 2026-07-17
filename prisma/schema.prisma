@@ -21,6 +21,7 @@ model User {
   accounts      Account[]
   apiKeys       ApiKey[]
   qrCodes       QrCode[]
+  dynamicQrs    DynamicQr[]
 
   @@map("user")
 }
@@ -105,18 +106,62 @@ enum QrContentType {
 }
 
 model QrCode {
-  id        String        @id @default(cuid())
-  userId    String
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name      String
-  type      QrContentType
-  data      String        @db.Text // payload final codificado
-  config    Json // QrConfig validado por zod (lib/qr/schema.ts)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  id           String        @id @default(cuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  type         QrContentType
+  data         String        @db.Text // payload final codificado
+  config       Json // QrConfig validado por zod (lib/qr/schema.ts)
+  // Si es un QR dinámico, apunta al DynamicQr cuyo slug codifica su `data`.
+  dynamicQrId  String?       @unique
+  dynamicQr    DynamicQr?    @relation(fields: [dynamicQrId], references: [id], onDelete: SetNull)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
   @@index([userId, createdAt(sort: Desc)])
   @@map("qr_code")
+}
+
+// ---------- QR dinámicos ----------
+
+model DynamicQr {
+  id           String      @id @default(cuid())
+  slug         String      @unique // base62, corto; codificado en el QR como /r/{slug}
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title        String
+  targetUrl    String      @db.Text // destino editable sin regenerar el QR
+  active       Boolean     @default(true) // pausar sin borrar
+  expiresAt    DateTime?
+  passwordHash String? // opcional (fase avanzada); MVP: null
+  scanCount    Int         @default(0) // contador desnormalizado
+  qrCode       QrCode? // back-relation 1:1 opcional
+  scans        ScanEvent[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("dynamic_qr")
+}
+
+model ScanEvent {
+  id          String    @id @default(cuid())
+  dynamicQrId String
+  dynamicQr   DynamicQr @relation(fields: [dynamicQrId], references: [id], onDelete: Cascade)
+  timestamp   DateTime  @default(now())
+  country     String? // ISO-2, nivel país
+  region      String? // opcional (fase avanzada)
+  deviceType  String? // "mobile" | "tablet" | "desktop" | "bot"
+  os          String?
+  browser     String?
+  referrer    String?
+  ipHash      String? // HMAC-SHA256(ip + salt diario); nunca IP cruda
+
+  @@index([dynamicQrId, timestamp])
+  @@index([dynamicQrId, country])
+  @@index([dynamicQrId, deviceType])
+  @@map("scan_event")
 }
 
 model RateLimitWindow {
