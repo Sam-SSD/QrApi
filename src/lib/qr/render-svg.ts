@@ -728,9 +728,9 @@ export function renderMatrixSvg(
   let bgImageLayers = "";
   let finderPlates = "";
   if (bgImage) {
-    const scrimColor = getContrastColor(dotColor) === "#ffffff"
-      ? "#000000"
-      : "#ffffff";
+    // El scrim empuja el contraste hacia el color OPUESTO a los módulos:
+    // puntos oscuros → scrim claro (aclara la foto), puntos claros → oscuro.
+    const scrimColor = getContrastColor(dotColor);
     bgImageLayers =
       `<image x="0" y="0" width="${round(totalW)}" height="${round(totalH)}" href="${bgImage.dataUri}" preserveAspectRatio="xMidYMid slice"/>` +
       `<rect x="0" y="0" width="${round(totalW)}" height="${round(totalH)}" fill="${scrimColor}" opacity="${round(bgImage.opacity)}"/>`;

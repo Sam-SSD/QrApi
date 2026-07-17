@@ -273,6 +273,26 @@ describe("renderQrSvg", () => {
     expect(await decodeSvg(svg, 700)).toBe(DATA);
   });
 
+  it("imagen de fondo SIN placa (default) sigue escaneable", async () => {
+    // Camino imagen-visible: sin placa global, solo scrim + placas de finder +
+    // EC=H forzado. Debe decodificar igual (la imagen NO tapa los módulos).
+    const svg = renderQrSvg(
+      DATA,
+      config({
+        style: {
+          dots: { style: "square", color: "#0b0b14" },
+          background: {
+            color: "#ffffff",
+            transparent: false,
+            image: { dataUri: RED_PIXEL_PNG, opacity: 0.35, plate: false },
+          },
+        },
+      }),
+    );
+    expect(svg).toContain("<image");
+    expect(await decodeSvg(svg, 700)).toBe(DATA);
+  });
+
   it("gradiente en fondo y esquinas es escaneable", async () => {
     const svg = renderQrSvg(
       DATA,

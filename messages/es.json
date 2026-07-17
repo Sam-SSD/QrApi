@@ -243,6 +243,7 @@
       "enable": "Añadir marco",
       "style": "Estilo",
       "styles": {
+        "none": "Ninguno",
         "modern": "Moderno",
         "classic": "Clásico",
         "neon": "Neón",
