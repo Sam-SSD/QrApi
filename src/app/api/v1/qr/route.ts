@@ -100,7 +100,7 @@ async function authenticate(request: NextRequest) {
       missing: errorResponse(
         401,
         "missing_token",
-        "Provide your API key: Authorization: Bearer qrf_...",
+        "Provide your API key: Authorization: Bearer qra_...",
       ),
       invalid: errorResponse(401, "invalid_token", "The API key is not valid"),
       revoked: errorResponse(403, "revoked_token", "This API key was revoked"),

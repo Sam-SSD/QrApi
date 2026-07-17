@@ -13,12 +13,16 @@ export interface HistoryItem {
   config: QrConfig;
 }
 
-const STORAGE_KEY = "qrforge:history";
+const STORAGE_KEY = "qrapi:history";
+// clave anterior al rebrand: se lee solo si la nueva no existe y se limpia al persistir
+const LEGACY_STORAGE_KEY = "qrforge:history";
 const MAX_ITEMS = 20;
 
 function readHistory(): HistoryItem[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw =
+      localStorage.getItem(STORAGE_KEY) ??
+      localStorage.getItem(LEGACY_STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
@@ -37,6 +41,7 @@ export function useQrHistory() {
   const persist = useCallback((next: HistoryItem[]) => {
     setItems(next);
     try {
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     } catch {
       // cuota llena: descartar el más antiguo y reintentar una vez

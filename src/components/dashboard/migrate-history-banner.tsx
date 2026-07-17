@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button";
 import { importHistory } from "@/actions/qr-codes";
 import type { HistoryItem } from "@/hooks/use-qr-history";
 
-const STORAGE_KEY = "qrforge:history";
-const DISMISS_KEY = "qrforge:history-migration-dismissed";
+const STORAGE_KEY = "qrapi:history";
+// clave anterior al rebrand: se lee como fallback y se limpia al migrar
+const LEGACY_STORAGE_KEY = "qrforge:history";
+const DISMISS_KEY = "qrapi:history-migration-dismissed";
 
 export function MigrateHistoryBanner() {
   const t = useTranslations("dashboard.migrate");
@@ -20,7 +22,9 @@ export function MigrateHistoryBanner() {
   useEffect(() => {
     try {
       if (localStorage.getItem(DISMISS_KEY)) return;
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw =
+        localStorage.getItem(STORAGE_KEY) ??
+        localStorage.getItem(LEGACY_STORAGE_KEY);
       const parsed: HistoryItem[] = raw ? JSON.parse(raw) : [];
       if (Array.isArray(parsed) && parsed.length > 0) {
         setItems(parsed);
@@ -47,6 +51,7 @@ export function MigrateHistoryBanner() {
         .filter(Boolean);
       const { imported } = await importHistory(payloadItems);
       localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
       localStorage.setItem(DISMISS_KEY, "1");
       setVisible(false);
       toast.success(t("done", { count: imported }));

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
-const STORAGE_KEY = "qrforge:docs-lang";
+const STORAGE_KEY = "qrapi:docs-lang";
 
 export function LanguageTabs({
   tabs,
