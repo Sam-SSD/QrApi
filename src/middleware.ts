@@ -27,6 +27,7 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Excluir api, archivos estáticos e internals de Next
-  matcher: "/((?!api|trpc|_next|_vercel|.*\\..*).*)",
+  // Excluir api, archivos estáticos, rutas de metadata (icon/og/manifest) e internals de Next
+  matcher:
+    "/((?!api|trpc|_next|_vercel|icon|apple-icon|opengraph-image|manifest|.*\\..*).*)",
 };
