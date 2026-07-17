@@ -5,12 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { ColorControl } from "../controls/color-control";
-import {
-  FRAME_STYLES,
-  FRAME_POSITIONS,
-  FRAME_ICONS,
-  type QrFrame,
-} from "@/lib/qr/schema";
+import { FRAME_STYLES, FRAME_POSITIONS, type QrFrame } from "@/lib/qr/schema";
 import { useQrStore } from "@/stores/qr-store";
 import { cn } from "@/lib/utils";
 
@@ -34,7 +29,6 @@ export function FrameSection() {
         text: t("textPlaceholder"),
         color: "#4f46e5",
         position: "bottom",
-        icon: "none",
       });
     }
   }
@@ -125,37 +119,6 @@ export function FrameSection() {
                     )}
                   >
                     {t(`positions.${position}`)}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Icono opcional en la banda */}
-          <div className="flex flex-col gap-2">
-            <span className="text-sm font-medium">{t("icon")}</span>
-            <div
-              role="radiogroup"
-              aria-label={t("icon")}
-              className="flex flex-wrap gap-1.5"
-            >
-              {FRAME_ICONS.map((icon) => {
-                const active = frame.icon === icon;
-                return (
-                  <button
-                    key={icon}
-                    type="button"
-                    role="radio"
-                    aria-checked={active}
-                    onClick={() => patchFrame({ icon })}
-                    className={cn(
-                      "rounded-md border px-3 py-1.5 text-xs font-medium transition-all duration-150",
-                      active
-                        ? "border-primary/50 bg-brand-soft text-primary"
-                        : "border-line text-muted-foreground hover:border-line-strong hover:text-foreground",
-                    )}
-                  >
-                    {t(`icons.${icon}`)}
                   </button>
                 );
               })}

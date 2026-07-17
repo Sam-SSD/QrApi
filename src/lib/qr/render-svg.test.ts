@@ -218,20 +218,50 @@ describe("renderQrSvg", () => {
     expect(brackets).toContain("stroke-linecap");
   });
 
-  it("icono del marco se dibuja cuando icon !== none", () => {
-    const withIcon = renderQrSvg(
-      DATA,
-      config({
-        frame: { style: "modern", text: "HOLA", color: "#4f46e5", icon: "camera" },
-      }),
-    );
-    const withoutIcon = renderQrSvg(
-      DATA,
-      config({
-        frame: { style: "modern", text: "HOLA", color: "#4f46e5", icon: "none" },
-      }),
-    );
-    expect(withIcon.length).toBeGreaterThan(withoutIcon.length);
+  it("el color de texto del marco se respeta en todos los estilos", () => {
+    // Incluye estilos sin banda (minimal/neon/elegant) que antes ignoraban
+    // textColor y usaban frame.color.
+    for (const style of ["modern", "minimal", "neon", "elegant"] as const) {
+      const svg = renderQrSvg(
+        DATA,
+        config({
+          frame: {
+            style,
+            text: "HOLA",
+            color: "#4f46e5",
+            textColor: "#ff0000",
+          },
+        }),
+      );
+      // El texto lleva el color pedido y NO cae al color del marco.
+      expect(svg, style).toContain('fill="#ff0000"');
+      expect(svg, `${style} no usa frame.color en texto`).toMatch(
+        /fill="#ff0000"[^>]*>HOLA<\/text>/,
+      );
+    }
+  });
+
+  it("el texto de los marcos con banda contrasta por defecto (sin textColor)", () => {
+    // Estilos con banda sólida: el texto por defecto NO puede ser del color de
+    // la banda (seria invisible). Captura regresiones como speech-bubble.
+    for (const style of [
+      "modern",
+      "classic",
+      "banner-top",
+      "ticket",
+      "badge",
+      "speech-bubble",
+    ] as const) {
+      const svg = renderQrSvg(
+        DATA,
+        config({ frame: { style, text: "HOLA", color: "#4f46e5" } }),
+      );
+      const fill = svg.match(/<text[^>]*fill="([^"]+)"[^>]*>HOLA<\/text>/)?.[1];
+      expect(fill, `${style} texto`).toBeDefined();
+      expect(fill?.toLowerCase(), `${style} texto no es el color de banda`).not.toBe(
+        "#4f46e5",
+      );
+    }
   });
 
   it("imagen de fondo con salvaguardas mantiene el QR escaneable", async () => {
@@ -291,9 +321,12 @@ describe("renderQrSvg", () => {
       }),
     );
     expect(svg).toContain("<image");
-    // Sin placa global: fondo base + scrim + 3 placas de finder = 5 rects.
-    // Garantiza que las esquinas siguen protegidas aunque la imagen se vea.
-    expect((svg.match(/<rect/g) ?? []).length).toBeGreaterThanOrEqual(5);
+    // Sin placa global: fondo base + scrim (2 rects) + 3 placas de finder como
+    // <path> con la silueta del anillo. Garantiza que las esquinas siguen
+    // protegidas aunque la imagen se vea.
+    expect((svg.match(/<rect/g) ?? []).length).toBeGreaterThanOrEqual(2);
+    // 3 placas de finder rellenas del color de fondo (#ffffff).
+    expect((svg.match(/<path d="[^"]+" fill="#ffffff"\/>/g) ?? []).length).toBe(3);
     expect(await decodeSvg(svg, 700)).toBe(DATA);
   });
 

@@ -264,15 +264,6 @@
       "positions": {
         "bottom": "Abajo",
         "top": "Arriba"
-      },
-      "icon": "Icono",
-      "icons": {
-        "none": "Ninguno",
-        "arrow-down": "Flecha",
-        "camera": "Cámara",
-        "gift": "Regalo",
-        "wifi": "WiFi",
-        "pin": "Pin"
       }
     },
     "advanced": {

@@ -264,15 +264,6 @@
       "positions": {
         "bottom": "Bottom",
         "top": "Top"
-      },
-      "icon": "Icon",
-      "icons": {
-        "none": "None",
-        "arrow-down": "Arrow",
-        "camera": "Camera",
-        "gift": "Gift",
-        "wifi": "WiFi",
-        "pin": "Pin"
       }
     },
     "advanced": {

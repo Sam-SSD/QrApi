@@ -7,7 +7,6 @@ import {
   CORNER_DOT_STYLES,
   FRAME_STYLES,
   FRAME_POSITIONS,
-  FRAME_ICONS,
 } from "./schema";
 
 describe("qrConfigSchema", () => {
@@ -26,36 +25,39 @@ describe("qrConfigSchema", () => {
   });
 
   describe("frame", () => {
-    it("aplica defaults de position e icon", () => {
+    it("aplica default de position", () => {
       const parsed = qrConfigSchema.parse({
         frame: { style: "modern", text: "HOLA", color: "#4f46e5" },
       });
       expect(parsed.frame?.position).toBe("bottom");
-      expect(parsed.frame?.icon).toBe("none");
     });
 
-    it("acepta position e icon explícitos", () => {
+    it("acepta position y textColor explícitos", () => {
       const parsed = qrConfigSchema.parse({
         frame: {
           style: "banner-top",
           text: "HOLA",
           color: "#4f46e5",
           position: "top",
-          icon: "camera",
+          textColor: "#ffffff",
         },
       });
       expect(parsed.frame?.position).toBe("top");
-      expect(parsed.frame?.icon).toBe("camera");
+      expect(parsed.frame?.textColor).toBe("#ffffff");
     });
 
-    it("rechaza position/icon fuera del enum", () => {
+    it("rechaza position fuera del enum", () => {
       expect(() =>
         qrConfigSchema.parse({
-          frame: { style: "modern", text: "x", color: "#4f46e5", icon: "emoji" },
+          frame: {
+            style: "modern",
+            text: "x",
+            color: "#4f46e5",
+            position: "side",
+          },
         }),
       ).toThrow();
       expect(FRAME_POSITIONS).toEqual(["bottom", "top"]);
-      expect(FRAME_ICONS).toContain("none");
     });
   });
 
