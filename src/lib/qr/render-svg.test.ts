@@ -330,6 +330,30 @@ describe("renderQrSvg", () => {
     expect(await decodeSvg(svg, 700)).toBe(DATA);
   });
 
+  it("las placas de finder usan el tinte muestreado y siguen escaneando", async () => {
+    const svg = renderQrSvg(
+      DATA,
+      config({
+        style: {
+          dots: { style: "square", color: "#0b0b14" },
+          background: {
+            color: "#ffffff",
+            transparent: false,
+            image: {
+              dataUri: RED_PIXEL_PNG,
+              opacity: 0.35,
+              plate: false,
+              tint: "#e6d4f0", // tinte pálido de ejemplo
+            },
+          },
+        },
+      }),
+    );
+    // Las 3 placas de finder usan el tinte (no blanco).
+    expect((svg.match(/<path d="[^"]+" fill="#e6d4f0"\/>/g) ?? []).length).toBe(3);
+    expect(await decodeSvg(svg, 700)).toBe(DATA);
+  });
+
   it("gradiente en fondo y esquinas es escaneable", async () => {
     const svg = renderQrSvg(
       DATA,

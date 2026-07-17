@@ -702,11 +702,13 @@ export function renderMatrixSvg(
     // Placas "sagradas" bajo los 3 finder patterns, solo si NO hay ya placa
     // global. Toman la SILUETA del estilo de esquina (mismos radios) para no
     // sobresalir como cuadros blancos por los lados del anillo redondeado.
+    // Color: tinte muestreado de la imagen (aclarado) si existe; si no, blanco.
     if (!bgImage.plate) {
+      const plateColor = bgImage.tint ?? bgColor;
       finderPlates = finders
         .map(
           (f) =>
-            `<path d="${finderPlatePath(style.cornersSquare.style, qrX + margin + f.x, qrY + margin + f.y)}" fill="${bgColor}"/>`,
+            `<path d="${finderPlatePath(style.cornersSquare.style, qrX + margin + f.x, qrY + margin + f.y)}" fill="${plateColor}"/>`,
         )
         .join("");
     }

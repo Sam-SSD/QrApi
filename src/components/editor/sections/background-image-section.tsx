@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { LabeledSlider } from "../controls/labeled-slider";
 import { useQrStore } from "@/stores/qr-store";
 import { MAX_IMAGE_BYTES } from "@/lib/constants";
+import { sampleTint } from "@/lib/qr/sample-tint";
 
 export function BackgroundImageSection() {
   const t = useTranslations("editor.backgroundImage");
@@ -26,14 +27,19 @@ export function BackgroundImageSection() {
       return;
     }
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
+      const dataUri = String(reader.result);
       setBgImage({
-        dataUri: String(reader.result),
+        dataUri,
         opacity: image?.opacity ?? 0.35,
         // Placa OFF por defecto: la imagen debe verse; los finders + EC=H la
         // mantienen escaneable (ver default del schema).
         plate: image?.plate ?? false,
       });
+      // Muestrea el tono de la imagen (aclarado) para teñir las placas de
+      // finder de forma que combinen sin perder contraste. Best-effort.
+      const tint = await sampleTint(dataUri);
+      if (tint) patchBgImage({ tint });
     };
     reader.readAsDataURL(file);
   }

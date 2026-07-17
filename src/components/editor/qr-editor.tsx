@@ -82,6 +82,10 @@ export function QrEditor({ initialTemplateId }: { initialTemplateId?: string }) 
   // Atajos de teclado
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
+      // Algunos eventos sintéticos (autofill, gestores de contraseñas) llegan
+      // sin `key`; sin este guard, key.toLowerCase() lanzaría.
+      if (!event.key) return;
+
       const target = event.target as HTMLElement;
       const typing =
         target.tagName === "INPUT" ||
