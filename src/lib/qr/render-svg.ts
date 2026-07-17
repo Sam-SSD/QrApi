@@ -739,14 +739,17 @@ export function renderMatrixSvg(
       // compitan con la foto (el sangrado en el margen es el fallo más común).
       bgImageLayers += `<rect x="${round(qrX)}" y="${round(qrY)}" width="${round(qrUnits)}" height="${round(qrUnits)}" rx="1.5" fill="${bgColor}"/>`;
     }
-    // Placas "sagradas" bajo los 3 finder patterns (siempre, aunque no haya
-    // placa global), para blindar su alto contraste.
-    finderPlates = finders
-      .map(
-        (f) =>
-          `<rect x="${round(qrX + margin + f.x - 0.4)}" y="${round(qrY + margin + f.y - 0.4)}" width="7.8" height="7.8" rx="0.6" fill="${bgColor}"/>`,
-      )
-      .join("");
+    // Placas "sagradas" bajo los 3 finder patterns, solo si NO hay ya placa
+    // global (esa cubre todo el QR). Ajustadas al finder 7×7 exacto para tapar
+    // lo mínimo de la imagen manteniendo el alto contraste de las esquinas.
+    if (!bgImage.plate) {
+      finderPlates = finders
+        .map(
+          (f) =>
+            `<rect x="${round(qrX + margin + f.x)}" y="${round(qrY + margin + f.y)}" width="7" height="7" rx="0.5" fill="${bgColor}"/>`,
+        )
+        .join("");
+    }
   }
 
   const width = options.width;

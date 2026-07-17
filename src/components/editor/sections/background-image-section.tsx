@@ -30,7 +30,9 @@ export function BackgroundImageSection() {
       setBgImage({
         dataUri: String(reader.result),
         opacity: image?.opacity ?? 0.35,
-        plate: image?.plate ?? true,
+        // Placa OFF por defecto: la imagen debe verse; los finders + EC=H la
+        // mantienen escaneable (ver default del schema).
+        plate: image?.plate ?? false,
       });
     };
     reader.readAsDataURL(file);

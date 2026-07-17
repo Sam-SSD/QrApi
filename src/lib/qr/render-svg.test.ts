@@ -249,8 +249,9 @@ describe("renderQrSvg", () => {
       }),
     );
     expect(svg).toContain("<image");
-    // 3 placas de finder + placa global bajo el QR
-    expect((svg.match(/<rect/g) ?? []).length).toBeGreaterThanOrEqual(4);
+    // Con placa global (plate:true) esta cubre todo el QR (fondo + scrim +
+    // placa); las placas de finder no se duplican bajo ella.
+    expect((svg.match(/<rect/g) ?? []).length).toBeGreaterThanOrEqual(3);
     expect(await decodeSvg(svg, 700)).toBe(DATA);
   });
 
@@ -290,6 +291,9 @@ describe("renderQrSvg", () => {
       }),
     );
     expect(svg).toContain("<image");
+    // Sin placa global: fondo base + scrim + 3 placas de finder = 5 rects.
+    // Garantiza que las esquinas siguen protegidas aunque la imagen se vea.
+    expect((svg.match(/<rect/g) ?? []).length).toBeGreaterThanOrEqual(5);
     expect(await decodeSvg(svg, 700)).toBe(DATA);
   });
 
