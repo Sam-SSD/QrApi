@@ -9,6 +9,8 @@ import {
   DOT_STYLES,
   CORNER_SQUARE_STYLES,
   CORNER_DOT_STYLES,
+  FRAME_STYLES,
+  FRAME_POSITIONS,
   MAX_QR_DATA_LENGTH,
   hexColor,
   payloadSchema,
@@ -48,6 +50,12 @@ const getQuerySchema = z.object({
     .enum(["true", "false"])
     .optional()
     .transform((v) => v === "true"),
+  // Marco (opcional): se aplica solo si viene frameStyle.
+  frameStyle: z.enum(FRAME_STYLES).optional(),
+  frameText: z.string().max(30).optional(),
+  frameColor: hexColor.optional(),
+  frameTextColor: hexColor.optional(),
+  framePosition: z.enum(FRAME_POSITIONS).optional(),
 });
 
 const postBodySchema = z
@@ -203,6 +211,17 @@ export async function GET(request: NextRequest) {
       ...(p.cornersDotStyle ? { cornersDot: { style: p.cornersDotStyle } } : {}),
       background: { color: p.bgColor, transparent: p.transparent ?? false },
     },
+    ...(p.frameStyle
+      ? {
+          frame: {
+            style: p.frameStyle,
+            ...(p.frameText !== undefined ? { text: p.frameText } : {}),
+            ...(p.frameColor ? { color: p.frameColor } : {}),
+            ...(p.frameTextColor ? { textColor: p.frameTextColor } : {}),
+            ...(p.framePosition ? { position: p.framePosition } : {}),
+          },
+        }
+      : {}),
   });
 
   return respondWithQr(p.data, config, p.format, p.size, auth.rate);
