@@ -29,6 +29,8 @@ export function FrameSection() {
                     style: "modern",
                     text: t("textPlaceholder"),
                     color: "#4f46e5",
+                    position: "bottom",
+                    icon: "none",
                   }
                 : undefined,
             )
