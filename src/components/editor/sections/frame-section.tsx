@@ -5,7 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { ColorControl } from "../controls/color-control";
-import { FRAME_STYLES, FRAME_POSITIONS, FRAME_ICONS } from "@/lib/qr/schema";
+import {
+  FRAME_STYLES,
+  FRAME_POSITIONS,
+  FRAME_ICONS,
+  type QrFrame,
+} from "@/lib/qr/schema";
 import { useQrStore } from "@/stores/qr-store";
 import { cn } from "@/lib/utils";
 
@@ -15,61 +20,75 @@ export function FrameSection() {
   const setFrame = useQrStore((s) => s.setFrame);
   const patchFrame = useQrStore((s) => s.patchFrame);
 
+  // Selecciona un estilo (crea el marco si no existía) o lo quita ("none").
+  function selectStyle(style: QrFrame["style"] | "none") {
+    if (style === "none") {
+      setFrame(undefined);
+      return;
+    }
+    if (frame) {
+      patchFrame({ style });
+    } else {
+      setFrame({
+        style,
+        text: t("textPlaceholder"),
+        color: "#4f46e5",
+        position: "bottom",
+        icon: "none",
+      });
+    }
+  }
+
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
-        <Label htmlFor="frame-enable">{t("enable")}</Label>
-        <Switch
-          id="frame-enable"
-          checked={Boolean(frame)}
-          onCheckedChange={(on) =>
-            setFrame(
-              on
-                ? {
-                    style: "modern",
-                    text: t("textPlaceholder"),
-                    color: "#4f46e5",
-                    position: "bottom",
-                    icon: "none",
-                  }
-                : undefined,
-            )
-          }
-        />
+      {/* Selector de estilo siempre visible, con "Ninguno" como primera opción:
+          elegir un estilo crea el marco y muestra sus controles al instante. */}
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium">{t("style")}</span>
+        <div
+          role="radiogroup"
+          aria-label={t("style")}
+          className="flex flex-wrap gap-1.5"
+        >
+          <button
+            type="button"
+            role="radio"
+            aria-checked={!frame}
+            onClick={() => selectStyle("none")}
+            className={cn(
+              "rounded-md border px-3 py-1.5 text-xs font-medium transition-all duration-150",
+              !frame
+                ? "border-primary/50 bg-brand-soft text-primary"
+                : "border-line text-muted-foreground hover:border-line-strong hover:text-foreground",
+            )}
+          >
+            {t("styles.none")}
+          </button>
+          {FRAME_STYLES.map((style) => {
+            const active = frame?.style === style;
+            return (
+              <button
+                key={style}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => selectStyle(style)}
+                className={cn(
+                  "rounded-md border px-3 py-1.5 text-xs font-medium transition-all duration-150",
+                  active
+                    ? "border-primary/50 bg-brand-soft text-primary"
+                    : "border-line text-muted-foreground hover:border-line-strong hover:text-foreground",
+                )}
+              >
+                {t(`styles.${style}`)}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {frame && (
         <>
-          <div className="flex flex-col gap-2">
-            <span className="text-sm font-medium">{t("style")}</span>
-            <div
-              role="radiogroup"
-              aria-label={t("style")}
-              className="flex flex-wrap gap-1.5"
-            >
-              {FRAME_STYLES.map((style) => {
-                const active = frame.style === style;
-                return (
-                  <button
-                    key={style}
-                    type="button"
-                    role="radio"
-                    aria-checked={active}
-                    onClick={() => patchFrame({ style })}
-                    className={cn(
-                      "rounded-md border px-3 py-1.5 text-xs font-medium transition-all duration-150",
-                      active
-                        ? "border-primary/50 bg-brand-soft text-primary"
-                        : "border-line text-muted-foreground hover:border-line-strong hover:text-foreground",
-                    )}
-                  >
-                    {t(`styles.${style}`)}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
           <div className="flex flex-col gap-2">
             <Label htmlFor="frame-text">{t("text")}</Label>
             <Input

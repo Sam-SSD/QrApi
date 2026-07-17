@@ -9,6 +9,30 @@ import {
 import { useQrStore } from "@/stores/qr-store";
 import { cn } from "@/lib/utils";
 
+/** Rect con radio por esquina [tl, tr, br, bl] — mismo trazado que el motor. */
+function roundedRectThumb(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  [tl, tr, br, bl]: [number, number, number, number],
+): string {
+  return [
+    `M${x + tl},${y}`,
+    `h${w - tl - tr}`,
+    tr ? `a${tr},${tr} 0 0 1 ${tr},${tr}` : "",
+    `v${h - tr - br}`,
+    br ? `a${br},${br} 0 0 1 ${-br},${br}` : "",
+    `h${-(w - br - bl)}`,
+    bl ? `a${bl},${bl} 0 0 1 ${-bl},${-bl}` : "",
+    `v${-(h - bl - tl)}`,
+    tl ? `a${tl},${tl} 0 0 1 ${tl},${-tl}` : "",
+    "z",
+  ]
+    .filter(Boolean)
+    .join("");
+}
+
 /** Path de estrella para las miniaturas. */
 function starThumbPath(
   cx: number,
@@ -102,30 +126,26 @@ function CornerSquareThumb({
 }: {
   style: (typeof CORNER_SQUARE_STYLES)[number];
 }) {
-  // outpoint/inpoint/classy: esquinas en punta (rx=0) en dos vértices y
-  // redondeadas en los otros dos → se ilustran con un path de esquinas mixtas.
-  const strokeProps = {
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 4,
-  } as const;
-  if (style === "square" || style === "rounded" || style === "extra-rounded") {
-    const rx = style === "square" ? 0 : style === "rounded" ? 6 : 10;
-    return (
-      <svg viewBox="0 0 30 30" className="size-7" aria-hidden="true">
-        <rect x={3} y={3} width={24} height={24} rx={rx} {...strokeProps} />
-      </svg>
-    );
-  }
-  // Path con esquinas alternas redondeadas/en punta.
-  const r = style === "classy" ? 8 : 10;
-  const path =
-    style === "inpoint"
-      ? `M3,3 h24 v${24 - r} a${r},${r} 0 0 1 -${r},${r} h-${24 - r} v-${24 - r} a${r},${r} 0 0 1 ${r},-${r} z`
-      : `M${3 + r},3 h${24 - r} v24 h-${24 - r} a${r},${r} 0 0 1 -${r},-${r} v-${24 - r} a${r},${r} 0 0 1 ${r},-${r} z`;
+  // Radios por esquina [tl, tr, br, bl] que reflejan cada estilo del motor.
+  const radii: Record<
+    (typeof CORNER_SQUARE_STYLES)[number],
+    [number, number, number, number]
+  > = {
+    square: [0, 0, 0, 0],
+    rounded: [6, 6, 6, 6],
+    "extra-rounded": [10, 10, 10, 10],
+    outpoint: [0, 9, 0, 9], // TL y BR en punta
+    inpoint: [9, 0, 9, 0], // TR y BL en punta
+    classy: [0, 7, 0, 7], // una punta y su opuesta redondeada
+  };
   return (
     <svg viewBox="0 0 30 30" className="size-7" aria-hidden="true">
-      <path d={path} {...strokeProps} />
+      <path
+        d={roundedRectThumb(3, 3, 24, 24, radii[style])}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={4}
+      />
     </svg>
   );
 }
