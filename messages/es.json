@@ -74,7 +74,8 @@
     },
     "showcase": {
       "title": "Un QR para cada marca",
-      "subtitle": "Haz clic en cualquier ejemplo para abrirlo en el editor."
+      "subtitle": "Haz clic en cualquier ejemplo para abrirlo en el editor.",
+      "useTemplate": "Usar la plantilla {name}"
     },
     "developer": {
       "title": "Un endpoint. Cualquier estilo.",
@@ -278,7 +279,7 @@
         "marketing": "Marketing"
       },
       "names": {
-        "qrapi": "QrAPI",
+        "qrapi": "Marca",
         "aurora": "Aurora",
         "sticker": "Sticker transparente",
         "neon": "Neón",

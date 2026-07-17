@@ -4,9 +4,10 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { renderQrSvg } from "@/lib/qr/render-svg";
 import { qrConfigSchema } from "@/lib/qr/schema";
+import { SITE_URL } from "@/lib/constants";
 import { Reveal } from "./reveal";
 
-const CURL_EXAMPLE = `curl "https://tu-dominio.com/api/v1/qr" \\
+const CURL_EXAMPLE = `curl "${SITE_URL}/api/v1/qr" \\
   -H "Authorization: Bearer qra_TU_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
