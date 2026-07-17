@@ -83,7 +83,12 @@ export const GRADIENT_PRESETS: Record<string, QrGradient> = {
   },
 };
 
-export type QrTemplateCategory = "brand" | "dark" | "business" | "marketing";
+export type QrTemplateCategory =
+  | "brand"
+  | "dark"
+  | "business"
+  | "marketing"
+  | "industry";
 
 export interface QrTemplate {
   id: string;
@@ -110,7 +115,17 @@ export const TEMPLATE_CATEGORIES: QrTemplateCategory[] = [
   "dark",
   "business",
   "marketing",
+  "industry",
 ];
+
+/**
+ * Imagen de fondo de ejemplo (degradado naranja→rosa 48×48 en PNG) para las
+ * plantillas que muestran la función de foto detrás del QR. PNG (no SVG: el
+ * schema rechaza svg+xml) y pequeña para no inflar el bundle. Se fija un tinte
+ * pálido acorde con la imagen para las placas de finder.
+ */
+const SAMPLE_BG_SUNSET =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAABHVBMVEXrXVrqWFzsYVftYlbqWlvsYFjqWVvrW1rrXlnsX1jpV13pVl3tY1btZFXpVV7oVF7uZVXoUl/uZ1TuaFPoUWDnUGDvaVPnT2HvalLnTmHva1LmTWLwbFHmTGPwbVDmS2PwblDlSmTxb0/lSGXxcU7lR2Xxck7kRmbyc03ydE3kRWbkRGfydUzzdkvjQ2jzd0vjQmjzeErjQWn0eUriQGniPmr0e0niPWv0fEjhPGv1fUjhO2z1fkf1f0bhOm32gEbgOW32gUXgOG72gkXgN273hETfNW/3hUPfNHD3hkPfM3D4h0LeMnH4iELeMXH4iUHeMHL5ikDdL3P5i0DdLnP5jD/dLXT6jj7cK3X6jz7cKnX6kD3cKXb7kT3bKHY/fa09AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAyUlEQVRIx5XK1yICAABA0VsUIdkZUfZIkdWQEGWPSkPk/z/DN9zzfBj8fHfbrcbH28vTQ+3u9vqqXCpcnOaOMof7eztbG6m1xPLiwuzMVHRiKBiKjIL8I8g/jPxh5A8g/xjyjyP/JPLHkH8a+eeQfx7549i/hPwryL+K/EnkX0f+TeTfRv5d5D9A/jTyZ5H/GPlPkP8M+c+RP4/8ReS/RP4K8t8gfxX575G/jvyPyP+M/K/I/478n8jfRP4v5O8gfw/5+8j/i/x///YGG74JgK5kAAAAAElFTkSuQmCC";
 
 const base = DEFAULT_QR_CONFIG;
 
@@ -353,6 +368,139 @@ const TEMPLATE_DEFS: QrTemplateInput[] = [
         text: "ESCRÍBEME",
         color: "#6366f1",
       },
+    },
+  },
+  // ─ marketing: imagen de fondo + gradiente en esquinas (features nuevas) ─
+  {
+    id: "photo",
+    category: "marketing",
+    payload: { type: "url", url: "https://qrapi.dev/promo" },
+    config: {
+      ...base,
+      ecLevel: "H",
+      style: {
+        dots: { style: "rounded", color: "#0b0b14" },
+        cornersSquare: { style: "extra-rounded", color: "#0b0b14" },
+        cornersDot: { style: "dot", color: "#0b0b14" },
+        background: {
+          color: "#ffffff",
+          transparent: false,
+          image: { dataUri: SAMPLE_BG_SUNSET, opacity: 0.4, tint: "#fde4d6" },
+        },
+      },
+    },
+  },
+  {
+    id: "prisma",
+    category: "marketing",
+    payload: { type: "url", url: "https://qrapi.dev" },
+    config: {
+      ...base,
+      ecLevel: "Q",
+      style: {
+        dots: { style: "extra-rounded", color: "#4f46e5", gradient: GRADIENT_PRESETS.aurora },
+        cornersSquare: { style: "extra-rounded", gradient: GRADIENT_PRESETS.brand },
+        cornersDot: { style: "dot", gradient: GRADIENT_PRESETS.brand },
+        background: { color: "#f5f3ff", transparent: false },
+      },
+    },
+  },
+  // ─ industry: presets de 1 clic por sector ─
+  {
+    id: "restaurant",
+    category: "industry",
+    payload: { type: "url", url: "https://qrapi.dev/menu" },
+    config: {
+      ...base,
+      ecLevel: "Q",
+      style: {
+        dots: { style: "rounded", color: "#b45309", gradient: GRADIENT_PRESETS.fire },
+        cornersSquare: { style: "rounded", color: "#b45309" },
+        cornersDot: { style: "dot", color: "#dc2626" },
+        background: { color: "#fffbeb", transparent: false },
+      },
+      frame: { style: "speech-bubble", text: "VER EL MENÚ", color: "#b45309" },
+    },
+  },
+  {
+    id: "eventpass",
+    category: "industry",
+    payload: { type: "url", url: "https://qrapi.dev/eventos" },
+    config: {
+      ...base,
+      ecLevel: "Q",
+      style: {
+        dots: { style: "extra-rounded", color: "#7c3aed", gradient: GRADIENT_PRESETS.purple },
+        cornersSquare: { style: "extra-rounded", color: "#7c3aed" },
+        cornersDot: { style: "dot", color: "#db2777" },
+        background: { color: "#ffffff", transparent: false },
+      },
+      frame: { style: "ticket", text: "ENTRADA", color: "#7c3aed" },
+    },
+  },
+  {
+    id: "realestate",
+    category: "industry",
+    payload: { type: "url", url: "https://qrapi.dev/inmueble" },
+    config: {
+      ...base,
+      ecLevel: "Q",
+      style: {
+        dots: { style: "classy", color: "#0f766e", gradient: GRADIENT_PRESETS.mint },
+        cornersSquare: { style: "rounded", color: "#0f766e" },
+        cornersDot: { style: "dot", color: "#0d9488" },
+        background: { color: "#ffffff", transparent: false },
+      },
+      frame: { style: "elegant", text: "VER PROPIEDAD", color: "#0f766e" },
+    },
+  },
+  {
+    id: "retail",
+    category: "industry",
+    payload: { type: "url", url: "https://qrapi.dev/tienda" },
+    config: {
+      ...base,
+      ecLevel: "Q",
+      style: {
+        dots: { style: "rounded", color: "#db2777", gradient: GRADIENT_PRESETS.purple },
+        cornersSquare: { style: "extra-rounded", color: "#db2777" },
+        cornersDot: { style: "dot", color: "#7c3aed" },
+        background: { color: "#ffffff", transparent: false },
+      },
+      frame: { style: "badge", text: "-20% DESCUENTO", color: "#db2777" },
+    },
+  },
+  {
+    id: "hotel",
+    category: "industry",
+    payload: { type: "wifi", ssid: "Hotel Guest", password: "bienvenido", security: "WPA", hidden: false },
+    config: {
+      ...base,
+      ecLevel: "Q",
+      style: {
+        dots: { style: "extra-rounded", color: "#1d4ed8", gradient: GRADIENT_PRESETS.ocean },
+        cornersSquare: { style: "extra-rounded", color: "#1d4ed8" },
+        cornersDot: { style: "dot", color: "#0891b2" },
+        background: { color: "#ffffff", transparent: false },
+      },
+      frame: { style: "classic", text: "WIFI HOTEL", color: "#1d4ed8" },
+    },
+  },
+  {
+    id: "gym",
+    category: "industry",
+    payload: { type: "url", url: "https://qrapi.dev/clases" },
+    config: {
+      ...base,
+      ecLevel: "H",
+      style: {
+        dots: { style: "diamond", color: "#22d3ee", gradient: GRADIENT_PRESETS.neon },
+        cornersSquare: { style: "rounded", color: "#818cf8" },
+        cornersDot: { style: "dot", color: "#22d3ee" },
+        background: { color: "#09090b", transparent: false },
+      },
+      frame: { style: "neon", text: "RESERVA CLASE", color: "#22d3ee" },
+      effects: { ...base.effects, glow: true },
     },
   },
 ];

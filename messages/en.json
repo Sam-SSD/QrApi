@@ -310,7 +310,8 @@
         "brand": "Identity",
         "dark": "Dark mode",
         "business": "Business",
-        "marketing": "Marketing"
+        "marketing": "Marketing",
+        "industry": "By industry"
       },
       "names": {
         "qrapi": "Brand",
@@ -324,7 +325,15 @@
         "payment": "Crypto payment",
         "event": "Event",
         "sunset": "Sunset promo",
-        "email": "Email contact"
+        "email": "Email contact",
+        "photo": "Photo background",
+        "prisma": "Prism",
+        "restaurant": "Restaurant",
+        "eventpass": "Event pass",
+        "realestate": "Real estate",
+        "retail": "Retail",
+        "hotel": "Hotel",
+        "gym": "Gym"
       }
     },
     "history": {
