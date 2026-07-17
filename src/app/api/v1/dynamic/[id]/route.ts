@@ -1,0 +1,160 @@
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { prisma } from "@/lib/prisma";
+import {
+  CORS_HEADERS,
+  authenticateApi,
+  errorResponse,
+  jsonResponse,
+} from "@/lib/api-helpers";
+import { buildRedirectUrl } from "@/lib/dynamic-qr/redirect-url";
+
+export const runtime = "nodejs";
+
+const httpUrl = z
+  .string()
+  .url()
+  .max(2048)
+  .refine((u) => /^https?:\/\//i.test(u), "URL must be http(s)");
+
+const patchBodySchema = z
+  .object({
+    targetUrl: httpUrl.optional(),
+    active: z.boolean().optional(),
+  })
+  .refine((b) => b.targetUrl !== undefined || b.active !== undefined, {
+    message: "Provide targetUrl and/or active",
+  });
+
+export function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
+}
+
+/** Detalle + resumen de analytics de un QR dinámico propio. */
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const auth = await authenticateApi(request);
+  if (auth.response) return auth.response;
+  const { id } = await params;
+
+  // Ownership en la query: un id ajeno es un 404.
+  const dynamic = await prisma.dynamicQr.findUnique({
+    where: { id, userId: auth.apiKey.userId },
+  });
+  if (!dynamic) {
+    return errorResponse(404, "not_found", "Dynamic QR not found");
+  }
+
+  const [byCountry, byDevice] = await Promise.all([
+    prisma.scanEvent.groupBy({
+      by: ["country"],
+      where: { dynamicQrId: dynamic.id },
+      _count: { _all: true },
+    }),
+    prisma.scanEvent.groupBy({
+      by: ["deviceType"],
+      where: { dynamicQrId: dynamic.id },
+      _count: { _all: true },
+    }),
+  ]);
+
+  const toRecord = (rows: Array<{ key: string | null; count: number }>) =>
+    Object.fromEntries(
+      rows
+        .sort((a, b) => b.count - a.count)
+        .map((r) => [r.key ?? "unknown", r.count]),
+    );
+
+  return jsonResponse(
+    {
+      id: dynamic.id,
+      slug: dynamic.slug,
+      title: dynamic.title,
+      redirectUrl: buildRedirectUrl(dynamic.slug),
+      targetUrl: dynamic.targetUrl,
+      active: dynamic.active,
+      createdAt: dynamic.createdAt.toISOString(),
+      analytics: {
+        totalScans: dynamic.scanCount,
+        byCountry: toRecord(
+          byCountry.map((r) => ({ key: r.country, count: r._count._all })),
+        ),
+        byDevice: toRecord(
+          byDevice.map((r) => ({ key: r.deviceType, count: r._count._all })),
+        ),
+      },
+    },
+    auth.rate,
+  );
+}
+
+/** Edita destino y/o estado activo sin regenerar el código. */
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const auth = await authenticateApi(request);
+  if (auth.response) return auth.response;
+  const { id } = await params;
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return errorResponse(415, "invalid_json", "Body must be valid JSON");
+  }
+  const parsed = patchBodySchema.safeParse(body);
+  if (!parsed.success) {
+    return errorResponse(
+      400,
+      "invalid_body",
+      "Invalid body",
+      z.flattenError(parsed.error).fieldErrors,
+    );
+  }
+
+  const result = await prisma.dynamicQr.updateMany({
+    where: { id, userId: auth.apiKey.userId }, // ownership
+    data: {
+      ...(parsed.data.targetUrl !== undefined
+        ? { targetUrl: parsed.data.targetUrl }
+        : {}),
+      ...(parsed.data.active !== undefined
+        ? { active: parsed.data.active }
+        : {}),
+    },
+  });
+  if (result.count === 0) {
+    return errorResponse(404, "not_found", "Dynamic QR not found");
+  }
+
+  const updated = await prisma.dynamicQr.findUnique({ where: { id } });
+  return jsonResponse(
+    {
+      id,
+      targetUrl: updated?.targetUrl,
+      active: updated?.active,
+    },
+    auth.rate,
+  );
+}
+
+/** Elimina un QR dinámico propio (y su historial de escaneos, por cascada). */
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const auth = await authenticateApi(request);
+  if (auth.response) return auth.response;
+  const { id } = await params;
+
+  const result = await prisma.dynamicQr.deleteMany({
+    where: { id, userId: auth.apiKey.userId },
+  });
+  if (result.count === 0) {
+    return errorResponse(404, "not_found", "Dynamic QR not found");
+  }
+  return jsonResponse({ deleted: true }, auth.rate);
+}
