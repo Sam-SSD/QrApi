@@ -1,0 +1,119 @@
+"use server";
+
+import { headers } from "next/headers";
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import { Prisma } from "@prisma/client";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { qrConfigSchema } from "@/lib/qr/schema";
+import { generateSlug } from "@/lib/dynamic-qr/slug";
+import { buildRedirectUrl } from "@/lib/dynamic-qr/redirect-url";
+
+const MAX_DYNAMIC_QRS = 100;
+
+async function requireSession() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) throw new Error("UNAUTHORIZED");
+  return session;
+}
+
+// Solo http/https: `new URL()` (y z.url()) aceptarían javascript:/data:, que no
+// deben vivir en un redirector público bajo nuestro dominio.
+const httpUrl = z
+  .string()
+  .url()
+  .max(2048)
+  .refine((u) => /^https?:\/\//i.test(u), "URL debe ser http(s)");
+
+const createInput = z.object({
+  title: z.string().min(1).max(80),
+  targetUrl: httpUrl,
+  config: qrConfigSchema,
+});
+
+/**
+ * Crea un QR dinámico: genera un slug único, crea el DynamicQr, y crea el
+ * QrCode cuyo `data` codifica la URL de redirección `/r/{slug}`. El destino
+ * (targetUrl) se edita luego sin regenerar el código.
+ */
+export async function createDynamicQr(input: z.infer<typeof createInput>) {
+  const session = await requireSession();
+  const parsed = createInput.parse(input);
+
+  const count = await prisma.dynamicQr.count({
+    where: { userId: session.user.id },
+  });
+  if (count >= MAX_DYNAMIC_QRS) throw new Error("LIMIT_REACHED");
+
+  // Inserta con reintento ante colisión de slug (índice único → P2002).
+  let dynamic;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const slug = generateSlug();
+    try {
+      dynamic = await prisma.dynamicQr.create({
+        data: {
+          slug,
+          userId: session.user.id,
+          title: parsed.title,
+          targetUrl: parsed.targetUrl,
+        },
+      });
+      break;
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        continue; // colisión de slug: reintenta
+      }
+      throw error;
+    }
+  }
+  if (!dynamic) throw new Error("SLUG_COLLISION");
+
+  const data = buildRedirectUrl(dynamic.slug);
+  const created = await prisma.qrCode.create({
+    data: {
+      userId: session.user.id,
+      name: parsed.title,
+      type: "URL",
+      data,
+      config: { dynamic: true, config: parsed.config },
+      dynamicQrId: dynamic.id,
+    },
+  });
+
+  revalidatePath("/[locale]/dashboard", "layout");
+  return { id: created.id, slug: dynamic.slug, redirectUrl: data };
+}
+
+export async function updateDynamicTarget(id: string, targetUrl: string) {
+  const session = await requireSession();
+  const url = httpUrl.parse(targetUrl);
+  const result = await prisma.dynamicQr.updateMany({
+    where: { id, userId: session.user.id }, // ownership
+    data: { targetUrl: url },
+  });
+  if (result.count === 0) throw new Error("NOT_FOUND");
+  revalidatePath("/[locale]/dashboard", "layout");
+}
+
+export async function toggleDynamicActive(id: string, active: boolean) {
+  const session = await requireSession();
+  const result = await prisma.dynamicQr.updateMany({
+    where: { id, userId: session.user.id },
+    data: { active },
+  });
+  if (result.count === 0) throw new Error("NOT_FOUND");
+  revalidatePath("/[locale]/dashboard", "layout");
+}
+
+export async function deleteDynamicQr(id: string) {
+  const session = await requireSession();
+  const result = await prisma.dynamicQr.deleteMany({
+    where: { id, userId: session.user.id },
+  });
+  if (result.count === 0) throw new Error("NOT_FOUND");
+  revalidatePath("/[locale]/dashboard", "layout");
+}

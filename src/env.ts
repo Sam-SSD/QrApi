@@ -30,6 +30,14 @@ const envSchema = z.object({
   // Límites de la API pública (por API key)
   RATE_LIMIT_PER_MINUTE: z.coerce.number().default(60),
   RATE_LIMIT_PER_DAY: z.coerce.number().default(5000),
+
+  // Secreto para el HMAC de IPs en los eventos de escaneo (QR dinámicos).
+  // En producción DEBE fijarse a un valor propio; el default solo sirve en dev,
+  // donde la IP suele ser null y el hash no se usa.
+  SCAN_IP_SECRET: z
+    .string()
+    .min(1)
+    .default("dev-scan-ip-secret-change-in-production"),
 });
 
 const parsed = envSchema.safeParse(process.env);

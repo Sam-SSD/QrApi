@@ -400,7 +400,10 @@
       "nameLabel": "Name",
       "namePlaceholder": "My QR",
       "submit": "Save QR",
-      "loginRequired": "Sign in to save your QRs"
+      "loginRequired": "Sign in to save your QRs",
+      "dynamicLabel": "Dynamic QR",
+      "dynamicHint": "Change the destination without reprinting the code and see scan analytics",
+      "targetUrlLabel": "Destination URL"
     },
     "migrate": {
       "title": "You have {count} guest QRs in this browser",

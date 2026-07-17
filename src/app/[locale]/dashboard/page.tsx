@@ -16,7 +16,9 @@ export default async function DashboardPage({
   if (!session) return null; // el layout ya redirige
 
   const rows = await prisma.qrCode.findMany({
-    where: { userId: session.user.id },
+    // Los QR dinámicos tienen su propia vista (dashboard/dynamic); aquí solo
+    // los estáticos, cuyo config incluye `payload` para el preview del grid.
+    where: { userId: session.user.id, dynamicQrId: null },
     orderBy: { createdAt: "desc" },
   });
 
