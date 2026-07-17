@@ -73,7 +73,7 @@ export function Footer() {
       </div>
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 text-xs text-ink-faint sm:px-6">
-          <span>QRForge · {t("license")}</span>
+          <span>QrAPI · {t("license")}</span>
         </div>
       </div>
     </footer>

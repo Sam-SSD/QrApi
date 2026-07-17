@@ -19,7 +19,7 @@ const envSchema = z.object({
   SMTP_PORT: z.coerce.number().default(1025),
   SMTP_USER: z.string().optional(),
   SMTP_PASSWORD: z.string().optional(),
-  SMTP_FROM: z.string().default("QRForge <no-reply@qrforge.local>"),
+  SMTP_FROM: z.string().default("QrAPI <no-reply@qrapi.local>"),
 
   // OAuth opcional: los proveedores solo se activan si sus vars existen
   GITHUB_CLIENT_ID: z.string().optional(),

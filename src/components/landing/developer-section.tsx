@@ -7,10 +7,10 @@ import { qrConfigSchema } from "@/lib/qr/schema";
 import { Reveal } from "./reveal";
 
 const CURL_EXAMPLE = `curl "https://tu-dominio.com/api/v1/qr" \\
-  -H "Authorization: Bearer qrf_TU_TOKEN" \\
+  -H "Authorization: Bearer qra_TU_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "data": "https://qrforge.dev",
+    "data": "https://qrapi.dev",
     "format": "png",
     "size": 512,
     "style": {
@@ -32,7 +32,7 @@ export function DeveloperSection() {
   const t = useTranslations("landing.developer");
 
   const resultSvg = renderQrSvg(
-    "https://qrforge.dev",
+    "https://qrapi.dev",
     qrConfigSchema.parse({
       style: {
         dots: {

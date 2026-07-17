@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Símbolo de QRForge: un finder pattern estilizado con un módulo "desprendido"
- * en la esquina inferior derecha — la forja de un QR en construcción.
+ * Símbolo de QrAPI: un finder pattern estilizado con un módulo "desprendido"
+ * en la esquina inferior derecha.
  */
 export function LogoMark({ className }: { className?: string }) {
   return (
@@ -28,11 +28,11 @@ export function LogoMark({ className }: { className?: string }) {
         width="6"
         height="6"
         rx="1.5"
-        fill="url(#qrforge-brand)"
+        fill="url(#qrapi-brand)"
       />
       <defs>
         <linearGradient
-          id="qrforge-brand"
+          id="qrapi-brand"
           x1="23"
           y1="23"
           x2="29"
@@ -52,7 +52,7 @@ export function Logo({ className }: { className?: string }) {
     <span className={cn("flex items-center gap-2", className)}>
       <LogoMark className="text-foreground" />
       <span className="text-lg font-semibold tracking-tight">
-        <span className="text-gradient-brand">qr</span>forge
+        <span className="text-gradient-brand">qr</span>api
       </span>
     </span>
   );

@@ -61,7 +61,7 @@ export async function exportQr(
   format: ExportFormat,
   options: { width: number; filename?: string },
 ): Promise<void> {
-  const filename = options.filename ?? "qrforge";
+  const filename = options.filename ?? "qrapi";
 
   switch (format) {
     case "svg": {

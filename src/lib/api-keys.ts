@@ -2,7 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import type { ApiKey } from "@prisma/client";
 
-export const API_KEY_PREFIX = "qrf_";
+export const API_KEY_PREFIX = "qra_";
 
 /** Genera un token nuevo. Solo se muestra completo UNA vez. */
 export function generateApiToken(): {
@@ -26,7 +26,7 @@ export type ApiKeyVerification =
   | { ok: true; apiKey: ApiKey }
   | { ok: false; reason: "missing" | "invalid" | "revoked" | "expired" };
 
-/** Verifica un header Authorization: Bearer qrf_... */
+/** Verifica un header Authorization: Bearer qra_... */
 export async function verifyApiToken(
   authorization: string | null,
 ): Promise<ApiKeyVerification> {

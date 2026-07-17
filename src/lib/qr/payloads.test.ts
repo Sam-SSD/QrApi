@@ -9,8 +9,8 @@ describe("buildPayload", () => {
   });
 
   it("url pasa sin cambios", () => {
-    expect(buildPayload({ type: "url", url: "https://qrforge.dev" })).toBe(
-      "https://qrforge.dev",
+    expect(buildPayload({ type: "url", url: "https://qrapi.dev" })).toBe(
+      "https://qrapi.dev",
     );
   });
 

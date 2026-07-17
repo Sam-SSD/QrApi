@@ -73,14 +73,14 @@ model Verification {
   @@map("verification")
 }
 
-// ---------- Dominio QRForge ----------
+// ---------- Dominio QrAPI ----------
 
 model ApiKey {
   id           String    @id @default(cuid())
   userId       String
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   name         String
-  prefix       String // primeros 12 chars visibles: "qrf_a1B2c3D4"
+  prefix       String // primeros 12 chars visibles: "qra_a1B2c3D4"
   keyHash      String    @unique // SHA-256 hex del token completo
   scopes       String[]  @default(["qr:generate"])
   expiresAt    DateTime?

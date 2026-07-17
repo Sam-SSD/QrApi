@@ -14,7 +14,7 @@ export function AuthCard({
     <div className="flex min-h-[calc(100dvh-8rem)] items-center justify-center px-4 py-16">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center gap-4 text-center">
-          <Link href="/" aria-label="QRForge">
+          <Link href="/" aria-label="QrAPI">
             <LogoMark className="size-10 text-foreground" />
           </Link>
           <div>
