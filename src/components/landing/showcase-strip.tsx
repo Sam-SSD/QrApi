@@ -34,6 +34,7 @@ export function ShowcaseStrip() {
             <Reveal key={id} delay={index * 50}>
               <Link
                 href={`/generator?preset=${id}`}
+                aria-label={t("useTemplate", { name: tNames(id) })}
                 className="group flex flex-col gap-2 rounded-xl border border-line bg-surface p-3 transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-raised"
               >
                 <span
