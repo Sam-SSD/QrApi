@@ -163,6 +163,7 @@ function CreateKeyDialog({
 
 function KeyRow({ row }: { row: ApiKeyRow }) {
   const t = useTranslations("dashboard.keys");
+  const tCommon = useTranslations("common");
   const format = useFormatter();
   const [confirmRevoke, setConfirmRevoke] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -216,7 +217,7 @@ function KeyRow({ row }: { row: ApiKeyRow }) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel />
+            <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={() =>
@@ -225,7 +226,9 @@ function KeyRow({ row }: { row: ApiKeyRow }) {
                   toast.success(t("revoked"));
                 })
               }
-            />
+            >
+              {t("revoke")}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
