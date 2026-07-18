@@ -494,9 +494,23 @@
       "generate": "Generate a QR",
       "params": "Parameters",
       "styles": "Styles",
+      "dynamic": "Dynamic QRs",
       "errors": "Errors",
       "rateLimits": "Rate limits",
       "tryIt": "Try it"
+    },
+    "dynamic": {
+      "body": "A dynamic QR encodes a short redirect URL of your own whose destination you can change at any time without regenerating or reprinting the code. Every scan is recorded with country and device type for analytics. Full management via API with your same key.",
+      "colEndpoint": "Endpoint",
+      "colDescription": "Description",
+      "rows": {
+        "create": "Creates a dynamic QR with a title and target URL; returns id, slug and redirectUrl",
+        "list": "Lists your dynamic QRs with their scan counts",
+        "get": "Detail of one, with aggregated analytics by country and device",
+        "patch": "Edits targetUrl and/or active (pause) without regenerating the code",
+        "delete": "Deletes the dynamic QR and its scan history"
+      },
+      "note": "The QR image is obtained from the generation endpoint by encoding the redirectUrl. Targets must be http(s)."
     },
     "intro": {
       "body": "The QrAPI API exposes a single endpoint that generates QR codes with every editor style: gradients, dot shapes, custom corners, logos and frames. It returns the image directly (PNG, SVG or JPEG), ready to use.",
