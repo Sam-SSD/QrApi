@@ -1,9 +1,10 @@
 "use client";
 
-import { Menu } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { Link, usePathname } from "@/i18n/navigation";
+import { signOut, useSession } from "@/lib/auth-client";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -51,6 +52,8 @@ function NavLink({
 export function Header() {
   const t = useTranslations("nav");
   const [open, setOpen] = useState(false);
+  const { data: session, isPending } = useSession();
+  const router = useRouter();
 
   const links = [
     { href: "/generator", label: t("generator") },
@@ -112,16 +115,44 @@ export function Header() {
                 <div className="flex justify-start">
                   <LocaleSwitcher />
                 </div>
-                <Button variant="outline" asChild>
-                  <Link href="/login" onClick={() => setOpen(false)}>
-                    {t("login")}
-                  </Link>
-                </Button>
-                <Button asChild>
-                  <Link href="/register" onClick={() => setOpen(false)}>
-                    {t("register")}
-                  </Link>
-                </Button>
+                {isPending ? (
+                  <div className="h-9 animate-pulse rounded-md bg-muted" />
+                ) : session ? (
+                  <>
+                    <Button asChild>
+                      <Link href="/dashboard" onClick={() => setOpen(false)}>
+                        <LayoutDashboard className="size-4" strokeWidth={1.75} />
+                        {t("dashboard")}
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="text-destructive hover:text-destructive"
+                      onClick={async () => {
+                        await signOut();
+                        setOpen(false);
+                        router.push("/");
+                        router.refresh();
+                      }}
+                    >
+                      <LogOut className="size-4" strokeWidth={1.75} />
+                      {t("logout")}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" asChild>
+                      <Link href="/login" onClick={() => setOpen(false)}>
+                        {t("login")}
+                      </Link>
+                    </Button>
+                    <Button asChild>
+                      <Link href="/register" onClick={() => setOpen(false)}>
+                        {t("register")}
+                      </Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </SheetContent>
           </Sheet>

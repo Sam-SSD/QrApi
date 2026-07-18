@@ -37,46 +37,47 @@ export function UserMenu() {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={session.user.name}
-          className="rounded-full"
-        >
-          <span className="flex size-7 items-center justify-center rounded-full bg-brand-soft text-primary">
-            <UserRound className="size-4" strokeWidth={1.75} />
-          </span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52">
-        <DropdownMenuLabel className="truncate">
-          {session.user.name}
-          <span className="block truncate text-xs font-normal text-muted-foreground">
-            {session.user.email}
-          </span>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/dashboard">
-            <LayoutDashboard className="size-4" strokeWidth={1.75} />
-            {t("dashboard")}
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          variant="destructive"
-          onClick={async () => {
-            await signOut();
-            router.push("/");
-            router.refresh();
-          }}
-        >
-          <LogOut className="size-4" strokeWidth={1.75} />
-          {t("logout")}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex items-center gap-2">
+      <Button variant="outline" size="sm" asChild>
+        <Link href="/dashboard">
+          <LayoutDashboard className="size-4" strokeWidth={1.75} />
+          {t("dashboard")}
+        </Link>
+      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={session.user.name}
+            className="rounded-full"
+          >
+            <span className="flex size-7 items-center justify-center rounded-full bg-brand-soft text-primary">
+              <UserRound className="size-4" strokeWidth={1.75} />
+            </span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-52">
+          <DropdownMenuLabel className="truncate">
+            {session.user.name}
+            <span className="block truncate text-xs font-normal text-muted-foreground">
+              {session.user.email}
+            </span>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            variant="destructive"
+            onClick={async () => {
+              await signOut();
+              router.push("/");
+              router.refresh();
+            }}
+          >
+            <LogOut className="size-4" strokeWidth={1.75} />
+            {t("logout")}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }
