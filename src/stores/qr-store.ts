@@ -80,6 +80,22 @@ function fieldsToPayloadInput(
   return cleaned;
 }
 
+/**
+ * Inverso de fieldsToPayloadInput: reconstruye los campos del formulario a
+ * partir de un payload guardado (para editar un QR de la cuenta). Los campos
+ * ausentes en el payload conservan su default.
+ */
+export function payloadToFields(payload: QrPayload): Partial<FieldsMap> {
+  const { type, ...rest } = payload;
+  const base = structuredClone(DEFAULT_FIELDS[type]) as Record<string, unknown>;
+  for (const [key, value] of Object.entries(rest)) {
+    if (!(key in base)) continue;
+    // crypto.amount es number en el payload pero string en el formulario
+    base[key] = typeof value === "number" ? String(value) : value;
+  }
+  return { [type]: base } as Partial<FieldsMap>;
+}
+
 export interface PayloadResult {
   /** Cadena final a codificar, o null si el formulario está vacío/inválido. */
   data: string | null;

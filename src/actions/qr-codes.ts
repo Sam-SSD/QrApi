@@ -51,6 +51,30 @@ export async function saveQrCode(input: z.infer<typeof saveQrInput>) {
   return { id: created.id };
 }
 
+/** Actualiza un QR guardado (nombre, contenido y diseño). Solo estáticos. */
+export async function updateSavedQr(
+  id: string,
+  input: z.infer<typeof saveQrInput>,
+) {
+  const session = await requireSession();
+  const parsed = saveQrInput.parse(input);
+  const data = buildPayload(parsed.payload);
+  if (data.length > MAX_QR_DATA_LENGTH) throw new Error("PAYLOAD_TOO_LONG");
+
+  const result = await prisma.qrCode.updateMany({
+    // ownership + solo estáticos (los dinámicos editan su diseño aparte)
+    where: { id, userId: session.user.id, dynamicQrId: null },
+    data: {
+      name: parsed.name,
+      type: parsed.payload.type.toUpperCase() as QrContentType,
+      data,
+      config: { payload: parsed.payload, config: parsed.config },
+    },
+  });
+  if (result.count === 0) throw new Error("NOT_FOUND");
+  revalidatePath("/[locale]/dashboard", "layout");
+}
+
 export async function renameQrCode(id: string, name: string) {
   const session = await requireSession();
   const clean = z.string().min(1).max(80).parse(name);

@@ -11,7 +11,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { useQrStore, computePayload } from "@/stores/qr-store";
+import {
+  useQrStore,
+  computePayload,
+  type QrSnapshot,
+} from "@/stores/qr-store";
 import { renderQrSvg } from "@/lib/qr/render-svg";
 import { useQrHistory } from "@/hooks/use-qr-history";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -31,13 +35,37 @@ import { TemplatesGallery } from "./templates-gallery";
 import { HistoryDrawer } from "./history-drawer";
 import { ShortcutsDialog } from "./shortcuts-dialog";
 
-export function QrEditor({ initialTemplateId }: { initialTemplateId?: string }) {
+/** QR guardado que se está editando desde el panel. */
+export interface EditingQr {
+  id: string;
+  name: string;
+  dynamic: boolean;
+}
+
+export function QrEditor({
+  initialTemplateId,
+  initialSnapshot,
+  editing,
+}: {
+  initialTemplateId?: string;
+  initialSnapshot?: QrSnapshot;
+  editing?: EditingQr;
+}) {
   const t = useTranslations("editor");
   const type = useQrStore((s) => s.type);
   const fields = useQrStore((s) => s.fields);
   const config = useQrStore((s) => s.config);
   const reset = useQrStore((s) => s.reset);
   const applyTemplate = useQrStore((s) => s.applyTemplate);
+  const loadSnapshot = useQrStore((s) => s.loadSnapshot);
+
+  // Carga el QR guardado (modo edición) una sola vez.
+  const appliedSnapshot = useRef(false);
+  useEffect(() => {
+    if (appliedSnapshot.current || !initialSnapshot) return;
+    loadSnapshot(initialSnapshot);
+    appliedSnapshot.current = true;
+  }, [initialSnapshot, loadSnapshot]);
 
   const [templatesOpen, setTemplatesOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -136,6 +164,7 @@ export function QrEditor({ initialTemplateId }: { initialTemplateId?: string }) 
           payload={payload.payload}
           config={config}
           disabled={!payload.data}
+          editing={editing}
         />
       </div>
     </div>

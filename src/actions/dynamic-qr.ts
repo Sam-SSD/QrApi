@@ -67,6 +67,23 @@ export async function createDynamicQr(input: z.infer<typeof createInput>) {
   return { id: created.id, slug: dynamic.slug, redirectUrl: data };
 }
 
+/** Actualiza el diseño (config visual) del QrCode asociado a un dinámico. */
+export async function updateDynamicDesign(qrCodeId: string, config: unknown) {
+  const session = await requireSession();
+  const parsed = qrConfigSchema.parse(config);
+  const result = await prisma.qrCode.updateMany({
+    // ownership + solo dinámicos (su data /r/{slug} no cambia)
+    where: {
+      id: qrCodeId,
+      userId: session.user.id,
+      NOT: { dynamicQrId: null },
+    },
+    data: { config: { dynamic: true, config: parsed } },
+  });
+  if (result.count === 0) throw new Error("NOT_FOUND");
+  revalidatePath("/[locale]/dashboard", "layout");
+}
+
 export async function updateDynamicTarget(id: string, targetUrl: string) {
   const session = await requireSession();
   const url = httpUrl.parse(targetUrl);
