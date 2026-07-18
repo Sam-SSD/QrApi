@@ -5,7 +5,7 @@
 **Forja códigos QR que no parecen códigos QR.**
 *Forge QR codes that don't look like QR codes.*
 
-Generador de códigos QR open source con editor visual, exportación vectorial real y API REST para developers.
+Generador de códigos QR con editor visual, exportación vectorial real y API REST para developers.
 
 [Español](#español) · [English](#english)
 
@@ -64,6 +64,7 @@ npm run dev
 | `DATABASE_URL` | Sí | Conexión Postgres (el compose usa el puerto **5433**) |
 | `BETTER_AUTH_SECRET` | Sí | Secret de sesiones (mín. 32 chars) |
 | `BETTER_AUTH_URL` | Sí | URL pública de la app |
+| `NEXT_PUBLIC_SITE_URL` | No | URL base pública (default `http://localhost:3000`; cambiarla requiere rebuild) |
 | `SMTP_HOST/PORT/USER/PASSWORD/FROM` | Sí (dev: Mailpit) | Envío de emails de verificación |
 | `GITHUB_CLIENT_ID/SECRET` | No | Activa login con GitHub |
 | `GOOGLE_CLIENT_ID/SECRET` | No | Activa login con Google |
@@ -140,4 +141,5 @@ The core is an **isomorphic SVG QR engine** (`src/lib/qr/`): `qrcode` provides o
 
 ## Licencia / License
 
-MIT
+Software propietario · Todos los derechos reservados.
+Proprietary software · All rights reserved.

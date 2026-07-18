@@ -1,5 +1,3 @@
-export const GITHUB_URL = "https://github.com/Sam-SSD/QrApi";
-
 /**
  * URL pública donde corre la app, desde NEXT_PUBLIC_SITE_URL (validada en
  * src/env.ts). Se lee process.env directamente — no `env` — porque este
