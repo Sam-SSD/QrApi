@@ -146,6 +146,32 @@ const POST_PARAMS: ParamRow[] = [
   { name: "effects", type: "object", def: "—", key: "effects" },
 ];
 
+const DYNAMIC_ENDPOINTS: Array<{ method: string; path: string; key: string }> =
+  [
+    { method: "POST", path: "/api/v1/dynamic", key: "create" },
+    { method: "GET", path: "/api/v1/dynamic", key: "list" },
+    { method: "GET", path: "/api/v1/dynamic/:id", key: "get" },
+    { method: "PATCH", path: "/api/v1/dynamic/:id", key: "patch" },
+    { method: "DELETE", path: "/api/v1/dynamic/:id", key: "delete" },
+  ];
+
+const CURL_DYNAMIC = `# 1) Crear el QR dinamico
+curl "${SITE_URL}/api/v1/dynamic" \\
+  -H "Authorization: Bearer qra_TU_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{"title": "Campana", "targetUrl": "https://ejemplo.com/promo"}'
+# -> "slug": "Ab3dE9xZ", "redirectUrl": "${SITE_URL}/r/Ab3dE9xZ"
+
+# 2) Obtener la imagen (codifica redirectUrl con el endpoint de generacion)
+curl "${SITE_URL}/api/v1/qr?data=${SITE_URL}/r/Ab3dE9xZ&format=png" \\
+  -H "Authorization: Bearer qra_TU_TOKEN" -o qr.png
+
+# 3) Cambiar el destino mas tarde, sin reimprimir el codigo
+curl -X PATCH "${SITE_URL}/api/v1/dynamic/ID" \\
+  -H "Authorization: Bearer qra_TU_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{"targetUrl": "https://ejemplo.com/nuevo-destino"}'`;
+
 const ERRORS: Array<{ status: number; code: string }> = [
   { status: 400, code: "invalid_params" },
   { status: 400, code: "invalid_body" },
@@ -177,6 +203,7 @@ export default async function ApiDocsPage({
     "generate",
     "params",
     "styles",
+    "dynamic",
     "errors",
     "rateLimits",
     "tryIt",
@@ -331,6 +358,48 @@ export default async function ApiDocsPage({
           <SectionHeading id="styles">{t("nav.styles")}</SectionHeading>
           <p className="text-sm text-muted-foreground">{t("styles.body")}</p>
           <StyleSamples labels={(key) => t(`styles.${key}`)} />
+        </section>
+
+        {/* QR dinámicos */}
+        <section className="flex flex-col gap-4">
+          <SectionHeading id="dynamic">{t("nav.dynamic")}</SectionHeading>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {t("dynamic.body")}
+          </p>
+          <div className="overflow-x-auto rounded-xl border border-line">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-line bg-canvas-subtle text-left">
+                  <th className="px-4 py-2.5 font-medium">
+                    {t("dynamic.colEndpoint")}
+                  </th>
+                  <th className="px-4 py-2.5 font-medium">
+                    {t("dynamic.colDescription")}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {DYNAMIC_ENDPOINTS.map((row) => (
+                  <tr key={row.key} className="border-b border-line last:border-b-0">
+                    <td className="px-4 py-2.5 whitespace-nowrap">
+                      <Badge
+                        variant="outline"
+                        className="mr-2 font-mono text-[10px]"
+                      >
+                        {row.method}
+                      </Badge>
+                      <code className="font-mono text-xs">{row.path}</code>
+                    </td>
+                    <td className="px-4 py-2.5 text-muted-foreground">
+                      {t(`dynamic.rows.${row.key}`)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <CodeBlock lang="bash" label="curl" code={CURL_DYNAMIC} />
+          <p className="text-xs text-muted-foreground">{t("dynamic.note")}</p>
         </section>
 
         {/* Errores */}

@@ -494,9 +494,23 @@
       "generate": "Generar un QR",
       "params": "Parámetros",
       "styles": "Estilos",
+      "dynamic": "QR dinámicos",
       "errors": "Errores",
       "rateLimits": "Límites",
       "tryIt": "Pruébala"
+    },
+    "dynamic": {
+      "body": "Un QR dinámico codifica una URL corta de redirección propia cuyo destino puedes cambiar en cualquier momento sin regenerar ni reimprimir el código. Cada escaneo se registra con país y tipo de dispositivo para las estadísticas. Gestión completa vía API con tu misma clave.",
+      "colEndpoint": "Endpoint",
+      "colDescription": "Descripción",
+      "rows": {
+        "create": "Crea un QR dinámico con título y URL de destino; devuelve id, slug y redirectUrl",
+        "list": "Lista tus QR dinámicos con su contador de escaneos",
+        "get": "Detalle de uno, con estadísticas agregadas por país y dispositivo",
+        "patch": "Edita targetUrl y/o active (pausar) sin regenerar el código",
+        "delete": "Elimina el QR dinámico y su historial de escaneos"
+      },
+      "note": "La imagen del QR se obtiene con el endpoint de generación codificando la redirectUrl. Los destinos deben ser http(s)."
     },
     "intro": {
       "body": "La API de QrAPI expone un único endpoint que genera códigos QR con todos los estilos del editor: gradientes, formas de puntos, esquinas personalizadas, logos y marcos. Devuelve la imagen directamente (PNG, SVG o JPEG), lista para usar.",
