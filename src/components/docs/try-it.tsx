@@ -31,7 +31,7 @@ interface ResponseMeta {
 export function TryIt() {
   const t = useTranslations("docs.tryIt");
   const [token, setToken] = useState("");
-  const [data, setData] = useState("https://qrapi.dev");
+  const [data, setData] = useState(SITE_URL);
   const [format, setFormat] = useState<(typeof FORMATS)[number]>("png");
   const [size, setSize] = useState<(typeof SIZES)[number]>("400");
   const [dotsStyle, setDotsStyle] = useState<(typeof DOT_STYLES)[number]>("rounded");

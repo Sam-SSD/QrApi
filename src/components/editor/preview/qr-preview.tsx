@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { AnimatePresence, m } from "motion/react";
 import { renderQrSvg } from "@/lib/qr/render-svg";
 import { qrConfigSchema, type QrConfig } from "@/lib/qr/schema";
+import { SITE_URL } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 /**
@@ -14,7 +15,7 @@ import { cn } from "@/lib/utils";
  * `currentColor` (no se puede tematizar por tokens dentro del SVG).
  */
 const GHOST_SVG = renderQrSvg(
-  "https://qrapi.dev",
+  SITE_URL,
   qrConfigSchema.parse({
     ecLevel: "M",
     margin: 1,

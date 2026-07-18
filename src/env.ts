@@ -14,6 +14,11 @@ const envSchema = z.object({
     .min(32, "BETTER_AUTH_SECRET debe tener al menos 32 caracteres"),
   BETTER_AUTH_URL: z.string().url().default("http://localhost:3000"),
 
+  // URL pública donde corre la app (docs, /r/{slug}, sitemap, metadata).
+  // Prefijo NEXT_PUBLIC_ porque también la consumen client components vía
+  // `SITE_URL` en src/lib/constants.ts (Next la inlina en build).
+  NEXT_PUBLIC_SITE_URL: z.string().url().default("http://localhost:3000"),
+
   // SMTP (verificación de email)
   SMTP_HOST: z.string().default("localhost"),
   SMTP_PORT: z.coerce.number().default(1025),
