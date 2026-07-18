@@ -11,7 +11,7 @@ const CURL_EXAMPLE = `curl "${SITE_URL}/api/v1/qr" \\
   -H "Authorization: Bearer qra_TU_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "data": "https://qrapi.dev",
+    "data": "${SITE_URL}",
     "format": "png",
     "size": 512,
     "style": {
@@ -33,7 +33,7 @@ export function DeveloperSection() {
   const t = useTranslations("landing.developer");
 
   const resultSvg = renderQrSvg(
-    "https://qrapi.dev",
+    SITE_URL,
     qrConfigSchema.parse({
       style: {
         dots: {

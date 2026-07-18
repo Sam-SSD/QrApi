@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { routing } from "@/i18n/routing";
+import { SITE_URL } from "@/lib/constants";
 
-const BASE_URL = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
+const BASE_URL = SITE_URL;
 
 const PAGES = ["", "/generator", "/docs/api", "/login", "/register"];
 

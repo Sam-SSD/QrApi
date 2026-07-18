@@ -7,8 +7,9 @@ import {
   FRAME_STYLES,
 } from "@/lib/qr/schema";
 import { renderQrSvg } from "@/lib/qr/render-svg";
+import { SITE_URL } from "@/lib/constants";
 
-const SAMPLE_DATA = "https://qrapi.dev";
+const SAMPLE_DATA = SITE_URL;
 
 type QrStyle = QrConfig["style"];
 
