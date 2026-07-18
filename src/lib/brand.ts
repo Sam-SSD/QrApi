@@ -32,3 +32,29 @@ export const LOGO_MODULE = { size: 7, radius: 2.4 } as const;
 
 /** Cola de la Q: módulo desprendido en diagonal, con gradiente de marca. */
 export const LOGO_TAIL = { x: 24.5, y: 24.5, size: 6.5, radius: 2.2 } as const;
+
+/** Gradiente de marca como CSS (variante sobre fondo oscuro, la del wordmark). */
+export const BRAND_GRADIENT_CSS = `linear-gradient(135deg, ${BRAND_COLORS.indigoLight} 0%, ${BRAND_COLORS.cyanLight} 100%)`;
+
+/**
+ * Geometría del monograma escalada a `target` px, en coordenadas absolutas.
+ * Para favicons/ImageResponse: Satori rasteriza divs posicionados con
+ * gradientes CSS de forma fiable (el <linearGradient> SVG anidado es frágil).
+ */
+export function logoLayout(target: number) {
+  const scale = target / LOGO_VIEWBOX;
+  return {
+    ring: LOGO_RING_MODULES.map(({ x, y }) => ({
+      left: x * scale,
+      top: y * scale,
+      size: LOGO_MODULE.size * scale,
+      radius: LOGO_MODULE.radius * scale,
+    })),
+    tail: {
+      left: LOGO_TAIL.x * scale,
+      top: LOGO_TAIL.y * scale,
+      size: LOGO_TAIL.size * scale,
+      radius: LOGO_TAIL.radius * scale,
+    },
+  };
+}
