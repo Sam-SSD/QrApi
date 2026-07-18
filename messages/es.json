@@ -392,7 +392,20 @@
       "chartTitle": "Escaneos por día (últimos {days} días)",
       "byCountry": "Por país",
       "byDevice": "Por dispositivo",
-      "unknown": "Desconocido"
+      "unknown": "Desconocido",
+      "rangeLabel": "Rango de fechas",
+      "rangeDays": "{days} días",
+      "exportCsv": "Exportar CSV",
+      "passwordTitle": "Contraseña de escaneo",
+      "passwordHint": "Opcional: quien escanee el código tendrá que introducir una contraseña antes de ser redirigido",
+      "passwordActiveHint": "Este QR está protegido: los escaneos piden contraseña antes de redirigir",
+      "passwordLabel": "Contraseña (mín. 4 caracteres)",
+      "passwordChangeLabel": "Nueva contraseña",
+      "passwordSet": "Guardar",
+      "passwordRemove": "Quitar protección",
+      "passwordSaved": "Contraseña guardada",
+      "passwordRemoved": "Protección eliminada",
+      "passwordTooShort": "La contraseña debe tener al menos 4 caracteres"
     },
     "settings": {
       "passwordTitle": "Cambiar contraseña",

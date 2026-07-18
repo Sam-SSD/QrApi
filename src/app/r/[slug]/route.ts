@@ -3,37 +3,44 @@ import { after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { parseUserAgent } from "@/lib/dynamic-qr/parse-ua";
 import { hashIp } from "@/lib/dynamic-qr/ip-hash";
+import { verifyPassword } from "@/lib/dynamic-qr/password";
 import { SITE_URL } from "@/lib/constants";
 
 export const runtime = "nodejs";
 
-/**
- * Redirección de un QR dinámico: /r/{slug} → targetUrl. El registro del escaneo
- * se hace en `after()`, tras emitir el 302, para no añadir latencia perceptible
- * a la redirección.
- */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> },
-) {
-  const { slug } = await params;
+type DynamicRow = {
+  id: string;
+  targetUrl: string;
+  active: boolean;
+  expiresAt: Date | null;
+  passwordHash: string | null;
+};
 
-  const dynamic = await prisma.dynamicQr.findUnique({
+async function findBySlug(slug: string): Promise<DynamicRow | null> {
+  return prisma.dynamicQr.findUnique({
     where: { slug },
     select: {
       id: true,
       targetUrl: true,
       active: true,
       expiresAt: true,
+      passwordHash: true,
     },
   });
+}
 
-  const notFound = () => NextResponse.redirect(new URL("/es", SITE_URL), 302);
+function isUnavailable(dynamic: DynamicRow | null): dynamic is null {
+  return (
+    !dynamic ||
+    !dynamic.active ||
+    (dynamic.expiresAt !== null && dynamic.expiresAt < new Date())
+  );
+}
 
-  if (!dynamic || !dynamic.active) return notFound();
-  if (dynamic.expiresAt && dynamic.expiresAt < new Date()) return notFound();
+const notFound = () => NextResponse.redirect(new URL("/es", SITE_URL), 302);
 
-  // Registrar el escaneo sin bloquear la redirección.
+/** Registra el escaneo en after() para no retrasar la redirección. */
+function recordScan(request: NextRequest, dynamicQrId: string) {
   const ua = request.headers.get("user-agent");
   const country =
     request.headers.get("x-vercel-ip-country") ??
@@ -51,7 +58,7 @@ export async function GET(
       await prisma.$transaction([
         prisma.scanEvent.create({
           data: {
-            dynamicQrId: dynamic.id,
+            dynamicQrId,
             country,
             deviceType,
             os,
@@ -61,14 +68,90 @@ export async function GET(
           },
         }),
         prisma.dynamicQr.update({
-          where: { id: dynamic.id },
+          where: { id: dynamicQrId },
           data: { scanCount: { increment: 1 } },
         }),
       ]);
     } catch {
-      // El registro es best-effort: nunca debe afectar a la redirección.
+      // Best-effort: el registro nunca debe afectar a la redirección.
     }
   });
+}
 
+/** Página intermedia mínima que pide la contraseña (bilingüe, sin assets). */
+function passwordPage(slug: string, error: boolean): NextResponse {
+  const html = `<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="noindex"/>
+<title>QR protegido · QrAPI</title>
+<style>
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:#09090b;color:#f4f4f5;font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+  .card{width:min(92vw,360px);background:#141419;border:1px solid rgba(255,255,255,.09);
+    border-radius:16px;padding:32px 28px;text-align:center}
+  h1{font-size:18px;margin:0 0 6px}
+  p{font-size:13px;color:#a1a1aa;margin:0 0 20px}
+  input{width:100%;box-sizing:border-box;background:#0e0e12;color:#f4f4f5;
+    border:1px solid rgba(255,255,255,.13);border-radius:10px;padding:10px 12px;
+    font-size:14px;margin-bottom:12px;outline:none}
+  input:focus{border-color:#818cf8}
+  button{width:100%;background:linear-gradient(135deg,#4f46e5,#0891b2);color:#fff;
+    border:0;border-radius:10px;padding:10px;font-size:14px;font-weight:600;cursor:pointer}
+  .err{color:#f87171;font-size:12px;margin:0 0 12px}
+</style></head>
+<body><form class="card" method="post" action="/r/${slug}">
+  <h1>Contenido protegido</h1>
+  <p>Introduce la contraseña para continuar &middot; Enter the password to continue</p>
+  ${error ? '<p class="err">Contraseña incorrecta &middot; Wrong password</p>' : ""}
+  <input type="password" name="password" autofocus required aria-label="Contraseña"/>
+  <button type="submit">Continuar &middot; Continue</button>
+</form></body></html>`;
+  return new NextResponse(html, {
+    status: error ? 401 : 200,
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
+}
+
+/**
+ * Redirección de un QR dinámico: /r/{slug} → targetUrl. Si el QR está
+ * protegido, muestra una página intermedia que pide la contraseña (POST).
+ */
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string }> },
+) {
+  const { slug } = await params;
+  const dynamic = await findBySlug(slug);
+  if (isUnavailable(dynamic)) return notFound();
+
+  if (dynamic.passwordHash) return passwordPage(slug, false);
+
+  recordScan(request, dynamic.id);
   return NextResponse.redirect(dynamic.targetUrl, 302);
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string }> },
+) {
+  const { slug } = await params;
+  const dynamic = await findBySlug(slug);
+  if (isUnavailable(dynamic)) return notFound();
+
+  if (!dynamic.passwordHash) {
+    // Sin contraseña ya no hay nada que verificar: redirigir igual que GET.
+    recordScan(request, dynamic.id);
+    return NextResponse.redirect(dynamic.targetUrl, 302);
+  }
+
+  const form = await request.formData().catch(() => null);
+  const password = String(form?.get("password") ?? "");
+  if (!password || !verifyPassword(password, dynamic.passwordHash)) {
+    return passwordPage(slug, true);
+  }
+
+  recordScan(request, dynamic.id);
+  // 303: tras un POST, redirige con GET al destino.
+  return NextResponse.redirect(dynamic.targetUrl, 303);
 }

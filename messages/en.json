@@ -392,7 +392,20 @@
       "chartTitle": "Scans per day (last {days} days)",
       "byCountry": "By country",
       "byDevice": "By device",
-      "unknown": "Unknown"
+      "unknown": "Unknown",
+      "rangeLabel": "Date range",
+      "rangeDays": "{days} days",
+      "exportCsv": "Export CSV",
+      "passwordTitle": "Scan password",
+      "passwordHint": "Optional: whoever scans the code will have to enter a password before being redirected",
+      "passwordActiveHint": "This QR is protected: scans ask for a password before redirecting",
+      "passwordLabel": "Password (min. 4 characters)",
+      "passwordChangeLabel": "New password",
+      "passwordSet": "Save",
+      "passwordRemove": "Remove protection",
+      "passwordSaved": "Password saved",
+      "passwordRemoved": "Protection removed",
+      "passwordTooShort": "Password must be at least 4 characters"
     },
     "settings": {
       "passwordTitle": "Change password",

@@ -1,24 +1,28 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, FileDown } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { buildRedirectUrl } from "@/lib/dynamic-qr/redirect-url";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   ScanChart,
   type ScanChartPoint,
 } from "@/components/dashboard/scan-chart";
+import { DynamicPasswordForm } from "@/components/dashboard/dynamic-password-form";
 
-const DAYS = 30;
+const RANGES = [7, 30, 90] as const;
 
-/** Agrega timestamps por día (UTC) sobre los últimos `DAYS` días. */
+/** Agrega timestamps por día (UTC) sobre los últimos `days` días. */
 function aggregateByDay(
   timestamps: Date[],
   locale: string,
   now: Date,
+  days: number,
 ): ScanChartPoint[] {
   const fmt = new Intl.DateTimeFormat(locale, {
     day: "2-digit",
@@ -30,7 +34,7 @@ function aggregateByDay(
     counts.set(key, (counts.get(key) ?? 0) + 1);
   }
   const points: ScanChartPoint[] = [];
-  for (let i = DAYS - 1; i >= 0; i--) {
+  for (let i = days - 1; i >= 0; i--) {
     const day = new Date(now.getTime() - i * 86_400_000);
     const key = day.toISOString().slice(0, 10);
     points.push({ label: fmt.format(day), count: counts.get(key) ?? 0 });
@@ -79,14 +83,21 @@ function BreakdownTable({
 
 export default async function DynamicQrDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; id: string }>;
+  searchParams: Promise<{ days?: string }>;
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) return null; // el layout ya redirige
   const t = await getTranslations("dashboard.dynamic");
+
+  const { days: daysParam } = await searchParams;
+  const days = (RANGES as readonly number[]).includes(Number(daysParam))
+    ? Number(daysParam)
+    : 30;
 
   // Ownership en la propia query: un id ajeno es un 404, no un 403.
   const dynamic = await prisma.dynamicQr.findUnique({
@@ -95,7 +106,7 @@ export default async function DynamicQrDetailPage({
   if (!dynamic) notFound();
 
   const now = new Date();
-  const since = new Date(now.getTime() - (DAYS - 1) * 86_400_000);
+  const since = new Date(now.getTime() - (days - 1) * 86_400_000);
   since.setUTCHours(0, 0, 0, 0);
 
   const [recentScans, byCountry, byDevice] = await Promise.all([
@@ -119,6 +130,7 @@ export default async function DynamicQrDetailPage({
     recentScans.map((s) => s.timestamp),
     locale,
     now,
+    days,
   );
   const sortRows = (
     rows: Array<{ key: string | null; count: number }>,
@@ -158,6 +170,38 @@ export default async function DynamicQrDetailPage({
         </p>
       </div>
 
+      {/* Rango + export */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div
+          role="radiogroup"
+          aria-label={t("rangeLabel")}
+          className="flex gap-1.5"
+        >
+          {RANGES.map((r) => (
+            <Link
+              key={r}
+              href={`/dashboard/dynamic/${dynamic.id}?days=${r}`}
+              role="radio"
+              aria-checked={days === r}
+              className={cn(
+                "rounded-md border px-3 py-1.5 text-xs font-medium transition-colors",
+                days === r
+                  ? "border-primary/50 bg-brand-soft text-primary"
+                  : "border-line text-muted-foreground hover:border-line-strong hover:text-foreground",
+              )}
+            >
+              {t("rangeDays", { days: r })}
+            </Link>
+          ))}
+        </div>
+        <Button type="button" variant="outline" size="sm" asChild>
+          <a href={`/api/export/scans/${dynamic.id}`} download>
+            <FileDown className="size-4" strokeWidth={1.75} />
+            {t("exportCsv")}
+          </a>
+        </Button>
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-xl border border-line bg-surface p-4">
           <p className="text-sm text-muted-foreground">{t("totalScans")}</p>
@@ -167,7 +211,7 @@ export default async function DynamicQrDetailPage({
         </div>
         <div className="rounded-xl border border-line bg-surface p-4">
           <p className="text-sm text-muted-foreground">
-            {t("scansLastDays", { days: DAYS })}
+            {t("scansLastDays", { days })}
           </p>
           <p className="mt-1 text-3xl font-semibold tabular-nums">
             {recentScans.length}
@@ -177,7 +221,7 @@ export default async function DynamicQrDetailPage({
 
       <div className="rounded-xl border border-line bg-surface p-4">
         <h3 className="mb-3 text-sm font-semibold">
-          {t("chartTitle", { days: DAYS })}
+          {t("chartTitle", { days })}
         </h3>
         <ScanChart points={points} />
       </div>
@@ -194,6 +238,11 @@ export default async function DynamicQrDetailPage({
           total={dynamic.scanCount}
         />
       </div>
+
+      <DynamicPasswordForm
+        id={dynamic.id}
+        hasPassword={Boolean(dynamic.passwordHash)}
+      />
     </div>
   );
 }
