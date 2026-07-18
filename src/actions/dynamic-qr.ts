@@ -18,8 +18,8 @@ async function requireSession() {
   return session;
 }
 
-// Solo http/https: `new URL()` (y z.url()) aceptarían javascript:/data:, que no
-// deben vivir en un redirector público bajo nuestro dominio.
+// http/https only: `new URL()` (and z.url()) would accept javascript:/data:,
+// which must not live behind a public redirector under our domain.
 const httpUrl = z
   .string()
   .url()
@@ -33,9 +33,9 @@ const createInput = z.object({
 });
 
 /**
- * Crea un QR dinámico: genera un slug único, crea el DynamicQr, y crea el
- * QrCode cuyo `data` codifica la URL de redirección `/r/{slug}`. El destino
- * (targetUrl) se edita luego sin regenerar el código.
+ * Creates a dynamic QR: generates a unique slug, creates the DynamicQr, and
+ * creates the QrCode whose `data` encodes the redirect URL `/r/{slug}`. The
+ * destination (targetUrl) is edited later without regenerating the code.
  */
 export async function createDynamicQr(input: z.infer<typeof createInput>) {
   const session = await requireSession();
@@ -68,12 +68,12 @@ export async function createDynamicQr(input: z.infer<typeof createInput>) {
   return { id: created.id, slug: dynamic.slug, redirectUrl: data };
 }
 
-/** Actualiza el diseño (config visual) del QrCode asociado a un dinámico. */
+/** Updates the design (visual config) of the QrCode tied to a dynamic QR. */
 export async function updateDynamicDesign(qrCodeId: string, config: unknown) {
   const session = await requireSession();
   const parsed = qrConfigSchema.parse(config);
   const result = await prisma.qrCode.updateMany({
-    // ownership + solo dinámicos (su data /r/{slug} no cambia)
+    // ownership + dynamic only (their /r/{slug} data never changes)
     where: {
       id: qrCodeId,
       userId: session.user.id,
@@ -106,7 +106,7 @@ export async function toggleDynamicActive(id: string, active: boolean) {
   revalidatePath("/[locale]/dashboard", "layout");
 }
 
-/** Protege (o desprotege, con null) un dinámico con contraseña de escaneo. */
+/** Protects (or unprotects, with null) a dynamic QR with a scan password. */
 export async function setDynamicPassword(id: string, password: string | null) {
   const session = await requireSession();
   const clean =

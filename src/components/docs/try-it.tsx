@@ -34,7 +34,8 @@ export function TryIt() {
   const [data, setData] = useState(SITE_URL);
   const [format, setFormat] = useState<(typeof FORMATS)[number]>("png");
   const [size, setSize] = useState<(typeof SIZES)[number]>("400");
-  const [dotsStyle, setDotsStyle] = useState<(typeof DOT_STYLES)[number]>("rounded");
+  const [dotsStyle, setDotsStyle] =
+    useState<(typeof DOT_STYLES)[number]>("rounded");
   const [ecLevel, setEcLevel] = useState<(typeof EC_LEVELS)[number]>("M");
   const [origin, setOrigin] = useState("");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -123,12 +124,19 @@ export function TryIt() {
                 value={format}
                 onValueChange={(v) => setFormat(v as typeof format)}
               >
-                <SelectTrigger id="tryit-format" className="w-full font-mono text-xs">
+                <SelectTrigger
+                  id="tryit-format"
+                  className="w-full font-mono text-xs"
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {FORMATS.map((value) => (
-                    <SelectItem key={value} value={value} className="font-mono text-xs">
+                    <SelectItem
+                      key={value}
+                      value={value}
+                      className="font-mono text-xs"
+                    >
                       {value}
                     </SelectItem>
                   ))}
@@ -137,13 +145,23 @@ export function TryIt() {
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="tryit-size">{t("sizeLabel")}</Label>
-              <Select value={size} onValueChange={(v) => setSize(v as typeof size)}>
-                <SelectTrigger id="tryit-size" className="w-full font-mono text-xs">
+              <Select
+                value={size}
+                onValueChange={(v) => setSize(v as typeof size)}
+              >
+                <SelectTrigger
+                  id="tryit-size"
+                  className="w-full font-mono text-xs"
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {SIZES.map((value) => (
-                    <SelectItem key={value} value={value} className="font-mono text-xs">
+                    <SelectItem
+                      key={value}
+                      value={value}
+                      className="font-mono text-xs"
+                    >
                       {value}
                     </SelectItem>
                   ))}
@@ -156,12 +174,19 @@ export function TryIt() {
                 value={dotsStyle}
                 onValueChange={(v) => setDotsStyle(v as typeof dotsStyle)}
               >
-                <SelectTrigger id="tryit-style" className="w-full font-mono text-xs">
+                <SelectTrigger
+                  id="tryit-style"
+                  className="w-full font-mono text-xs"
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {DOT_STYLES.map((value) => (
-                    <SelectItem key={value} value={value} className="font-mono text-xs">
+                    <SelectItem
+                      key={value}
+                      value={value}
+                      className="font-mono text-xs"
+                    >
                       {value}
                     </SelectItem>
                   ))}
@@ -174,12 +199,19 @@ export function TryIt() {
                 value={ecLevel}
                 onValueChange={(v) => setEcLevel(v as typeof ecLevel)}
               >
-                <SelectTrigger id="tryit-ec" className="w-full font-mono text-xs">
+                <SelectTrigger
+                  id="tryit-ec"
+                  className="w-full font-mono text-xs"
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {EC_LEVELS.map((value) => (
-                    <SelectItem key={value} value={value} className="font-mono text-xs">
+                    <SelectItem
+                      key={value}
+                      value={value}
+                      className="font-mono text-xs"
+                    >
                       {value}
                     </SelectItem>
                   ))}
@@ -218,7 +250,9 @@ export function TryIt() {
             <div className="flex flex-wrap items-center justify-center gap-1.5 font-mono text-[11px]">
               <Badge
                 variant="outline"
-                className={meta.status < 400 ? "text-success" : "text-destructive"}
+                className={
+                  meta.status < 400 ? "text-success" : "text-destructive"
+                }
               >
                 {meta.status}
               </Badge>

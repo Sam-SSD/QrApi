@@ -51,7 +51,7 @@ export async function saveQrCode(input: z.infer<typeof saveQrInput>) {
   return { id: created.id };
 }
 
-/** Actualiza un QR guardado (nombre, contenido y diseño). Solo estáticos. */
+/** Updates a saved QR (name, content and design). Static QRs only. */
 export async function updateSavedQr(
   id: string,
   input: z.infer<typeof saveQrInput>,
@@ -62,7 +62,7 @@ export async function updateSavedQr(
   if (data.length > MAX_QR_DATA_LENGTH) throw new Error("PAYLOAD_TOO_LONG");
 
   const result = await prisma.qrCode.updateMany({
-    // ownership + solo estáticos (los dinámicos editan su diseño aparte)
+    // ownership + static only (dynamic QRs edit their design separately)
     where: { id, userId: session.user.id, dynamicQrId: null },
     data: {
       name: parsed.name,
@@ -79,7 +79,7 @@ export async function renameQrCode(id: string, name: string) {
   const session = await requireSession();
   const clean = z.string().min(1).max(80).parse(name);
   await prisma.qrCode.update({
-    // ownership: solo filas del usuario
+    // ownership: only the user's rows
     where: { id, userId: session.user.id },
     data: { name: clean },
   });
@@ -112,7 +112,7 @@ export async function duplicateQrCode(id: string) {
   revalidatePath("/[locale]/dashboard", "layout");
 }
 
-/** Migra el historial anónimo de localStorage a la cuenta tras el login. */
+/** Migrates the anonymous localStorage history into the account after login. */
 export async function importHistory(
   items: Array<{ name: string; payload: unknown; config: unknown }>,
 ) {

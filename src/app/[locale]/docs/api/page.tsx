@@ -36,9 +36,9 @@ export async function generateMetadata({
   return { title: t("title"), description: t("subtitle") };
 }
 
-// ---------- Ejemplos de código ----------
-// Los textos localizables (comentarios, URLs de ejemplo, token) vienen de
-// `docs.code.*`; el resto del código es idéntico en ambos idiomas.
+// ---------- Code examples ----------
+// Localizable texts (comments, example URLs, token) come from `docs.code.*`;
+// the rest of the code is identical in both languages.
 
 function codeExamples(c: (key: string) => string) {
   const token = c("token");
@@ -274,7 +274,7 @@ const ERROR_SHAPE = `{
   }
 }`;
 
-// ---------- Tablas ----------
+// ---------- Tables ----------
 
 const DYNAMIC_ENDPOINTS: Array<{ method: string; path: string; key: string }> =
   [
@@ -310,7 +310,7 @@ const RATE_LIMIT_HEADERS: Array<{ header: string; key: string }> = [
   { header: "Retry-After", key: "retryAfter" },
 ];
 
-// ---------- Página ----------
+// ---------- Page ----------
 
 export default async function ApiDocsPage({
   params,
@@ -369,22 +369,95 @@ export default async function ApiDocsPage({
   const ex = codeExamples((key) => t(`code.${key}`));
 
   const getParams: ParamRow[] = [
-    { name: "data", type: "string", def: "—", required: true, description: d("data") },
-    { name: "format", type: "enum", enumValues: ["png", "svg", "jpeg"], def: "png", description: d("format") },
+    {
+      name: "data",
+      type: "string",
+      def: "—",
+      required: true,
+      description: d("data"),
+    },
+    {
+      name: "format",
+      type: "enum",
+      enumValues: ["png", "svg", "jpeg"],
+      def: "png",
+      description: d("format"),
+    },
     { name: "size", type: "number", def: "512", description: d("size") },
-    { name: "ecLevel", type: "enum", enumValues: [...EC_LEVELS], def: "M", description: d("ecLevel") },
+    {
+      name: "ecLevel",
+      type: "enum",
+      enumValues: [...EC_LEVELS],
+      def: "M",
+      description: d("ecLevel"),
+    },
     { name: "margin", type: "number", def: "2", description: d("margin") },
-    { name: "dotsStyle", type: "enum", enumValues: [...DOT_STYLES], def: "square", description: d("dotsStyle") },
-    { name: "dotsColor", type: "hex", def: "#18181b", description: d("dotsColor") },
+    {
+      name: "dotsStyle",
+      type: "enum",
+      enumValues: [...DOT_STYLES],
+      def: "square",
+      description: d("dotsStyle"),
+    },
+    {
+      name: "dotsColor",
+      type: "hex",
+      def: "#18181b",
+      description: d("dotsColor"),
+    },
     { name: "bgColor", type: "hex", def: "#ffffff", description: d("bgColor") },
-    { name: "cornersSquareStyle", type: "enum", enumValues: [...CORNER_SQUARE_STYLES], def: "square", description: d("cornersSquareStyle") },
-    { name: "cornersDotStyle", type: "enum", enumValues: [...CORNER_DOT_STYLES], def: "square", description: d("cornersDotStyle") },
-    { name: "transparent", type: "boolean", def: "false", description: d("transparent") },
-    { name: "frameStyle", type: "enum", enumValues: [...FRAME_STYLES], def: "—", description: d("frameStyle") },
-    { name: "frameText", type: "string", def: "ESCANÉAME", description: d("frameText") },
-    { name: "frameColor", type: "hex", def: "#4f46e5", description: d("frameColor") },
-    { name: "frameTextColor", type: "hex", def: "auto", description: d("frameTextColor") },
-    { name: "framePosition", type: "enum", enumValues: [...FRAME_POSITIONS], def: "bottom", description: d("framePosition") },
+    {
+      name: "cornersSquareStyle",
+      type: "enum",
+      enumValues: [...CORNER_SQUARE_STYLES],
+      def: "square",
+      description: d("cornersSquareStyle"),
+    },
+    {
+      name: "cornersDotStyle",
+      type: "enum",
+      enumValues: [...CORNER_DOT_STYLES],
+      def: "square",
+      description: d("cornersDotStyle"),
+    },
+    {
+      name: "transparent",
+      type: "boolean",
+      def: "false",
+      description: d("transparent"),
+    },
+    {
+      name: "frameStyle",
+      type: "enum",
+      enumValues: [...FRAME_STYLES],
+      def: "—",
+      description: d("frameStyle"),
+    },
+    {
+      name: "frameText",
+      type: "string",
+      def: "ESCANÉAME",
+      description: d("frameText"),
+    },
+    {
+      name: "frameColor",
+      type: "hex",
+      def: "#4f46e5",
+      description: d("frameColor"),
+    },
+    {
+      name: "frameTextColor",
+      type: "hex",
+      def: "auto",
+      description: d("frameTextColor"),
+    },
+    {
+      name: "framePosition",
+      type: "enum",
+      enumValues: [...FRAME_POSITIONS],
+      def: "bottom",
+      description: d("framePosition"),
+    },
   ];
 
   const postParams: ParamRow[] = [
@@ -395,12 +468,31 @@ export default async function ApiDocsPage({
       def: "—",
       description: d("payload"),
       children: [
-        { name: "type", type: "enum", enumValues: [...PAYLOAD_TYPES], def: "—", required: true, description: d("payloadType") },
+        {
+          name: "type",
+          type: "enum",
+          enumValues: [...PAYLOAD_TYPES],
+          def: "—",
+          required: true,
+          description: d("payloadType"),
+        },
       ],
     },
-    { name: "format", type: "enum", enumValues: ["png", "svg", "jpeg"], def: "png", description: d("format") },
+    {
+      name: "format",
+      type: "enum",
+      enumValues: ["png", "svg", "jpeg"],
+      def: "png",
+      description: d("format"),
+    },
     { name: "size", type: "number", def: "512", description: d("size") },
-    { name: "ecLevel", type: "enum", enumValues: [...EC_LEVELS], def: "M", description: d("ecLevel") },
+    {
+      name: "ecLevel",
+      type: "enum",
+      enumValues: [...EC_LEVELS],
+      def: "M",
+      description: d("ecLevel"),
+    },
     { name: "margin", type: "number", def: "2", description: d("margin") },
     {
       name: "style",
@@ -409,11 +501,36 @@ export default async function ApiDocsPage({
       description: d("style"),
       children: [
         { name: "dots", type: "object", def: "—", description: d("styleDots") },
-        { name: "cornersSquare", type: "object", def: "—", description: d("styleCornersSquare") },
-        { name: "cornersDot", type: "object", def: "—", description: d("styleCornersDot") },
-        { name: "background", type: "object", def: "—", description: d("styleBackground") },
-        { name: "background.image", type: "object", def: "—", description: d("backgroundImage") },
-        { name: "*.gradient", type: "object", def: "—", description: d("gradientShape") },
+        {
+          name: "cornersSquare",
+          type: "object",
+          def: "—",
+          description: d("styleCornersSquare"),
+        },
+        {
+          name: "cornersDot",
+          type: "object",
+          def: "—",
+          description: d("styleCornersDot"),
+        },
+        {
+          name: "background",
+          type: "object",
+          def: "—",
+          description: d("styleBackground"),
+        },
+        {
+          name: "background.image",
+          type: "object",
+          def: "—",
+          description: d("backgroundImage"),
+        },
+        {
+          name: "*.gradient",
+          type: "object",
+          def: "—",
+          description: d("gradientShape"),
+        },
       ],
     },
     {
@@ -422,10 +539,31 @@ export default async function ApiDocsPage({
       def: "—",
       description: d("logo"),
       children: [
-        { name: "dataUri", type: "string", def: "—", required: true, description: d("logoDataUri") },
-        { name: "sizeRatio", type: "number", def: "0.22", description: d("logoSizeRatio") },
-        { name: "margin", type: "number", def: "1", description: d("logoMargin") },
-        { name: "background", type: "boolean", def: "true", description: d("logoBackground") },
+        {
+          name: "dataUri",
+          type: "string",
+          def: "—",
+          required: true,
+          description: d("logoDataUri"),
+        },
+        {
+          name: "sizeRatio",
+          type: "number",
+          def: "0.22",
+          description: d("logoSizeRatio"),
+        },
+        {
+          name: "margin",
+          type: "number",
+          def: "1",
+          description: d("logoMargin"),
+        },
+        {
+          name: "background",
+          type: "boolean",
+          def: "true",
+          description: d("logoBackground"),
+        },
       ],
     },
     {
@@ -434,11 +572,38 @@ export default async function ApiDocsPage({
       def: "—",
       description: d("frame"),
       children: [
-        { name: "style", type: "enum", enumValues: [...FRAME_STYLES], def: "modern", description: d("frameStyleSub") },
-        { name: "text", type: "string", def: "ESCANÉAME", description: d("frameTextSub") },
-        { name: "color", type: "hex", def: "#4f46e5", description: d("frameColorSub") },
-        { name: "textColor", type: "hex", def: "auto", description: d("frameTextColorSub") },
-        { name: "position", type: "enum", enumValues: [...FRAME_POSITIONS], def: "bottom", description: d("framePositionSub") },
+        {
+          name: "style",
+          type: "enum",
+          enumValues: [...FRAME_STYLES],
+          def: "modern",
+          description: d("frameStyleSub"),
+        },
+        {
+          name: "text",
+          type: "string",
+          def: "ESCANÉAME",
+          description: d("frameTextSub"),
+        },
+        {
+          name: "color",
+          type: "hex",
+          def: "#4f46e5",
+          description: d("frameColorSub"),
+        },
+        {
+          name: "textColor",
+          type: "hex",
+          def: "auto",
+          description: d("frameTextColorSub"),
+        },
+        {
+          name: "position",
+          type: "enum",
+          enumValues: [...FRAME_POSITIONS],
+          def: "bottom",
+          description: d("framePositionSub"),
+        },
       ],
     },
     {
@@ -447,9 +612,24 @@ export default async function ApiDocsPage({
       def: "—",
       description: d("effects"),
       children: [
-        { name: "invert", type: "boolean", def: "false", description: d("effectsInvert") },
-        { name: "glow", type: "boolean", def: "false", description: d("effectsGlow") },
-        { name: "opacity", type: "number", def: "1", description: d("effectsOpacity") },
+        {
+          name: "invert",
+          type: "boolean",
+          def: "false",
+          description: d("effectsInvert"),
+        },
+        {
+          name: "glow",
+          type: "boolean",
+          def: "false",
+          description: d("effectsGlow"),
+        },
+        {
+          name: "opacity",
+          type: "number",
+          def: "1",
+          description: d("effectsOpacity"),
+        },
       ],
     },
   ];
@@ -461,7 +641,11 @@ export default async function ApiDocsPage({
   ];
 
   const overviewEndpoints = [
-    { methods: ["GET", "POST"], path: "/api/v1/qr", label: t("intro.qrEndpoint") },
+    {
+      methods: ["GET", "POST"],
+      path: "/api/v1/qr",
+      label: t("intro.qrEndpoint"),
+    },
     {
       methods: ["POST", "GET", "PATCH", "DELETE"],
       path: "/api/v1/dynamic",
@@ -473,7 +657,7 @@ export default async function ApiDocsPage({
     <div className="mx-auto grid max-w-7xl gap-x-10 gap-y-6 px-4 py-12 sm:px-6 lg:grid-cols-[220px_1fr]">
       <DocsNav items={navItems} ariaLabel={t("title")} />
 
-      {/* Contenido */}
+      {/* Content */}
       <div className="flex min-w-0 flex-col gap-12">
         <header>
           <h1 className="text-3xl font-semibold tracking-[-0.02em]">
@@ -494,7 +678,7 @@ export default async function ApiDocsPage({
           </div>
         </header>
 
-        {/* Introducción */}
+        {/* Introduction */}
         <section className="flex flex-col gap-4">
           <SectionHeading id="intro" anchorLabel={anchorLabel}>
             {t("nav.intro")}
@@ -522,7 +706,7 @@ export default async function ApiDocsPage({
           </div>
         </section>
 
-        {/* Inicio rápido */}
+        {/* Quick start */}
         <section className="flex flex-col gap-4">
           <SectionHeading id="quickstart" anchorLabel={anchorLabel}>
             {t("nav.quickstart")}
@@ -537,7 +721,7 @@ export default async function ApiDocsPage({
             />
             {quickstartSteps.map((step, index) => (
               <li key={step.title} className="relative flex items-start gap-4">
-                <span className="bg-gradient-brand z-10 flex size-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-semibold text-white">
+                <span className="z-10 flex size-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-semibold text-white bg-gradient-brand">
                   {index + 1}
                 </span>
                 <div className="flex min-w-0 flex-col gap-1">
@@ -549,7 +733,7 @@ export default async function ApiDocsPage({
           </ol>
         </section>
 
-        {/* Autenticación */}
+        {/* Authentication */}
         <section className="flex flex-col gap-4">
           <SectionHeading id="auth" anchorLabel={anchorLabel}>
             {t("nav.auth")}
@@ -569,7 +753,7 @@ export default async function ApiDocsPage({
           </Button>
         </section>
 
-        {/* Generar */}
+        {/* Generate */}
         <section className="flex flex-col gap-6">
           <SectionHeading id="generate" anchorLabel={anchorLabel}>
             {t("nav.generate")}
@@ -579,26 +763,38 @@ export default async function ApiDocsPage({
               <MethodBadge method="GET" className="mr-2 align-middle" />
               {t("generate.getTitle")}
             </SubHeading>
-            <p className="text-sm text-muted-foreground">{t("generate.getBody")}</p>
+            <p className="text-sm text-muted-foreground">
+              {t("generate.getBody")}
+            </p>
             <LanguageTabs
               tabs={[
                 {
                   id: "curl",
                   label: "curl",
-                  content: <CodeBlock lang="bash" label="curl" code={ex.curlGet} />,
+                  content: (
+                    <CodeBlock lang="bash" label="curl" code={ex.curlGet} />
+                  ),
                 },
                 {
                   id: "js",
                   label: "JavaScript",
                   content: (
-                    <CodeBlock lang="javascript" label="JavaScript" code={ex.jsGet} />
+                    <CodeBlock
+                      lang="javascript"
+                      label="JavaScript"
+                      code={ex.jsGet}
+                    />
                   ),
                 },
                 {
                   id: "python",
                   label: "Python",
                   content: (
-                    <CodeBlock lang="python" label="Python" code={ex.pythonGet} />
+                    <CodeBlock
+                      lang="python"
+                      label="Python"
+                      code={ex.pythonGet}
+                    />
                   ),
                 },
               ]}
@@ -609,26 +805,38 @@ export default async function ApiDocsPage({
               <MethodBadge method="POST" className="mr-2 align-middle" />
               {t("generate.postTitle")}
             </SubHeading>
-            <p className="text-sm text-muted-foreground">{t("generate.postBody")}</p>
+            <p className="text-sm text-muted-foreground">
+              {t("generate.postBody")}
+            </p>
             <LanguageTabs
               tabs={[
                 {
                   id: "curl",
                   label: "curl",
-                  content: <CodeBlock lang="bash" label="curl" code={ex.curlPost} />,
+                  content: (
+                    <CodeBlock lang="bash" label="curl" code={ex.curlPost} />
+                  ),
                 },
                 {
                   id: "js",
                   label: "JavaScript",
                   content: (
-                    <CodeBlock lang="javascript" label="JavaScript" code={ex.jsPost} />
+                    <CodeBlock
+                      lang="javascript"
+                      label="JavaScript"
+                      code={ex.jsPost}
+                    />
                   ),
                 },
                 {
                   id: "python",
                   label: "Python",
                   content: (
-                    <CodeBlock lang="python" label="Python" code={ex.pythonPost} />
+                    <CodeBlock
+                      lang="python"
+                      label="Python"
+                      code={ex.pythonPost}
+                    />
                   ),
                 },
               ]}
@@ -645,7 +853,7 @@ export default async function ApiDocsPage({
           </div>
         </section>
 
-        {/* Parámetros */}
+        {/* Parameters */}
         <section className="flex flex-col gap-6">
           <SectionHeading id="params" anchorLabel={anchorLabel}>
             {t("nav.params")}
@@ -660,12 +868,14 @@ export default async function ApiDocsPage({
             <SubHeading id="params-post" anchorLabel={anchorLabel}>
               {t("params.postTitle")}
             </SubHeading>
-            <p className="text-xs text-muted-foreground">{t("params.postNote")}</p>
+            <p className="text-xs text-muted-foreground">
+              {t("params.postNote")}
+            </p>
             <ParamsTable rows={postParams} labels={paramLabels} />
           </div>
         </section>
 
-        {/* Estilos */}
+        {/* Styles */}
         <section className="flex flex-col gap-4">
           <SectionHeading id="styles" anchorLabel={anchorLabel}>
             {t("nav.styles")}
@@ -674,7 +884,7 @@ export default async function ApiDocsPage({
           <StyleSamples labels={(key) => t(`styles.${key}`)} />
         </section>
 
-        {/* QR dinámicos */}
+        {/* Dynamic QRs */}
         <section className="flex flex-col gap-6">
           <SectionHeading id="dynamic" anchorLabel={anchorLabel}>
             {t("nav.dynamic")}
@@ -734,14 +944,22 @@ export default async function ApiDocsPage({
                   id: "js",
                   label: "JavaScript",
                   content: (
-                    <CodeBlock lang="javascript" label="JavaScript" code={ex.jsDynamic} />
+                    <CodeBlock
+                      lang="javascript"
+                      label="JavaScript"
+                      code={ex.jsDynamic}
+                    />
                   ),
                 },
                 {
                   id: "python",
                   label: "Python",
                   content: (
-                    <CodeBlock lang="python" label="Python" code={ex.pythonDynamic} />
+                    <CodeBlock
+                      lang="python"
+                      label="Python"
+                      code={ex.pythonDynamic}
+                    />
                   ),
                 },
               ]}
@@ -772,7 +990,7 @@ export default async function ApiDocsPage({
           </div>
         </section>
 
-        {/* Errores */}
+        {/* Errors */}
         <section className="flex flex-col gap-4">
           <SectionHeading id="errors" anchorLabel={anchorLabel}>
             {t("nav.errors")}

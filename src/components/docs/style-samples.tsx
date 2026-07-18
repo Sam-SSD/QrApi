@@ -24,7 +24,9 @@ function sampleConfig(overrides: {
     style: {
       ...DEFAULT_QR_CONFIG.style,
       dots: overrides.dots ?? { style: "rounded", color: "#18181b" },
-      ...(overrides.cornersSquare ? { cornersSquare: overrides.cornersSquare } : {}),
+      ...(overrides.cornersSquare
+        ? { cornersSquare: overrides.cornersSquare }
+        : {}),
       ...(overrides.cornersDot ? { cornersDot: overrides.cornersDot } : {}),
       background: { color: "#ffffff", transparent: false },
     },
@@ -81,7 +83,7 @@ const GROUPS: SampleGroup[] = [
   },
 ];
 
-/** Miniaturas reales de cada estilo, renderizadas con el mismo motor que la API. */
+/** Real thumbnails of each style, rendered with the same engine as the API. */
 export function StyleSamples({ labels }: { labels: (key: string) => string }) {
   return (
     <div className="flex flex-col gap-3">
@@ -93,7 +95,10 @@ export function StyleSamples({ labels }: { labels: (key: string) => string }) {
           <p className="mb-3 font-mono text-xs text-primary">{labels(key)}</p>
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
             {samples.map(({ value, config }) => (
-              <figure key={value} className="flex flex-col items-center gap-1.5">
+              <figure
+                key={value}
+                className="flex flex-col items-center gap-1.5"
+              >
                 <div
                   aria-hidden="true"
                   className="w-full overflow-hidden rounded-md border border-line bg-white p-1 [&_svg]:block [&_svg]:h-auto [&_svg]:w-full"

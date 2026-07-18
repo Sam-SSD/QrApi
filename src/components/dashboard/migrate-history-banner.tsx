@@ -9,7 +9,7 @@ import { importHistory } from "@/actions/qr-codes";
 import type { HistoryItem } from "@/hooks/use-qr-history";
 
 const STORAGE_KEY = "qrapi:history";
-// clave anterior al rebrand: se lee como fallback y se limpia al migrar
+// pre-rebrand key: read as a fallback and cleared on migration
 const LEGACY_STORAGE_KEY = "qrforge:history";
 const DISMISS_KEY = "qrapi:history-migration-dismissed";
 
@@ -31,7 +31,7 @@ export function MigrateHistoryBanner() {
         setVisible(true);
       }
     } catch {
-      /* sin historial */
+      /* no history */
     }
   }, []);
 
@@ -60,7 +60,9 @@ export function MigrateHistoryBanner() {
 
   return (
     <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-brand-soft px-4 py-3">
-      <p className="text-sm font-medium">{t("title", { count: items.length })}</p>
+      <p className="text-sm font-medium">
+        {t("title", { count: items.length })}
+      </p>
       <div className="flex items-center gap-2">
         <Button type="button" size="sm" disabled={pending} onClick={migrate}>
           <ArrowUpFromLine className="size-4" strokeWidth={1.75} />

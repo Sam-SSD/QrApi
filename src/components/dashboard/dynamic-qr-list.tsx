@@ -2,14 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useFormatter, useTranslations } from "next-intl";
-import {
-  BarChart3,
-  Copy,
-  Link2,
-  Pencil,
-  QrCode,
-  Trash2,
-} from "lucide-react";
+import { BarChart3, Copy, Link2, Pencil, QrCode, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -44,9 +37,9 @@ export interface DynamicQrItem {
   active: boolean;
   scanCount: number;
   createdAt: number;
-  /** Config visual del QrCode asociado (puede faltar). */
+  /** Visual config of the associated QrCode (may be missing). */
   config: unknown;
-  /** Id del QrCode asociado para editar el diseño (null si se creó por API). */
+  /** Id of the associated QrCode to edit the design (null when created via API). */
   qrCodeId: string | null;
 }
 
@@ -87,7 +80,6 @@ function DynamicCard({ item }: { item: DynamicQrItem }) {
       }
     });
   }
-
 
   return (
     <div className="group flex flex-col gap-3 rounded-xl border border-line bg-surface p-4 transition-all duration-150 hover:border-line-strong hover:shadow-raised">

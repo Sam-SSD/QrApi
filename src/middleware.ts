@@ -9,8 +9,8 @@ const DASHBOARD_PATTERN = /^\/(es|en)\/dashboard(\/|$)/;
 export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Guard optimista: sin cookie de sesión no hay nada que hacer en /dashboard.
-  // La verificación real de sesión ocurre server-side en dashboard/layout.tsx.
+  // Optimistic guard: without a session cookie there is nothing to do in
+  // /dashboard. The real session check happens server-side in dashboard/layout.tsx.
   if (DASHBOARD_PATTERN.test(pathname)) {
     const sessionCookie =
       request.cookies.get("better-auth.session_token") ??
@@ -27,8 +27,8 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Excluir api, la redirección de QR dinámicos (r/), archivos estáticos, rutas
-  // de metadata (icon/og/manifest) e internals de Next
+  // Exclude api, the dynamic QR redirect (r/), static files, metadata routes
+  // (icon/og/manifest) and Next internals
   matcher:
     "/((?!api|trpc|r/|_next|_vercel|icon|apple-icon|opengraph-image|manifest|.*\\..*).*)",
 };

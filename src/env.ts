@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 /**
- * Validación de variables de entorno al arrancar el servidor.
- * Importar este módulo desde cualquier código server-side que use env vars.
+ * Environment variable validation at server boot.
+ * Import this module from any server-side code that uses env vars.
  */
 const envSchema = z.object({
   NODE_ENV: z
@@ -14,31 +14,31 @@ const envSchema = z.object({
     .min(32, "BETTER_AUTH_SECRET debe tener al menos 32 caracteres"),
   BETTER_AUTH_URL: z.string().url().default("http://localhost:3000"),
 
-  // URL pública donde corre la app (docs, /r/{slug}, sitemap, metadata).
-  // Prefijo NEXT_PUBLIC_ porque también la consumen client components vía
-  // `SITE_URL` en src/lib/constants.ts (Next la inlina en build).
+  // Public URL where the app runs (docs, /r/{slug}, sitemap, metadata).
+  // NEXT_PUBLIC_ prefix because client components also consume it via
+  // `SITE_URL` in src/lib/constants.ts (Next inlines it at build time).
   NEXT_PUBLIC_SITE_URL: z.string().url().default("http://localhost:3000"),
 
-  // SMTP (verificación de email)
+  // SMTP (email verification)
   SMTP_HOST: z.string().default("localhost"),
   SMTP_PORT: z.coerce.number().default(1025),
   SMTP_USER: z.string().optional(),
   SMTP_PASSWORD: z.string().optional(),
   SMTP_FROM: z.string().default("QrAPI <no-reply@qrapi.local>"),
 
-  // OAuth opcional: los proveedores solo se activan si sus vars existen
+  // Optional OAuth: providers activate only when their vars exist
   GITHUB_CLIENT_ID: z.string().optional(),
   GITHUB_CLIENT_SECRET: z.string().optional(),
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
 
-  // Límites de la API pública (por API key)
+  // Public API limits (per API key)
   RATE_LIMIT_PER_MINUTE: z.coerce.number().default(60),
   RATE_LIMIT_PER_DAY: z.coerce.number().default(5000),
 
-  // Secreto para el HMAC de IPs en los eventos de escaneo (QR dinámicos).
-  // En producción DEBE fijarse a un valor propio; el default solo sirve en dev,
-  // donde la IP suele ser null y el hash no se usa.
+  // Secret for the IP HMAC in scan events (dynamic QRs).
+  // In production it MUST be set to a custom value; the default only makes
+  // sense in dev, where the IP is usually null and the hash is unused.
   SCAN_IP_SECRET: z
     .string()
     .min(1)

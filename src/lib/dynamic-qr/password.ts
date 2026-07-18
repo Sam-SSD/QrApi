@@ -1,8 +1,8 @@
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 
 /**
- * Hash de contraseña para QR dinámicos protegidos: scrypt con salt aleatorio,
- * almacenado como `salt:hash` (hex). Server-only.
+ * Password hashing for protected dynamic QRs: scrypt with a random salt,
+ * stored as `salt:hash` (hex). Server-only.
  */
 export function hashPassword(password: string): string {
   const salt = randomBytes(16).toString("hex");

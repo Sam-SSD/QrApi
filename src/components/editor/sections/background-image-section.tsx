@@ -31,8 +31,8 @@ export function BackgroundImageSection() {
         dataUri,
         opacity: image?.opacity ?? 0.35,
       });
-      // Muestrea el tono de la imagen (aclarado) para teñir las placas de
-      // finder de forma que combinen sin perder contraste. Best-effort.
+      // Samples the image's hue (lightened) to tint the finder plates so
+      // they match without losing contrast. Best-effort.
       const tint = await sampleTint(dataUri);
       if (tint) patchBgImage({ tint });
     };
@@ -41,7 +41,7 @@ export function BackgroundImageSection() {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* El schema rechaza svg+xml (evita <script>): solo bitmaps. */}
+      {/* The schema rejects svg+xml (avoids <script>): bitmaps only. */}
       <input
         ref={inputRef}
         type="file"

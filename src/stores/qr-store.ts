@@ -14,7 +14,7 @@ import type { QrTemplate } from "@/lib/qr/templates";
 
 type QrBgImage = NonNullable<QrConfig["style"]["background"]["image"]>;
 
-// ---------- Campos por tipo ----------
+// ---------- Fields per type ----------
 
 export interface FieldsMap {
   text: { text: string };
@@ -61,7 +61,7 @@ export const DEFAULT_FIELDS: FieldsMap = {
   crypto: { currency: "bitcoin", address: "", amount: "" },
 };
 
-/** Convierte los campos del formulario en un candidato de payload (sin vacíos). */
+/** Turns the form fields into a payload candidate (empty values dropped). */
 function fieldsToPayloadInput(
   type: QrPayloadType,
   fields: FieldsMap,
@@ -81,28 +81,28 @@ function fieldsToPayloadInput(
 }
 
 /**
- * Inverso de fieldsToPayloadInput: reconstruye los campos del formulario a
- * partir de un payload guardado (para editar un QR de la cuenta). Los campos
- * ausentes en el payload conservan su default.
+ * Inverse of fieldsToPayloadInput: rebuilds the form fields from a saved
+ * payload (to edit an account QR). Fields missing from the payload keep
+ * their default.
  */
 export function payloadToFields(payload: QrPayload): Partial<FieldsMap> {
   const { type, ...rest } = payload;
   const base = structuredClone(DEFAULT_FIELDS[type]) as Record<string, unknown>;
   for (const [key, value] of Object.entries(rest)) {
     if (!(key in base)) continue;
-    // crypto.amount es number en el payload pero string en el formulario
+    // crypto.amount is a number in the payload but a string in the form
     base[key] = typeof value === "number" ? String(value) : value;
   }
   return { [type]: base } as Partial<FieldsMap>;
 }
 
 export interface PayloadResult {
-  /** Cadena final a codificar, o null si el formulario está vacío/inválido. */
+  /** Final string to encode, or null when the form is empty/invalid. */
   data: string | null;
   payload: QrPayload | null;
-  /** true si el usuario aún no ha escrito nada significativo. */
+  /** true while the user hasn't typed anything meaningful yet. */
   empty: boolean;
-  /** Errores por campo (clave = nombre de campo). */
+  /** Per-field errors (key = field name). */
   issues: Record<string, string>;
 }
 
@@ -111,7 +111,7 @@ export function computePayload(
   fields: FieldsMap,
 ): PayloadResult {
   const input = fieldsToPayloadInput(type, fields);
-  const empty = Object.keys(input).length <= 1; // solo "type"
+  const empty = Object.keys(input).length <= 1; // only "type"
   if (empty) {
     return { data: null, payload: null, empty: true, issues: {} };
   }
@@ -251,8 +251,8 @@ export const useQrStore = create<QrEditorState>((set) => ({
     set((s) => ({
       config: {
         ...s.config,
-        // Al poner imagen de fondo, subir a EC=H para máxima escaneabilidad
-        // (espejo del auto-bump del logo); el render también lo fuerza.
+        // When a background image is set, bump to EC=H for maximum
+        // scanability (mirrors the logo auto-bump); the render forces it too.
         ecLevel: image && s.config.ecLevel !== "H" ? "H" : s.config.ecLevel,
         style: {
           ...s.config.style,

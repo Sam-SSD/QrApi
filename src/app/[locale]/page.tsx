@@ -50,7 +50,7 @@ export default async function HomePage({
           <h1 className="max-w-2xl text-4xl font-semibold tracking-[-0.03em] text-balance md:text-6xl">
             {t("heroTitle")}
           </h1>
-          <p className="max-w-xl text-lg text-muted-foreground text-balance">
+          <p className="max-w-xl text-lg text-balance text-muted-foreground">
             {t("heroSubtitle")}
           </p>
           <div className="flex flex-wrap items-center gap-3">

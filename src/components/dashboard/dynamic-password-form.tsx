@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { setDynamicPassword } from "@/actions/dynamic-qr";
 
-/** Protege/desprotege un QR dinámico con contraseña de escaneo. */
+/** Protects/unprotects a dynamic QR with a scan password. */
 export function DynamicPasswordForm({
   id,
   hasPassword,
@@ -55,7 +55,10 @@ export function DynamicPasswordForm({
         {hasPassword ? (
           <Lock className="size-4 text-primary" strokeWidth={1.75} />
         ) : (
-          <LockOpen className="size-4 text-muted-foreground" strokeWidth={1.75} />
+          <LockOpen
+            className="size-4 text-muted-foreground"
+            strokeWidth={1.75}
+          />
         )}
         {t("passwordTitle")}
       </h3>

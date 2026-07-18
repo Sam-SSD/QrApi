@@ -18,7 +18,7 @@ import { GRADIENT_PRESETS } from "@/lib/qr/templates";
 import { useQrStore } from "@/stores/qr-store";
 import { cn } from "@/lib/utils";
 
-/** Reparte los offsets uniformemente entre 0 y 1 para una lista de colores. */
+/** Distributes offsets evenly between 0 and 1 for a list of colors. */
 function distributeStops(colors: string[]) {
   return colors.map((color, i) => ({
     offset: colors.length <= 1 ? 0 : i / (colors.length - 1),
@@ -89,7 +89,7 @@ export function StyleSection() {
 
       {gradient && (
         <div className="flex flex-col gap-4 rounded-lg border border-line bg-canvas-subtle p-3">
-          {/* Paradas de color (2-4), con offsets distribuidos uniformemente */}
+          {/* Color stops (2-4), with evenly distributed offsets */}
           <div className="flex flex-col gap-2">
             <span className="text-sm font-medium">{t("stops")}</span>
             {gradient.stops.map((stop, i) => (
@@ -186,7 +186,7 @@ export function StyleSection() {
         </div>
       )}
 
-      {/* Gradiente de fondo (independiente del de puntos) */}
+      {/* Background gradient (independent from the dots one) */}
       <div className="flex items-center justify-between">
         <Label htmlFor="style-bg-gradient">{t("useBgGradient")}</Label>
         <Switch
@@ -249,8 +249,7 @@ export function StyleSection() {
         <span className="text-sm font-medium">{t("presets")}</span>
         <div className="flex flex-wrap gap-2">
           {Object.entries(GRADIENT_PRESETS).map(([name, preset]) => {
-            const active =
-              JSON.stringify(gradient) === JSON.stringify(preset);
+            const active = JSON.stringify(gradient) === JSON.stringify(preset);
             const angle =
               preset.type === "radial" ? "circle" : `${preset.rotation}deg`;
             const css = `${preset.type === "radial" ? "radial" : "linear"}-gradient(${angle}, ${preset.stops

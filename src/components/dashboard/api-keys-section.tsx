@@ -54,7 +54,7 @@ function CreateKeyDialog({
 
   function close() {
     onOpenChange(false);
-    // limpiar el token de la memoria del componente al cerrar
+    // clear the token from component memory on close
     setTimeout(() => {
       setToken(null);
       setName("");
@@ -184,7 +184,8 @@ function KeyRow({ row }: { row: ApiKeyRow }) {
       </div>
       <div className="flex flex-col gap-0.5 text-right text-xs text-ink-faint">
         <span>
-          {t("created")}: {format.dateTime(row.createdAt, { dateStyle: "medium" })}
+          {t("created")}:{" "}
+          {format.dateTime(row.createdAt, { dateStyle: "medium" })}
         </span>
         <span>
           {t("lastUsed")}:{" "}

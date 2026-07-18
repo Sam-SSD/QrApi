@@ -93,7 +93,11 @@ export function HistoryDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side={side}
-        className={side === "bottom" ? "max-h-[80dvh] overflow-y-auto" : "w-96 overflow-y-auto sm:max-w-md"}
+        className={
+          side === "bottom"
+            ? "max-h-[80dvh] overflow-y-auto"
+            : "w-96 overflow-y-auto sm:max-w-md"
+        }
       >
         <SheetHeader>
           <SheetTitle>{t("title")}</SheetTitle>

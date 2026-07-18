@@ -6,22 +6,24 @@ import { cn } from "@/lib/utils";
 
 export interface ParamRow {
   name: string;
-  /** Tipo mostrado en mono (string, number, hex, object…). */
+  /** Type shown in mono (string, number, hex, object…). */
   type: string;
-  /** Valores de enum renderizados como chips (sustituyen a `type`). */
+  /** Enum values rendered as chips (they replace `type`). */
   enumValues?: string[];
   def: string;
   required?: boolean;
-  /** Descripción ya resuelta (este componente es client: no acepta funciones). */
+  /** Already-resolved description (this component is client: no functions). */
   description: string;
-  /** Subcampos: la fila se vuelve expandible. */
+  /** Subfields: the row becomes expandable. */
   children?: ParamRow[];
 }
 
 function TypeCell({ row }: { row: ParamRow }) {
   if (!row.enumValues) {
     return (
-      <span className="font-mono text-xs text-muted-foreground">{row.type}</span>
+      <span className="font-mono text-xs text-muted-foreground">
+        {row.type}
+      </span>
     );
   }
   return (

@@ -7,13 +7,13 @@ const STORAGE_KEY = "qrapi:docs-lang";
 const SYNC_EVENT = "qrapi:docs-lang-change";
 
 /**
- * Tabs de lenguaje sincronizadas: cambiar el lenguaje en un grupo lo cambia
- * en todos los grupos de la página (CustomEvent) y persiste (localStorage).
+ * Synchronized language tabs: switching the language in one group switches
+ * it in every group on the page (CustomEvent) and persists (localStorage).
  */
 export function LanguageTabs({
   tabs,
 }: {
-  /** [etiqueta, contenido server-rendered] */
+  /** [label, server-rendered content] */
   tabs: Array<{ id: string; label: string; content: React.ReactNode }>;
 }) {
   const [active, setActive] = useState(tabs[0].id);
@@ -22,10 +22,14 @@ export function LanguageTabs({
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored && stored !== tabs[0].id && tabs.some((tab) => tab.id === stored)) {
+    if (
+      stored &&
+      stored !== tabs[0].id &&
+      tabs.some((tab) => tab.id === stored)
+    ) {
       setActive(stored);
-      // aplicar la pestaña guardada cambia la altura de los paneles y puede
-      // desplazar un deep-link (#ancla) ya resuelto: re-anclar tras el cambio
+      // applying the stored tab changes panel heights and can displace an
+      // already-resolved deep-link (#anchor): re-anchor after the change
       const hash = window.location.hash.slice(1);
       if (hash) {
         requestAnimationFrame(() => {

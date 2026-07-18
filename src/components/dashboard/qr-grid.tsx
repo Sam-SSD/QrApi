@@ -20,14 +20,18 @@ import {
 } from "@/components/ui/alert-dialog";
 import { renderQrSvg } from "@/lib/qr/render-svg";
 import { qrConfigSchema, type QrConfig } from "@/lib/qr/schema";
-import { deleteQrCode, duplicateQrCode, renameQrCode } from "@/actions/qr-codes";
+import {
+  deleteQrCode,
+  duplicateQrCode,
+  renameQrCode,
+} from "@/actions/qr-codes";
 
 export interface SavedQr {
   id: string;
   name: string;
   type: string;
   data: string;
-  /** { payload, config } tal como se guardó en DB. */
+  /** { payload, config } exactly as stored in the DB. */
   config: { payload?: unknown; config?: unknown };
   createdAt: number;
 }
@@ -111,7 +115,7 @@ function QrCard({ item }: { item: SavedQr }) {
           {format.relativeTime(item.createdAt)}
         </span>
       </div>
-      <div className="flex items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100 max-lg:opacity-100">
+      <div className="flex items-center gap-1 opacity-0 transition-opacity duration-150 group-focus-within:opacity-100 group-hover:opacity-100 max-lg:opacity-100">
         <QrExportMenu getSvg={getSvg} filename={item.name} />
         <Button
           type="button"

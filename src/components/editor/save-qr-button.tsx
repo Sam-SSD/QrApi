@@ -30,7 +30,7 @@ export function SaveQrButton({
   payload: QrPayload | null;
   config: QrConfig;
   disabled: boolean;
-  /** Si viene, el botón actualiza este QR guardado en vez de crear uno nuevo. */
+  /** When present, the button updates this saved QR instead of creating one. */
   editing?: EditingQr;
 }) {
   const t = useTranslations("dashboard.save");
@@ -61,7 +61,7 @@ export function SaveQrButton({
     startTransition(async () => {
       try {
         if (editing) {
-          // Modo edición: actualizar el registro existente.
+          // Edit mode: update the existing record.
           if (editing.dynamic) {
             await updateDynamicDesign(editing.id, config);
           } else {
@@ -91,7 +91,7 @@ export function SaveQrButton({
     });
   }
 
-  // En modo dinámico basta un targetUrl válido; en estático hace falta payload.
+  // Dynamic mode only needs a valid targetUrl; static needs a payload.
   const canSubmit = editing
     ? editing.dynamic || Boolean(payload)
     : dynamic
@@ -116,7 +116,7 @@ export function SaveQrButton({
             <DialogTitle>{editing ? t("editTitle") : t("title")}</DialogTitle>
           </DialogHeader>
           <form onSubmit={submit} className="flex flex-col gap-4">
-            {/* El nombre del dinámico se gestiona en el panel; aquí solo diseño. */}
+            {/* Dynamic QR names are managed in the dashboard; only design here. */}
             {!editing?.dynamic && (
               <div className="flex flex-col gap-2">
                 <Label htmlFor="save-qr-name">{t("nameLabel")}</Label>
@@ -131,7 +131,7 @@ export function SaveQrButton({
               </div>
             )}
 
-            {/* Estático vs dinámico: solo al crear (el modo no se cambia editando) */}
+            {/* Static vs dynamic: create-time only (the mode is not editable) */}
             {!editing && (
               <div className="flex items-start justify-between gap-3 rounded-lg border border-line bg-canvas-subtle p-3">
                 <div className="flex flex-col gap-0.5">
@@ -163,7 +163,9 @@ export function SaveQrButton({
             )}
 
             {editing?.dynamic && (
-              <p className="text-sm text-muted-foreground">{t("editDynamicHint")}</p>
+              <p className="text-sm text-muted-foreground">
+                {t("editDynamicHint")}
+              </p>
             )}
 
             <Button type="submit" disabled={pending || !canSubmit}>

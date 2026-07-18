@@ -36,7 +36,7 @@ export function LogoSection() {
         margin: logo?.margin ?? 1,
         background: logo?.background ?? true,
       });
-      // Con logo conviene subir la corrección de errores
+      // With a logo it pays to raise the error correction level
       if (ecLevel === "L" || ecLevel === "M") setEcLevel("H");
     };
     reader.readAsDataURL(file);

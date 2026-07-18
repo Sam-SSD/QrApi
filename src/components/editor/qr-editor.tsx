@@ -11,11 +11,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import {
-  useQrStore,
-  computePayload,
-  type QrSnapshot,
-} from "@/stores/qr-store";
+import { useQrStore, computePayload, type QrSnapshot } from "@/stores/qr-store";
 import { renderQrSvg } from "@/lib/qr/render-svg";
 import { useQrHistory } from "@/hooks/use-qr-history";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -35,7 +31,7 @@ import { TemplatesGallery } from "./templates-gallery";
 import { HistoryDrawer } from "./history-drawer";
 import { ShortcutsDialog } from "./shortcuts-dialog";
 
-/** QR guardado que se está editando desde el panel. */
+/** Saved QR being edited from the dashboard. */
 export interface EditingQr {
   id: string;
   name: string;
@@ -59,7 +55,7 @@ export function QrEditor({
   const applyTemplate = useQrStore((s) => s.applyTemplate);
   const loadSnapshot = useQrStore((s) => s.loadSnapshot);
 
-  // Carga el QR guardado (modo edición) una sola vez.
+  // Loads the saved QR (edit mode) exactly once.
   const appliedSnapshot = useRef(false);
   useEffect(() => {
     if (appliedSnapshot.current || !initialSnapshot) return;
@@ -74,7 +70,7 @@ export function QrEditor({
   const isMobile = useMediaQuery("(max-width: 1023px)");
   const lastSvgRef = useRef<string | null>(null);
 
-  // Preset inicial vía ?preset= (enlaces desde la landing)
+  // Initial preset via ?preset= (links from the landing page)
   const appliedInitial = useRef(false);
   useEffect(() => {
     if (appliedInitial.current || !initialTemplateId) return;
@@ -107,11 +103,11 @@ export function QrEditor({
     });
   }, [payload.data, type, fields, config, history]);
 
-  // Atajos de teclado
+  // Keyboard shortcuts
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      // Algunos eventos sintéticos (autofill, gestores de contraseñas) llegan
-      // sin `key`; sin este guard, key.toLowerCase() lanzaría.
+      // Some synthetic events (autofill, password managers) arrive without
+      // `key`; without this guard, key.toLowerCase() would throw.
       if (!event.key) return;
 
       const target = event.target as HTMLElement;
@@ -129,7 +125,11 @@ export function QrEditor({
       } else if (event.ctrlKey && event.key.toLowerCase() === "h") {
         event.preventDefault();
         setHistoryOpen((v) => !v);
-      } else if (event.ctrlKey && !event.shiftKey && event.key.toLowerCase() === "s") {
+      } else if (
+        event.ctrlKey &&
+        !event.shiftKey &&
+        event.key.toLowerCase() === "s"
+      ) {
         event.preventDefault();
         document.getElementById("qr-download-trigger")?.click();
       }
@@ -151,7 +151,9 @@ export function QrEditor({
       />
       {payload.data && <ScanCheck config={config} />}
       {!payload.empty && Object.keys(payload.issues).length > 0 && (
-        <p className="text-center text-xs text-warning">{t("preview.invalid")}</p>
+        <p className="text-center text-xs text-warning">
+          {t("preview.invalid")}
+        </p>
       )}
       <div id="qr-export-bar" className="flex flex-col gap-2">
         <ExportBar
@@ -215,9 +217,9 @@ export function QrEditor({
           </div>
 
           <div className="grid gap-8 lg:grid-cols-[1fr_minmax(420px,480px)]">
-            {/* En móvil la preview va primero y es sticky */}
+            {/* On mobile the preview goes first and is sticky */}
             {isMobile && (
-              <div className="glass sticky top-16 z-30 -mx-4 rounded-none border-x-0 px-4 py-3 sm:-mx-6 sm:px-6">
+              <div className="sticky top-16 z-30 -mx-4 rounded-none border-x-0 px-4 py-3 glass sm:-mx-6 sm:px-6">
                 <div className="mx-auto max-w-60">
                   <QrPreview
                     data={payload.data}
@@ -279,7 +281,7 @@ export function QrEditor({
                 </AccordionItem>
               </Accordion>
 
-              {/* Barra de export en móvil (abajo, siempre visible) */}
+              {/* Export bar on mobile (bottom, always visible) */}
               {isMobile && previewPanel}
             </div>
 

@@ -14,7 +14,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: page === "" ? 1 : page === "/generator" ? 0.9 : 0.7,
     alternates: {
       languages: Object.fromEntries(
-        routing.locales.map((locale) => [locale, `${BASE_URL}/${locale}${page}`]),
+        routing.locales.map((locale) => [
+          locale,
+          `${BASE_URL}/${locale}${page}`,
+        ]),
       ),
     },
   }));

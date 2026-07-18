@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { generateSlug } from "./slug";
 
 /**
- * Crea un DynamicQr con slug único, reintentando ante colisión (índice único
- * sobre slug → P2002). Compartido por la Server Action y la API pública.
+ * Creates a DynamicQr with a unique slug, retrying on collision (unique
+ * index on slug → P2002). Shared by the Server Action and the public API.
  */
 export async function createUniqueDynamicQr(input: {
   userId: string;
@@ -21,7 +21,7 @@ export async function createUniqueDynamicQr(input: {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === "P2002"
       ) {
-        continue; // colisión de slug: reintenta con otro
+        continue; // slug collision: retry with another one
       }
       throw error;
     }

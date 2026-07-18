@@ -5,8 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "QrAPI",
     short_name: "QrAPI",
-    description:
-      "Generador de códigos QR con editor visual y API REST",
+    description: "Generador de códigos QR con editor visual y API REST",
     start_url: "/",
     display: "standalone",
     background_color: BRAND_COLORS.bgDark,

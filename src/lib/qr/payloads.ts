@@ -1,11 +1,11 @@
 import type { QrPayload } from "./schema";
 
-/** Escapa los caracteres reservados del formato WIFI: (\ ; , : "). */
+/** Escapes the reserved characters of the WIFI: format (\ ; , : "). */
 function escapeWifi(value: string): string {
   return value.replace(/([\\;,:"])/g, "\\$1");
 }
 
-/** Escapa los caracteres reservados de vCard 3.0 (\ ; ,). */
+/** Escapes the reserved characters of vCard 3.0 (\ ; ,). */
 function escapeVCard(value: string): string {
   return value
     .replace(/\\/g, "\\\\")
@@ -14,7 +14,7 @@ function escapeVCard(value: string): string {
     .replace(/\n/g, "\\n");
 }
 
-/** Construye la cadena estándar que se codifica en el QR para cada tipo. */
+/** Builds the standard string encoded into the QR for each type. */
 export function buildPayload(payload: QrPayload): string {
   switch (payload.type) {
     case "text":
@@ -67,7 +67,8 @@ export function buildPayload(payload: QrPayload): string {
         payload.phone && `TEL;TYPE=CELL:${payload.phone}`,
         payload.email && `EMAIL:${payload.email}`,
         payload.website && `URL:${payload.website}`,
-        payload.address && `ADR;TYPE=WORK:;;${escapeVCard(payload.address)};;;;`,
+        payload.address &&
+          `ADR;TYPE=WORK:;;${escapeVCard(payload.address)};;;;`,
         "END:VCARD",
       ];
       return lines.filter(Boolean).join("\n");

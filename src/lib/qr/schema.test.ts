@@ -10,12 +10,12 @@ import {
 } from "./schema";
 
 describe("qrConfigSchema", () => {
-  it("parsea la config por defecto sin lanzar", () => {
+  it("parses the default config without throwing", () => {
     expect(() => qrConfigSchema.parse({})).not.toThrow();
     expect(DEFAULT_QR_CONFIG.style.dots.style).toBe("square");
   });
 
-  it("expone los estilos nuevos en las listas de constantes", () => {
+  it("exposes the new styles in the constant lists", () => {
     expect(DOT_STYLES).toContain("star");
     expect(DOT_STYLES).toContain("vertical-line");
     expect(CORNER_SQUARE_STYLES).toContain("outpoint");
@@ -25,14 +25,14 @@ describe("qrConfigSchema", () => {
   });
 
   describe("frame", () => {
-    it("aplica default de position", () => {
+    it("applies the position default", () => {
       const parsed = qrConfigSchema.parse({
         frame: { style: "modern", text: "HOLA", color: "#4f46e5" },
       });
       expect(parsed.frame?.position).toBe("bottom");
     });
 
-    it("acepta position y textColor explícitos", () => {
+    it("accepts explicit position and textColor", () => {
       const parsed = qrConfigSchema.parse({
         frame: {
           style: "banner-top",
@@ -46,7 +46,7 @@ describe("qrConfigSchema", () => {
       expect(parsed.frame?.textColor).toBe("#ffffff");
     });
 
-    it("rechaza position fuera del enum", () => {
+    it("rejects a position outside the enum", () => {
       expect(() =>
         qrConfigSchema.parse({
           frame: {
@@ -65,16 +65,15 @@ describe("qrConfigSchema", () => {
     const PNG =
       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
 
-    it("aplica el default de opacity", () => {
+    it("applies the opacity default", () => {
       const parsed = qrConfigSchema.parse({
         style: { background: { image: { dataUri: PNG } } },
       });
       expect(parsed.style.background.image?.opacity).toBe(0.35);
     });
 
-    it("rechaza un data URI svg+xml (evita <script>)", () => {
-      const svg =
-        "data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=";
+    it("rejects an svg+xml data URI (avoids <script>)", () => {
+      const svg = "data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=";
       expect(() =>
         qrConfigSchema.parse({
           style: { background: { image: { dataUri: svg } } },
@@ -82,7 +81,7 @@ describe("qrConfigSchema", () => {
       ).toThrow();
     });
 
-    it("acepta gradiente en background y en las esquinas", () => {
+    it("accepts a gradient on the background and the corners", () => {
       const grad = {
         type: "linear" as const,
         rotation: 45,

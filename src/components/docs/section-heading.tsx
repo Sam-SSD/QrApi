@@ -32,7 +32,7 @@ export function SectionHeading({
   );
 }
 
-/** h3 con ancla propia para deep-links dentro de una sección. */
+/** h3 with its own anchor for deep-links within a section. */
 export function SubHeading({
   id,
   anchorLabel,

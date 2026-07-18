@@ -20,7 +20,7 @@ export async function generateMetadata({
   };
 }
 
-/** Carga un QR guardado del usuario como snapshot editable (o null). */
+/** Loads a user's saved QR as an editable snapshot (or null). */
 async function loadEditable(
   id: string,
 ): Promise<{ snapshot: QrSnapshot; editing: EditingQr } | null> {
@@ -42,7 +42,7 @@ async function loadEditable(
 
   const isDynamic = Boolean(row.dynamicQrId);
   if (isDynamic) {
-    // El contenido de un dinámico es su URL de redirección (fija).
+    // A dynamic QR's content is its (fixed) redirect URL.
     return {
       snapshot: {
         type: "url",

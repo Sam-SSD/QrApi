@@ -4,9 +4,9 @@ import { checkRateLimit, type RateLimitResult } from "@/lib/rate-limit";
 import type { ApiKey } from "@prisma/client";
 
 /**
- * Andamiaje común de la API pública /api/v1/*: CORS, formato de error
- * `{error:{code,message,details?}}` (mensajes en inglés), cabeceras de rate
- * limit y autenticación Bearer con rate limiting.
+ * Shared scaffolding for the public API /api/v1/*: CORS, error format
+ * `{error:{code,message,details?}}` (messages in English), rate limit
+ * headers and Bearer authentication with rate limiting.
  */
 
 export const CORS_HEADERS = {
@@ -29,7 +29,9 @@ export function errorResponse(
   );
 }
 
-export function rateLimitHeaders(rate: RateLimitResult): Record<string, string> {
+export function rateLimitHeaders(
+  rate: RateLimitResult,
+): Record<string, string> {
   return {
     "X-RateLimit-Limit": String(rate.limit),
     "X-RateLimit-Remaining": String(rate.remaining),
@@ -41,7 +43,7 @@ export type ApiAuth =
   | { response: NextResponse; rate?: undefined; apiKey?: undefined }
   | { response?: undefined; rate: RateLimitResult; apiKey: ApiKey };
 
-/** Autentica el Bearer y aplica rate limiting; expone el apiKey (con userId). */
+/** Authenticates the Bearer and applies rate limiting; exposes the apiKey (with userId). */
 export async function authenticateApi(request: NextRequest): Promise<ApiAuth> {
   const verification = await verifyApiToken(
     request.headers.get("authorization"),
@@ -79,7 +81,7 @@ export async function authenticateApi(request: NextRequest): Promise<ApiAuth> {
   return { rate, apiKey: verification.apiKey };
 }
 
-/** Respuesta JSON con CORS + cabeceras de rate limit. */
+/** JSON response with CORS + rate limit headers. */
 export function jsonResponse(
   body: unknown,
   rate: RateLimitResult,

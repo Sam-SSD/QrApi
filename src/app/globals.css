@@ -102,7 +102,7 @@
 }
 
 .dark {
-  /* ---- Dark (identidad) ---- */
+  /* ---- Dark (brand identity) ---- */
   --background: #09090b;
   --canvas-subtle: #0e0e12;
   --foreground: #f4f4f5;
@@ -197,7 +197,7 @@
   box-shadow: var(--glow-accent);
 }
 
-/* Shimmer para skeletons y overlays de carga */
+/* Shimmer for skeletons and loading overlays */
 @keyframes shimmer {
   from {
     background-position: 200% 0;
@@ -218,7 +218,7 @@
   animation: shimmer 1.6s linear infinite;
 }
 
-/* Shiki: tema dual claro/oscuro */
+/* Shiki: dual light/dark theme */
 .shiki {
   background: transparent !important;
 }
@@ -227,7 +227,7 @@
   color: var(--shiki-dark) !important;
 }
 
-/* Hero: módulos del QR aparecen con stagger radial (CSS puro, LCP-safe) */
+/* Hero: QR modules appear with a radial stagger (pure CSS, LCP-safe) */
 @keyframes hero-module-in {
   from {
     opacity: 0;
@@ -247,7 +247,7 @@
   animation: hero-module-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* Scroll reveal (activado por IntersectionObserver) */
+/* Scroll reveal (triggered by IntersectionObserver) */
 .reveal {
   opacity: 0;
   transform: translateY(10px);

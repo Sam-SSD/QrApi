@@ -4,15 +4,15 @@ import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
-/** Escapa un valor CSV (comas, comillas y saltos de línea). */
+/** Escapes a CSV value (commas, quotes and newlines). */
 function csvEscape(value: string): string {
   if (/[",\n\r]/.test(value)) return `"${value.replace(/"/g, '""')}"`;
   return value;
 }
 
 /**
- * Exporta el historial de escaneos de un QR dinámico propio como CSV.
- * Autenticado por sesión (se usa desde el panel).
+ * Exports the scan history of an owned dynamic QR as CSV.
+ * Session-authenticated (used from the dashboard).
  */
 export async function GET(
   request: NextRequest,
@@ -52,7 +52,9 @@ export async function GET(
   });
 
   const lines = [
-    ["timestamp", "country", "deviceType", "os", "browser", "referrer"].join(","),
+    ["timestamp", "country", "deviceType", "os", "browser", "referrer"].join(
+      ",",
+    ),
     ...scans.map((s) =>
       [
         s.timestamp.toISOString(),

@@ -6,17 +6,10 @@ import { renderQrSvg } from "@/lib/qr/render-svg";
 import { Reveal } from "./reveal";
 
 /**
- * Muestra curada para la landing: una por familia (marca, oscuro, foto de
- * fondo, industria, negocio, marketing). La galería completa vive en el editor.
+ * Curated sample for the landing: one per family (brand, dark, background
+ * photo, industry, business, marketing). The full gallery lives in the editor.
  */
-const SHOWCASE_IDS = [
-  "qrapi",
-  "neon",
-  "photo",
-  "restaurant",
-  "wifi",
-  "sunset",
-];
+const SHOWCASE_IDS = ["qrapi", "neon", "photo", "restaurant", "wifi", "sunset"];
 
 export function ShowcaseStrip() {
   const t = useTranslations("landing.showcase");

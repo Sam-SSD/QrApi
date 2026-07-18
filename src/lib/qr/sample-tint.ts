@@ -1,17 +1,17 @@
 /**
- * Muestrea el tono dominante de una imagen (data URI) y devuelve un tinte
- * PÁLIDO en hex, pensado para las placas de finder sobre imagen de fondo:
- * conserva el hue de la foto (para que "combine") pero fuerza una luminosidad
- * alta y saturación baja (para no perder contraste con los módulos oscuros).
+ * Samples the dominant hue of an image (data URI) and returns a PALE tint
+ * in hex, meant for the finder plates over a background image: it keeps the
+ * photo's hue (so it "matches") but forces high lightness and low saturation
+ * (to not lose contrast against the dark modules).
  *
- * Solo cliente (usa canvas). Devuelve null si no se puede muestrear.
+ * Client only (uses canvas). Returns null if sampling is not possible.
  */
 export async function sampleTint(dataUri: string): Promise<string | null> {
   if (typeof document === "undefined") return null;
   const img = await loadImage(dataUri).catch(() => null);
   if (!img) return null;
 
-  const size = 16; // downscale barato: promedio representativo, no pixel-perfect
+  const size = 16; // cheap downscale: representative average, not pixel-perfect
   const canvas = document.createElement("canvas");
   canvas.width = size;
   canvas.height = size;
@@ -23,10 +23,10 @@ export async function sampleTint(dataUri: string): Promise<string | null> {
   try {
     data = ctx.getImageData(0, 0, size, size).data;
   } catch {
-    return null; // canvas "tainted" (no debería con data URI same-origin)
+    return null; // tainted canvas (should not happen with a same-origin data URI)
   }
 
-  // Promedio ponderado por alfa.
+  // Alpha-weighted average.
   let r = 0,
     g = 0,
     b = 0,
@@ -44,8 +44,8 @@ export async function sampleTint(dataUri: string): Promise<string | null> {
   g /= n;
   b /= n;
 
-  // Tomar el HUE de la foto, pero clampar a un tinte pálido (L alto, S media)
-  // para garantizar contraste con módulos oscuros por construcción.
+  // Take the photo's hue but clamp to a pale tint (high L, medium S)
+  // to guarantee contrast against dark modules by construction.
   const [h, s] = rgbToHsl(r, g, b);
   const paleS = Math.min(s, 0.4);
   const paleL = 0.9;
@@ -61,7 +61,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-/** RGB (0-255) → HSL (h en 0-1, s/l en 0-1). */
+/** RGB (0-255) → HSL (h in 0-1, s/l in 0-1). */
 function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
   r /= 255;
   g /= 255;

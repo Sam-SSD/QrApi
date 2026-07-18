@@ -13,14 +13,13 @@ import { cn } from "@/lib/utils";
 export interface DocsNavItem {
   id: string;
   label: string;
-  /** Sub-anclas (h3) mostradas cuando la sección está activa. */
+  /** Sub-anchors (h3) shown while the section is active. */
   children?: Array<{ id: string; label: string }>;
 }
 
 /**
- * Navegación de secciones de la documentación:
- * sidebar sticky con scroll-spy en desktop (con sub-secciones de la sección
- * activa) y barra con select en móvil.
+ * Docs section navigation: sticky sidebar with scroll-spy on desktop (with
+ * sub-sections of the active section) and a select bar on mobile.
  */
 export function DocsNav({
   items,
@@ -34,8 +33,8 @@ export function DocsNav({
   const visibleIds = useRef(new Set<string>());
 
   useEffect(() => {
-    // se observa la <section> completa (no solo el heading) para que los
-    // saltos de scroll largos no se salten ninguna zona de intersección
+    // the whole <section> is observed (not just the heading) so long scroll
+    // jumps never skip past an intersection zone
     const sections = new Map<Element, string>();
     for (const item of items) {
       const heading = document.getElementById(item.id);
@@ -55,7 +54,7 @@ export function DocsNav({
         const first = items.find((item) => visibleIds.current.has(item.id));
         if (first) setActive(first.id);
       },
-      // compensa el header sticky y prioriza la sección del tercio superior
+      // compensates for the sticky header and favors the top-third section
       { rootMargin: "-96px 0px -55% 0px" },
     );
     sections.forEach((_, section) => observer.observe(section));
@@ -63,8 +62,8 @@ export function DocsNav({
   }, [items]);
 
   useEffect(() => {
-    // los h3 son demasiado bajos para el truco de intersección de arriba:
-    // la sub-ancla activa es la última que quedó por encima del umbral
+    // h3s are too short for the intersection trick above: the active
+    // sub-anchor is the last one left above the threshold
     const subIds = items.flatMap(
       (item) => item.children?.map((child) => child.id) ?? [],
     );
@@ -96,7 +95,7 @@ export function DocsNav({
 
   return (
     <>
-      {/* Desktop: sidebar sticky con scroll-spy */}
+      {/* Desktop: sticky sidebar with scroll-spy */}
       <aside className="top-24 hidden self-start lg:sticky lg:block">
         <nav aria-label={ariaLabel} className="flex flex-col gap-1">
           {items.map((item) => (
@@ -137,8 +136,8 @@ export function DocsNav({
         </nav>
       </aside>
 
-      {/* Móvil: barra sticky con selector de sección */}
-      <div className="glass sticky top-16 z-30 -mx-4 px-4 py-2 sm:-mx-6 sm:px-6 lg:hidden">
+      {/* Mobile: sticky bar with a section selector */}
+      <div className="sticky top-16 z-30 -mx-4 px-4 py-2 glass sm:-mx-6 sm:px-6 lg:hidden">
         <Select value={active} onValueChange={jumpTo}>
           <SelectTrigger aria-label={ariaLabel} className="w-full">
             <SelectValue />

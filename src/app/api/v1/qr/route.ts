@@ -50,7 +50,7 @@ const getQuerySchema = z.object({
     .enum(["true", "false"])
     .optional()
     .transform((v) => v === "true"),
-  // Marco (opcional): se aplica solo si viene frameStyle.
+  // Frame (optional): applied only when frameStyle is present.
   frameStyle: z.enum(FRAME_STYLES).optional(),
   frameText: z.string().max(30).optional(),
   frameColor: hexColor.optional(),
@@ -76,7 +76,7 @@ const postBodySchema = z
     path: ["data"],
   });
 
-// ---------- Helpers de respuesta ----------
+// ---------- Response helpers ----------
 
 function errorResponse(
   status: number,
@@ -208,7 +208,9 @@ export async function GET(request: NextRequest) {
       ...(p.cornersSquareStyle
         ? { cornersSquare: { style: p.cornersSquareStyle } }
         : {}),
-      ...(p.cornersDotStyle ? { cornersDot: { style: p.cornersDotStyle } } : {}),
+      ...(p.cornersDotStyle
+        ? { cornersDot: { style: p.cornersDotStyle } }
+        : {}),
       background: { color: p.bgColor, transparent: p.transparent ?? false },
     },
     ...(p.frameStyle

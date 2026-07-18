@@ -1,7 +1,7 @@
 import "server-only";
 import sharp from "sharp";
 
-/** Rasteriza el SVG del renderer a PNG o JPEG. Solo servidor. */
+/** Rasterizes the renderer's SVG to PNG or JPEG. Server only. */
 export async function rasterizeSvg(
   svg: string,
   format: "png" | "jpeg",
