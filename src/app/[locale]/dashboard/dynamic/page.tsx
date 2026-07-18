@@ -20,7 +20,7 @@ export default async function DynamicQrPage({
   const rows = await prisma.dynamicQr.findMany({
     where: { userId: session.user.id },
     orderBy: { createdAt: "desc" },
-    include: { qrCode: { select: { config: true } } },
+    include: { qrCode: { select: { id: true, config: true } } },
   });
 
   const items: DynamicQrItem[] = rows.map((row) => ({
@@ -34,6 +34,8 @@ export default async function DynamicQrPage({
     // Config visual guardada como { dynamic: true, config } en QrCode.config
     config:
       (row.qrCode?.config as { config?: unknown } | null)?.config ?? null,
+    // Para el enlace de edición del diseño (null si se creó por API)
+    qrCodeId: row.qrCode?.id ?? null,
   }));
 
   return <DynamicQrList items={items} />;

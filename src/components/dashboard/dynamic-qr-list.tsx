@@ -5,8 +5,8 @@ import { useFormatter, useTranslations } from "next-intl";
 import {
   BarChart3,
   Copy,
-  Download,
   Link2,
+  Pencil,
   QrCode,
   Trash2,
 } from "lucide-react";
@@ -27,8 +27,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { renderQrSvg } from "@/lib/qr/render-svg";
-import { exportQr } from "@/lib/qr/export";
 import { qrConfigSchema } from "@/lib/qr/schema";
+import { QrExportMenu } from "./qr-export-menu";
 import { buildRedirectUrl } from "@/lib/dynamic-qr/redirect-url";
 import {
   deleteDynamicQr,
@@ -46,6 +46,8 @@ export interface DynamicQrItem {
   createdAt: number;
   /** Config visual del QrCode asociado (puede faltar). */
   config: unknown;
+  /** Id del QrCode asociado para editar el diseño (null si se creó por API). */
+  qrCodeId: string | null;
 }
 
 function useQrSvg(item: DynamicQrItem): string | null {
@@ -86,10 +88,6 @@ function DynamicCard({ item }: { item: DynamicQrItem }) {
     });
   }
 
-  async function handleDownload() {
-    if (!svg) return;
-    await exportQr(svg, "png", { width: 1024, filename: item.title });
-  }
 
   return (
     <div className="group flex flex-col gap-3 rounded-xl border border-line bg-surface p-4 transition-all duration-150 hover:border-line-strong hover:shadow-raised">
@@ -169,17 +167,21 @@ function DynamicCard({ item }: { item: DynamicQrItem }) {
             {t("analytics")}
           </Link>
         </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="size-8"
-          aria-label={t("download")}
-          onClick={handleDownload}
-          disabled={!svg}
-        >
-          <Download className="size-4" strokeWidth={1.75} />
-        </Button>
+        <QrExportMenu getSvg={() => svg} filename={item.title} />
+        {item.qrCodeId && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-8"
+            aria-label={t("edit")}
+            asChild
+          >
+            <Link href={`/generator?edit=${item.qrCodeId}`}>
+              <Pencil className="size-4" strokeWidth={1.75} />
+            </Link>
+          </Button>
+        )}
         <Button
           type="button"
           variant="ghost"
