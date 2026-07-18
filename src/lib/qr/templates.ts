@@ -119,13 +119,14 @@ export const TEMPLATE_CATEGORIES: QrTemplateCategory[] = [
 ];
 
 /**
- * Imagen de fondo de ejemplo (degradado naranja→rosa 48×48 en PNG) para las
- * plantillas que muestran la función de foto detrás del QR. PNG (no SVG: el
- * schema rechaza svg+xml) y pequeña para no inflar el bundle. Se fija un tinte
- * pálido acorde con la imagen para las placas de finder.
+ * Imagen de fondo de ejemplo (escena de atardecer 96×96: cielo degradado, sol
+ * y montañas) para la plantilla que muestra la foto detrás del QR. PNG (no
+ * SVG: el schema rechaza svg+xml), ~1.7 KB. Generada y verificada por script —
+ * NUNCA transcribir el base64 a mano (un byte corrupto deja la imagen a medias
+ * en el navegador). El tinte pálido acompaña a las placas de finder.
  */
 const SAMPLE_BG_SUNSET =
-  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAABHVBMVEXrXVrqWFzsYVftYlbqWlvsYFjqWVvrW1rrXlnsX1jpV13pVl3tY1btZFXpVV7oVF7uZVXoUl/uZ1TuaFPoUWDnUGDvaVPnT2HvalLnTmHva1LmTWLwbFHmTGPwbVDmS2PwblDlSmTxb0/lSGXxcU7lR2Xxck7kRmbyc03ydE3kRWbkRGfydUzzdkvjQ2jzd0vjQmjzeErjQWn0eUriQGniPmr0e0niPWv0fEjhPGv1fUjhO2z1fkf1f0bhOm32gEbgOW32gUXgOG72gkXgN273hETfNW/3hUPfNHD3hkPfM3D4h0LeMnH4iELeMXH4iUHeMHL5ikDdL3P5i0DdLnP5jD/dLXT6jj7cK3X6jz7cKnX6kD3cKXb7kT3bKHY/fa09AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAyUlEQVRIx5XK1yICAABA0VsUIdkZUfZIkdWQEGWPSkPk/z/DN9zzfBj8fHfbrcbH28vTQ+3u9vqqXCpcnOaOMof7eztbG6m1xPLiwuzMVHRiKBiKjIL8I8g/jPxh5A8g/xjyjyP/JPLHkH8a+eeQfx7549i/hPwryL+K/EnkX0f+TeTfRv5d5D9A/jTyZ5H/GPlPkP8M+c+RP4/8ReS/RP4K8t8gfxX575G/jvyPyP+M/K/I/478n8jfRP4v5O8gfw/5+8j/i/x///YGG74JgK5kAAAAAElFTkSuQmCC";
+  "data:image/png;base64,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";
 
 const base = DEFAULT_QR_CONFIG;
 
@@ -385,7 +386,7 @@ const TEMPLATE_DEFS: QrTemplateInput[] = [
         background: {
           color: "#ffffff",
           transparent: false,
-          image: { dataUri: SAMPLE_BG_SUNSET, opacity: 0.4, tint: "#fde4d6" },
+          image: { dataUri: SAMPLE_BG_SUNSET, opacity: 0.4, tint: "#f0dbea" },
         },
       },
     },

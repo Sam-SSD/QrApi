@@ -5,11 +5,26 @@ import { buildPayload } from "@/lib/qr/payloads";
 import { renderQrSvg } from "@/lib/qr/render-svg";
 import { Reveal } from "./reveal";
 
+/**
+ * Muestra curada para la landing: una por familia (marca, oscuro, foto de
+ * fondo, industria, negocio, marketing). La galería completa vive en el editor.
+ */
+const SHOWCASE_IDS = [
+  "qrapi",
+  "neon",
+  "photo",
+  "restaurant",
+  "wifi",
+  "sunset",
+];
+
 export function ShowcaseStrip() {
   const t = useTranslations("landing.showcase");
   const tNames = useTranslations("editor.templates.names");
 
-  const previews = TEMPLATES.map((template) => {
+  const previews = SHOWCASE_IDS.map((id) => {
+    const template = TEMPLATES.find((tpl) => tpl.id === id);
+    if (!template) return null;
     try {
       return {
         id: template.id,
