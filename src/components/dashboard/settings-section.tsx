@@ -96,6 +96,7 @@ function ChangePasswordCard() {
 
 function DangerZoneCard() {
   const t = useTranslations("dashboard.settings");
+  const tCommon = useTranslations("common");
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [password, setPassword] = useState("");
@@ -147,7 +148,7 @@ function DangerZoneCard() {
             />
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel />
+            <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
             <Button
               type="button"
               variant="destructive"

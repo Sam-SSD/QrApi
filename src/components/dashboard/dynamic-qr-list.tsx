@@ -57,6 +57,7 @@ function useQrSvg(item: DynamicQrItem): string | null {
 
 function DynamicCard({ item }: { item: DynamicQrItem }) {
   const t = useTranslations("dashboard.dynamic");
+  const tCommon = useTranslations("common");
   const format = useFormatter();
   const [pending, startTransition] = useTransition();
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -195,7 +196,7 @@ function DynamicCard({ item }: { item: DynamicQrItem }) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel />
+            <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={() =>
@@ -204,7 +205,9 @@ function DynamicCard({ item }: { item: DynamicQrItem }) {
                   toast.success(t("deleted"));
                 })
               }
-            />
+            >
+              {tCommon("delete")}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

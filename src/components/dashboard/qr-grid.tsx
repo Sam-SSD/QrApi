@@ -64,6 +64,7 @@ function QrCardPreview({ item }: { item: SavedQr }) {
 
 function QrCard({ item }: { item: SavedQr }) {
   const t = useTranslations("dashboard.qr");
+  const tCommon = useTranslations("common");
   const format = useFormatter();
   const [pending, startTransition] = useTransition();
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -166,7 +167,7 @@ function QrCard({ item }: { item: SavedQr }) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel />
+            <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={() =>
@@ -175,7 +176,9 @@ function QrCard({ item }: { item: SavedQr }) {
                   toast.success(t("deleted"));
                 })
               }
-            />
+            >
+              {tCommon("delete")}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
