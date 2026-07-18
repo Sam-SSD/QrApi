@@ -29,9 +29,9 @@ export function ShowcaseStrip() {
   }).filter(Boolean) as Array<{ id: string; svg: string }>;
 
   return (
-    <section className="border-y border-line bg-canvas-subtle py-24">
+    <section className="border-y border-line bg-canvas-subtle py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <Reveal className="mx-auto mb-12 max-w-2xl text-center">
+        <Reveal className="mx-auto mb-10 max-w-2xl text-center sm:mb-12">
           <h2 className="text-3xl font-semibold tracking-[-0.02em] text-balance md:text-4xl">
             {t("title")}
           </h2>

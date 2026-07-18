@@ -22,8 +22,8 @@ export function FeatureGrid() {
   const t = useTranslations("landing.features");
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
-      <Reveal className="mx-auto mb-14 max-w-2xl text-center">
+    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
+      <Reveal className="mx-auto mb-10 max-w-2xl text-center sm:mb-14">
         <h2 className="text-3xl font-semibold tracking-[-0.02em] text-balance md:text-4xl">
           {t("title")}
         </h2>

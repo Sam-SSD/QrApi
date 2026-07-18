@@ -55,9 +55,9 @@ export function DeveloperSection() {
   );
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
+    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
       <div className="grid items-center gap-10 lg:grid-cols-[1.2fr_1fr]">
-        <Reveal>
+        <Reveal className="min-w-0">
           <h2 className="text-3xl font-semibold tracking-[-0.02em] text-balance md:text-4xl">
             {t("title")}
           </h2>
@@ -69,14 +69,14 @@ export function DeveloperSection() {
             </Link>
           </Button>
         </Reveal>
-        <Reveal delay={100}>
+        <Reveal delay={100} className="min-w-0">
           <div className="relative">
             <pre className="overflow-x-auto rounded-xl border border-line bg-canvas-subtle p-5 font-mono text-xs leading-relaxed text-muted-foreground shadow-raised">
               <code>{CURL_EXAMPLE}</code>
             </pre>
             <div
               aria-hidden="true"
-              className="absolute -right-4 -bottom-6 w-28 rotate-6 overflow-hidden rounded-lg border border-line shadow-raised md:w-36 [&_svg]:block [&_svg]:h-auto [&_svg]:w-full"
+              className="absolute -right-4 -bottom-6 hidden w-28 rotate-6 overflow-hidden rounded-lg border border-line shadow-raised sm:block md:w-36 [&_svg]:block [&_svg]:h-auto [&_svg]:w-full"
               dangerouslySetInnerHTML={{ __html: resultSvg }}
             />
           </div>
