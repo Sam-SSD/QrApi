@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { qrConfigSchema } from "@/lib/qr/schema";
 import { createUniqueDynamicQr } from "@/lib/dynamic-qr/create";
 import { buildRedirectUrl } from "@/lib/dynamic-qr/redirect-url";
+import { hashPassword } from "@/lib/dynamic-qr/password";
 
 const MAX_DYNAMIC_QRS = 100;
 
@@ -100,6 +101,19 @@ export async function toggleDynamicActive(id: string, active: boolean) {
   const result = await prisma.dynamicQr.updateMany({
     where: { id, userId: session.user.id },
     data: { active },
+  });
+  if (result.count === 0) throw new Error("NOT_FOUND");
+  revalidatePath("/[locale]/dashboard", "layout");
+}
+
+/** Protege (o desprotege, con null) un dinámico con contraseña de escaneo. */
+export async function setDynamicPassword(id: string, password: string | null) {
+  const session = await requireSession();
+  const clean =
+    password === null ? null : z.string().min(4).max(72).parse(password);
+  const result = await prisma.dynamicQr.updateMany({
+    where: { id, userId: session.user.id },
+    data: { passwordHash: clean ? hashPassword(clean) : null },
   });
   if (result.count === 0) throw new Error("NOT_FOUND");
   revalidatePath("/[locale]/dashboard", "layout");
