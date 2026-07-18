@@ -7,7 +7,7 @@ import { HeroQr } from "@/components/landing/hero-qr";
 import { FeatureGrid } from "@/components/landing/feature-grid";
 import { ShowcaseStrip } from "@/components/landing/showcase-strip";
 import { DeveloperSection } from "@/components/landing/developer-section";
-import { OpenSourceCta } from "@/components/landing/open-source-cta";
+import { FinalCta } from "@/components/landing/final-cta";
 
 export default async function HomePage({
   params,
@@ -78,7 +78,7 @@ export default async function HomePage({
       <FeatureGrid />
       <ShowcaseStrip />
       <DeveloperSection />
-      <OpenSourceCta />
+      <FinalCta />
     </>
   );
 }

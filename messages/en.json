@@ -23,25 +23,23 @@
     "login": "Sign in",
     "register": "Sign up",
     "logout": "Sign out",
-    "github": "GitHub",
     "toggleTheme": "Toggle theme",
     "toggleLocale": "Change language",
     "openMenu": "Open menu"
   },
   "footer": {
-    "description": "Open source QR code generator with a visual editor and a developer API.",
+    "description": "QR code generator with a visual editor and a developer API.",
     "product": "Product",
     "developers": "Developers",
     "apiDocs": "API documentation",
-    "selfHost": "Self-hosting",
-    "license": "MIT License",
+    "rights": "All rights reserved",
     "language": "Language",
     "theme": "Theme"
   },
   "landing": {
-    "badge": "Open source · MIT",
+    "badge": "Dynamic QRs with analytics",
     "heroTitle": "Forge QR codes that don't look like QR codes.",
-    "heroSubtitle": "Visual editor with gradients, logos and frames. Vector export. Developer API. Free and open source.",
+    "heroSubtitle": "Visual editor with gradients, logos and frames. Vector export. Developer API. Free, no watermarks.",
     "ctaPrimary": "Create a free QR",
     "ctaSecondary": "Explore the API",
     "features": {
@@ -69,7 +67,7 @@
       },
       "privacy": {
         "title": "100% private",
-        "description": "The editor generates everything in your browser: your data never leaves your machine. Self-host in 5 minutes with Docker."
+        "description": "The editor generates everything in your browser: your data never leaves your machine. No telemetry, no trackers."
       }
     },
     "showcase": {
@@ -82,11 +80,11 @@
       "subtitle": "Authenticate with your token and get PNG, SVG or JPEG with every editor style. Generous rate limits and clear JSON errors.",
       "cta": "Read the docs"
     },
-    "openSource": {
-      "title": "Truly open source",
-      "subtitle": "MIT licensed, no telemetry, self-hosted in 5 minutes with Docker Compose. If it helps you, leave a star.",
-      "cta": "View on GitHub",
-      "selfHost": "docker compose up -d && npm run dev"
+    "finalCta": {
+      "title": "Your next QR doesn't have to be ugly",
+      "subtitle": "Design it in the editor or generate it from your code with the API. Free, no watermarks, print-ready.",
+      "ctaPrimary": "Create a free QR",
+      "ctaSecondary": "Explore the API"
     }
   },
   "auth": {

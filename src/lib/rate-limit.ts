@@ -13,7 +13,7 @@ export interface RateLimitResult {
 
 /**
  * Ventana fija en Postgres con UPSERT atómico. Autocontenido (sin Redis):
- * una única query por ventana, apta para self-hosting con varias instancias.
+ * una única query por ventana, apta para despliegues con varias instancias.
  */
 async function bumpWindow(
   apiKeyId: string,

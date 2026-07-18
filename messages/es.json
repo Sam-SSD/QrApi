@@ -23,25 +23,23 @@
     "login": "Iniciar sesión",
     "register": "Crear cuenta",
     "logout": "Cerrar sesión",
-    "github": "GitHub",
     "toggleTheme": "Cambiar tema",
     "toggleLocale": "Cambiar idioma",
     "openMenu": "Abrir menú"
   },
   "footer": {
-    "description": "Generador de códigos QR open source con editor visual y API para developers.",
+    "description": "Generador de códigos QR con editor visual y API para developers.",
     "product": "Producto",
     "developers": "Developers",
     "apiDocs": "Documentación de la API",
-    "selfHost": "Self-hosting",
-    "license": "Licencia MIT",
+    "rights": "Todos los derechos reservados",
     "language": "Idioma",
     "theme": "Tema"
   },
   "landing": {
-    "badge": "Open source · MIT",
+    "badge": "QR dinámicos con analíticas",
     "heroTitle": "Forja códigos QR que no parecen códigos QR.",
-    "heroSubtitle": "Editor visual con gradientes, logos y marcos. Export vectorial. API para developers. Gratis y open source.",
+    "heroSubtitle": "Editor visual con gradientes, logos y marcos. Export vectorial. API para developers. Gratis y sin marcas de agua.",
     "ctaPrimary": "Crear QR gratis",
     "ctaSecondary": "Ver la API",
     "features": {
@@ -69,7 +67,7 @@
       },
       "privacy": {
         "title": "100% privado",
-        "description": "El editor genera todo en tu navegador: tus datos nunca salen de tu máquina. Self-host en 5 minutos con Docker."
+        "description": "El editor genera todo en tu navegador: tus datos nunca salen de tu máquina. Sin telemetría ni rastreadores."
       }
     },
     "showcase": {
@@ -82,11 +80,11 @@
       "subtitle": "Autentícate con tu token y recibe PNG, SVG o JPEG con todos los estilos del editor. Rate limits generosos y errores JSON claros.",
       "cta": "Leer la documentación"
     },
-    "openSource": {
-      "title": "Open source de verdad",
-      "subtitle": "Licencia MIT, sin telemetría y self-host en 5 minutos con Docker Compose. Si te sirve, deja una estrella.",
-      "cta": "Ver en GitHub",
-      "selfHost": "docker compose up -d && npm run dev"
+    "finalCta": {
+      "title": "Tu próximo QR no tiene por qué ser feo",
+      "subtitle": "Diséñalo en el editor o genéralo desde tu código con la API. Gratis, sin marcas de agua y listo para imprimir.",
+      "ctaPrimary": "Crear QR gratis",
+      "ctaSecondary": "Explorar la API"
     }
   },
   "auth": {

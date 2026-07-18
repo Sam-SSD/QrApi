@@ -1,7 +1,6 @@
 "use client";
 
 import { Menu } from "lucide-react";
-import { GithubIcon } from "@/components/brand/github-icon";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -18,8 +17,6 @@ import { ThemeToggle } from "./theme-toggle";
 import { LocaleSwitcher } from "./locale-switcher";
 import { UserMenu } from "./user-menu";
 import { cn } from "@/lib/utils";
-
-import { GITHUB_URL } from "@/lib/constants";
 
 function NavLink({
   href,
@@ -75,16 +72,6 @@ export function Header() {
         </div>
 
         <div className="hidden items-center gap-1 md:flex">
-          <Button variant="ghost" size="icon" asChild>
-            <a
-              href={GITHUB_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={t("github")}
-            >
-              <GithubIcon className="size-5" />
-            </a>
-          </Button>
           <ThemeToggle />
           <LocaleSwitcher />
           <div className="ml-2">
@@ -118,14 +105,6 @@ export function Header() {
                     {link.label}
                   </NavLink>
                 ))}
-                <a
-                  href={GITHUB_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-base font-medium text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {t("github")}
-                </a>
               </nav>
               <div className="mt-auto flex flex-col gap-2 p-4">
                 <div className="flex justify-start">
