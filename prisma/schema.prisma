@@ -47,7 +47,7 @@ model Account {
   providerId            String // "credential" | "github" | "google"
   userId                String
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  password              String? // hash scrypt — solo providerId = "credential"
+  password              String? // scrypt hash — only for providerId = "credential"
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -74,15 +74,15 @@ model Verification {
   @@map("verification")
 }
 
-// ---------- Dominio QrAPI ----------
+// ---------- QrAPI domain ----------
 
 model ApiKey {
   id           String    @id @default(cuid())
   userId       String
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   name         String
-  prefix       String // primeros 12 chars visibles: "qra_a1B2c3D4"
-  keyHash      String    @unique // SHA-256 hex del token completo
+  prefix       String // first 12 visible chars: "qra_a1B2c3D4"
+  keyHash      String    @unique // SHA-256 hex of the full token
   scopes       String[]  @default(["qr:generate"])
   expiresAt    DateTime?
   lastUsedAt   DateTime?
@@ -111,9 +111,9 @@ model QrCode {
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   name         String
   type         QrContentType
-  data         String        @db.Text // payload final codificado
-  config       Json // QrConfig validado por zod (lib/qr/schema.ts)
-  // Si es un QR dinámico, apunta al DynamicQr cuyo slug codifica su `data`.
+  data         String        @db.Text // final encoded payload
+  config       Json // QrConfig validated with zod (lib/qr/schema.ts)
+  // For dynamic QRs, points to the DynamicQr whose slug encodes this `data`.
   dynamicQrId  String?       @unique
   dynamicQr    DynamicQr?    @relation(fields: [dynamicQrId], references: [id], onDelete: SetNull)
   createdAt    DateTime      @default(now())
@@ -123,20 +123,20 @@ model QrCode {
   @@map("qr_code")
 }
 
-// ---------- QR dinámicos ----------
+// ---------- Dynamic QRs ----------
 
 model DynamicQr {
   id           String      @id @default(cuid())
-  slug         String      @unique // base62, corto; codificado en el QR como /r/{slug}
+  slug         String      @unique // short base62; encoded in the QR as /r/{slug}
   userId       String
   user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   title        String
-  targetUrl    String      @db.Text // destino editable sin regenerar el QR
-  active       Boolean     @default(true) // pausar sin borrar
+  targetUrl    String      @db.Text // destination editable without regenerating the QR
+  active       Boolean     @default(true) // pause without deleting
   expiresAt    DateTime?
-  passwordHash String? // opcional (fase avanzada); MVP: null
-  scanCount    Int         @default(0) // contador desnormalizado
-  qrCode       QrCode? // back-relation 1:1 opcional
+  passwordHash String? // optional
+  scanCount    Int         @default(0) // denormalized counter
+  qrCode       QrCode? // optional 1:1 back-relation
   scans        ScanEvent[]
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
@@ -150,13 +150,13 @@ model ScanEvent {
   dynamicQrId String
   dynamicQr   DynamicQr @relation(fields: [dynamicQrId], references: [id], onDelete: Cascade)
   timestamp   DateTime  @default(now())
-  country     String? // ISO-2, nivel país
-  region      String? // opcional (fase avanzada)
+  country     String? // ISO-2, country level
+  region      String?
   deviceType  String? // "mobile" | "tablet" | "desktop" | "bot"
   os          String?
   browser     String?
   referrer    String?
-  ipHash      String? // HMAC-SHA256(ip + salt diario); nunca IP cruda
+  ipHash      String? // HMAC-SHA256(ip + daily salt); never the raw IP
 
   @@index([dynamicQrId, timestamp])
   @@index([dynamicQrId, country])

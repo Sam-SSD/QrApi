@@ -7,8 +7,8 @@ import {
 } from "@/lib/brand";
 
 /**
- * Símbolo de QrAPI: una "Q" de módulos QR redondeados cuya cola se
- * desprende en diagonal con el gradiente de marca indigo→cyan.
+ * QrAPI symbol: a "Q" made of rounded QR modules whose tail breaks away
+ * diagonally with the indigo→cyan brand gradient.
  */
 export function LogoMark({ className }: { className?: string }) {
   return (

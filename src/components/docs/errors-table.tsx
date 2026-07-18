@@ -21,7 +21,10 @@ export function ErrorsTable({
         </thead>
         <tbody className="divide-y divide-line">
           {errors.map(({ status, code }) => (
-            <tr key={code} className="transition-colors hover:bg-canvas-subtle/60">
+            <tr
+              key={code}
+              className="transition-colors hover:bg-canvas-subtle/60"
+            >
               <td className="px-4 py-2.5 font-mono text-xs">
                 <Badge
                   variant="outline"
@@ -36,7 +39,9 @@ export function ErrorsTable({
                   {status}
                 </Badge>
               </td>
-              <td className="px-4 py-2.5 font-mono text-xs text-primary">{code}</td>
+              <td className="px-4 py-2.5 font-mono text-xs text-primary">
+                {code}
+              </td>
               <td className="px-4 py-2.5 text-xs text-muted-foreground">
                 {meanings(code)}
               </td>

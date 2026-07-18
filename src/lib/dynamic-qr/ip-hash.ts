@@ -2,12 +2,12 @@ import { createHmac } from "node:crypto";
 import { env } from "@/env";
 
 /**
- * Hashea una IP para dedupe/analytics SIN almacenarla en claro. Usa HMAC-SHA256
- * con un secreto de servidor + salt diario (YYYY-MM-DD): irreversible en la
- * práctica (a diferencia de un SHA-256 plano de una IPv4, invertible por fuerza
- * bruta), y el salt diario limita el alcance a "único por día". GDPR-friendly.
+ * Hashes an IP for dedupe/analytics WITHOUT storing it in the clear. Uses
+ * HMAC-SHA256 with a server secret + daily salt (YYYY-MM-DD): irreversible
+ * in practice (unlike a plain SHA-256 of an IPv4, invertible by brute
+ * force), and the daily salt scopes it to "unique per day". GDPR-friendly.
  *
- * Devuelve null si no hay IP (p. ej. en desarrollo local sin proxy).
+ * Returns null when there is no IP (e.g. local development without a proxy).
  */
 export function hashIp(ip: string | null | undefined): string | null {
   if (!ip) return null;

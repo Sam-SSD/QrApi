@@ -1,7 +1,7 @@
 /**
- * Parser ligero de User-Agent (sin dependencias). Devuelve señales de
- * grano grueso suficientes para analytics de escaneo: tipo de dispositivo,
- * sistema operativo y navegador. No pretende ser exhaustivo.
+ * Lightweight User-Agent parser (no dependencies). Returns coarse-grained
+ * signals sufficient for scan analytics: device type, operating system and
+ * browser. It does not try to be exhaustive.
  */
 export interface UaInfo {
   deviceType: "mobile" | "tablet" | "desktop" | "bot";
@@ -13,9 +13,13 @@ export function parseUserAgent(ua: string | null | undefined): UaInfo {
   if (!ua) return { deviceType: "desktop", os: null, browser: null };
   const s = ua.toLowerCase();
 
-  const isBot = /bot|crawler|spider|crawling|facebookexternalhit|preview/.test(s);
+  const isBot = /bot|crawler|spider|crawling|facebookexternalhit|preview/.test(
+    s,
+  );
   const isTablet = /ipad|tablet|(android(?!.*mobile))/.test(s);
-  const isMobile = /mobile|iphone|ipod|android|blackberry|windows phone/.test(s);
+  const isMobile = /mobile|iphone|ipod|android|blackberry|windows phone/.test(
+    s,
+  );
 
   const deviceType: UaInfo["deviceType"] = isBot
     ? "bot"
@@ -33,7 +37,7 @@ export function parseUserAgent(ua: string | null | undefined): UaInfo {
   else if (/linux/.test(s)) os = "Linux";
 
   let browser: string | null = null;
-  // Orden importa: Edge/Opera/Brave se anuncian también como Chrome.
+  // Order matters: Edge/Opera/Brave also advertise themselves as Chrome.
   if (/edg\//.test(s)) browser = "Edge";
   else if (/opr\/|opera/.test(s)) browser = "Opera";
   else if (/firefox|fxios/.test(s)) browser = "Firefox";

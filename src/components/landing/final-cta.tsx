@@ -10,7 +10,7 @@ export function FinalCta() {
   return (
     <section className="mx-auto max-w-7xl px-4 pb-28 sm:px-6">
       <Reveal>
-        <div className="glass flex flex-col items-center gap-6 rounded-2xl px-6 py-14 text-center">
+        <div className="flex flex-col items-center gap-6 rounded-2xl px-6 py-14 text-center glass">
           <h2 className="text-3xl font-semibold tracking-[-0.02em] text-balance md:text-4xl">
             {t("title")}
           </h2>

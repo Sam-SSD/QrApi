@@ -39,7 +39,7 @@ function isUnavailable(dynamic: DynamicRow | null): dynamic is null {
 
 const notFound = () => NextResponse.redirect(new URL("/es", SITE_URL), 302);
 
-/** Registra el escaneo en after() para no retrasar la redirección. */
+/** Records the scan in after() so it never delays the redirect. */
 function recordScan(request: NextRequest, dynamicQrId: string) {
   const ua = request.headers.get("user-agent");
   const country =
@@ -73,12 +73,12 @@ function recordScan(request: NextRequest, dynamicQrId: string) {
         }),
       ]);
     } catch {
-      // Best-effort: el registro nunca debe afectar a la redirección.
+      // Best-effort: recording must never affect the redirect.
     }
   });
 }
 
-/** Página intermedia mínima que pide la contraseña (bilingüe, sin assets). */
+/** Minimal interstitial page asking for the password (bilingual, no assets). */
 function passwordPage(slug: string, error: boolean): NextResponse {
   const html = `<!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"/>
@@ -114,8 +114,8 @@ function passwordPage(slug: string, error: boolean): NextResponse {
 }
 
 /**
- * Redirección de un QR dinámico: /r/{slug} → targetUrl. Si el QR está
- * protegido, muestra una página intermedia que pide la contraseña (POST).
+ * Dynamic QR redirect: /r/{slug} → targetUrl. When the QR is protected, it
+ * shows an interstitial page asking for the password (POST).
  */
 export async function GET(
   request: NextRequest,
@@ -140,7 +140,7 @@ export async function POST(
   if (isUnavailable(dynamic)) return notFound();
 
   if (!dynamic.passwordHash) {
-    // Sin contraseña ya no hay nada que verificar: redirigir igual que GET.
+    // Without a password there is nothing to verify: redirect just like GET.
     recordScan(request, dynamic.id);
     return NextResponse.redirect(dynamic.targetUrl, 302);
   }
@@ -152,6 +152,6 @@ export async function POST(
   }
 
   recordScan(request, dynamic.id);
-  // 303: tras un POST, redirige con GET al destino.
+  // 303: after a POST, redirect to the destination with GET.
   return NextResponse.redirect(dynamic.targetUrl, 303);
 }

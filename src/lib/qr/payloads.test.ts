@@ -2,19 +2,19 @@ import { describe, expect, it } from "vitest";
 import { buildPayload } from "./payloads";
 
 describe("buildPayload", () => {
-  it("texto plano pasa sin cambios", () => {
+  it("passes plain text through unchanged", () => {
     expect(buildPayload({ type: "text", text: "hola mundo" })).toBe(
       "hola mundo",
     );
   });
 
-  it("url pasa sin cambios", () => {
+  it("passes urls through unchanged", () => {
     expect(buildPayload({ type: "url", url: "https://qrapi.dev" })).toBe(
       "https://qrapi.dev",
     );
   });
 
-  it("email genera mailto con subject y body codificados", () => {
+  it("email generates mailto with encoded subject and body", () => {
     const result = buildPayload({
       type: "email",
       to: "a@b.com",
@@ -25,13 +25,13 @@ describe("buildPayload", () => {
     expect(result).toContain("subject=Hola+%26+adi%C3%B3s");
   });
 
-  it("teléfono limpia separadores", () => {
+  it("phone strips separators", () => {
     expect(buildPayload({ type: "phone", number: "+34 600-111 (222)" })).toBe(
       "tel:+34600111222",
     );
   });
 
-  it("sms usa SMSTO con y sin mensaje", () => {
+  it("sms uses SMSTO with and without a message", () => {
     expect(
       buildPayload({ type: "sms", number: "+34600111222", message: "hola" }),
     ).toBe("SMSTO:+34600111222:hola");
@@ -40,7 +40,7 @@ describe("buildPayload", () => {
     );
   });
 
-  it("wifi escapa caracteres reservados", () => {
+  it("wifi escapes reserved characters", () => {
     const result = buildPayload({
       type: "wifi",
       ssid: 'Red;con:carac"teres,raros',
@@ -53,7 +53,7 @@ describe("buildPayload", () => {
     );
   });
 
-  it("wifi sin contraseña con nopass omite P:", () => {
+  it("wifi without a password and nopass omits P:", () => {
     const result = buildPayload({
       type: "wifi",
       ssid: "Abierta",
@@ -63,7 +63,7 @@ describe("buildPayload", () => {
     expect(result).toBe("WIFI:T:nopass;S:Abierta;;");
   });
 
-  it("vcard 3.0 completa con escapado", () => {
+  it("builds a full vcard 3.0 with escaping", () => {
     const result = buildPayload({
       type: "vcard",
       firstName: "Ana;María",
@@ -81,7 +81,7 @@ describe("buildPayload", () => {
     expect(result).toContain("END:VCARD");
   });
 
-  it("crypto genera URI con amount opcional", () => {
+  it("crypto generates a URI with optional amount", () => {
     expect(
       buildPayload({
         type: "crypto",

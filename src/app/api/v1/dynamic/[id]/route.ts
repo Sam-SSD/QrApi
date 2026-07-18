@@ -30,7 +30,7 @@ export function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
 }
 
-/** Detalle + resumen de analytics de un QR dinámico propio. */
+/** Detail + analytics summary of an owned dynamic QR. */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -39,7 +39,7 @@ export async function GET(
   if (auth.response) return auth.response;
   const { id } = await params;
 
-  // Ownership en la query: un id ajeno es un 404.
+  // Ownership in the query: someone else's id is a 404.
   const dynamic = await prisma.dynamicQr.findUnique({
     where: { id, userId: auth.apiKey.userId },
   });
@@ -90,7 +90,7 @@ export async function GET(
   );
 }
 
-/** Edita destino y/o estado activo sin regenerar el código. */
+/** Edits destination and/or active state without regenerating the code. */
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -141,7 +141,7 @@ export async function PATCH(
   );
 }
 
-/** Elimina un QR dinámico propio (y su historial de escaneos, por cascada). */
+/** Deletes an owned dynamic QR (and its scan history, by cascade). */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },

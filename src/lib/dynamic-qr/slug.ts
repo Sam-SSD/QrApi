@@ -5,8 +5,8 @@ const ALPHABET =
 const SLUG_LENGTH = 8;
 
 /**
- * Slug corto base62 (8 chars, ~2e14 combinaciones) desde bytes aleatorios
- * criptográficos. Se usa como ruta pública `/r/{slug}` de un QR dinámico.
+ * Short base62 slug (8 chars, ~2e14 combinations) from cryptographic random
+ * bytes. Used as the public `/r/{slug}` route of a dynamic QR.
  */
 export function generateSlug(length = SLUG_LENGTH): string {
   const bytes = randomBytes(length);

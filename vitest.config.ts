@@ -5,7 +5,7 @@ import path from "node:path";
 export default defineConfig({
   plugins: [react()],
   test: {
-    // Tests de componentes: añadir "// @vitest-environment jsdom" al inicio del archivo
+    // Component tests: add "// @vitest-environment jsdom" at the top of the file
     environment: "node",
     include: ["src/**/*.test.{ts,tsx}"],
   },

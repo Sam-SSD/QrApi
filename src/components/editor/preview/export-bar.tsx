@@ -12,7 +12,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { exportQr, copyQrToClipboard, type ExportFormat } from "@/lib/qr/export";
+import {
+  exportQr,
+  copyQrToClipboard,
+  type ExportFormat,
+} from "@/lib/qr/export";
 
 const SIZES = [512, 1024, 2048, 4096] as const;
 
@@ -22,7 +26,7 @@ export function ExportBar({
   disabled,
   onExported,
 }: {
-  /** Devuelve el SVG actual (o null si no hay QR válido). */
+  /** Returns the current SVG (or null when there is no valid QR). */
   getSvg: () => string | null;
   filename: string;
   disabled: boolean;
@@ -69,7 +73,10 @@ export function ExportBar({
   return (
     <div className="flex flex-col gap-2.5">
       <div className="grid grid-cols-2 gap-2">
-        <Select value={format} onValueChange={(v) => setFormat(v as ExportFormat)}>
+        <Select
+          value={format}
+          onValueChange={(v) => setFormat(v as ExportFormat)}
+        >
           <SelectTrigger aria-label={t("format")} className="w-full">
             <SelectValue />
           </SelectTrigger>

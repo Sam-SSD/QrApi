@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: qrapi
       POSTGRES_DB: qrapi
     ports:
-      # 5433 en el host para no chocar con instalaciones nativas de Postgres
+      # 5433 on the host to avoid clashing with native Postgres installs
       - "5433:5432"
     volumes:
       - qrapi_pgdata:/var/lib/postgresql/data

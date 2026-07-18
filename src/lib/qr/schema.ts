@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 /**
- * Contrato único del motor QR: estos schemas validan el estado del editor,
- * el JSON guardado en QrCode.config y el body de la API pública.
+ * Single contract of the QR engine: these schemas validate the editor state,
+ * the JSON stored in QrCode.config and the public API body.
  */
 
 export const hexColor = z
@@ -11,7 +11,7 @@ export const hexColor = z
 
 // ---------- Payloads ----------
 
-export const MAX_QR_DATA_LENGTH = 2953; // capacidad QR v40-L en bytes
+export const MAX_QR_DATA_LENGTH = 2953; // QR v40-L capacity in bytes
 
 export const payloadSchema = z.discriminatedUnion("type", [
   z.object({
@@ -77,7 +77,7 @@ export const PAYLOAD_TYPES = [
   "crypto",
 ] as const satisfies readonly QrPayloadType[];
 
-// ---------- Estilo ----------
+// ---------- Style ----------
 
 export const gradientSchema = z.object({
   type: z.enum(["linear", "radial"]).default("linear"),
@@ -147,7 +147,7 @@ export const qrStyleSchema = z.object({
   cornersSquare: z
     .object({
       style: z.enum(CORNER_SQUARE_STYLES).default("square"),
-      color: hexColor.optional(), // por defecto hereda dots.color
+      color: hexColor.optional(), // inherits dots.color by default
       gradient: gradientSchema.optional(),
     })
     .default({ style: "square" }),
@@ -163,9 +163,9 @@ export const qrStyleSchema = z.object({
       color: hexColor.default("#ffffff"),
       transparent: z.boolean().default(false),
       gradient: gradientSchema.optional(),
-      // Imagen de fondo detrás del QR. Segura por defecto: scrim tenue +
-      // placa opaca bajo el QR; el motor fuerza ecLevel=H cuando existe.
-      // Excluye svg+xml a propósito (un SVG de fondo podría llevar <script>).
+      // Background image behind the QR. Safe by default: subtle scrim +
+      // opaque plate under the QR; the engine forces ecLevel=H when present.
+      // svg+xml is excluded on purpose (a background SVG could carry <script>).
       image: z
         .object({
           dataUri: z
@@ -176,9 +176,9 @@ export const qrStyleSchema = z.object({
             )
             .max(700_000),
           opacity: z.number().min(0.05).max(1).default(0.35),
-          // Tinte de las placas de finder: tono muestreado de la imagen al
-          // subirla (cliente) pero aclarado para conservar contraste con los
-          // módulos. Si falta (plantillas/API), la placa cae a blanco.
+          // Finder plate tint: hue sampled from the image on upload (client)
+          // but lightened to keep contrast with the modules. When missing
+          // (templates/API), the plate falls back to white.
           tint: hexColor.optional(),
         })
         .optional(),
@@ -195,9 +195,9 @@ export const logoSchema = z.object({
       /^data:image\/(png|jpeg|svg\+xml|webp);base64,[A-Za-z0-9+/=]+$/,
       "El logo debe ser un data URI base64 (png, jpeg, svg o webp)",
     )
-    .max(700_000), // ~500KB binario en base64
+    .max(700_000), // ~500KB of binary as base64
   sizeRatio: z.number().min(0.1).max(0.35).default(0.22),
-  margin: z.number().min(0).max(4).default(1), // módulos excavados alrededor
+  margin: z.number().min(0).max(4).default(1), // excavated modules around it
   background: z.boolean().default(true),
 });
 
@@ -207,7 +207,7 @@ export const frameSchema = z.object({
   style: z.enum(FRAME_STYLES).default("modern"),
   text: z.string().max(30).default("ESCANÉAME"),
   color: hexColor.default("#4f46e5"),
-  textColor: hexColor.optional(), // por defecto contraste automático
+  textColor: hexColor.optional(), // automatic contrast by default
   position: z.enum(FRAME_POSITIONS).default("bottom"),
 });
 
@@ -221,11 +221,11 @@ export const effectsSchema = z.object({
 
 export type QrEffects = z.infer<typeof effectsSchema>;
 
-// ---------- Config completa ----------
+// ---------- Full config ----------
 
 export const qrConfigSchema = z.object({
   ecLevel: z.enum(EC_LEVELS).default("M"),
-  margin: z.number().int().min(0).max(10).default(2), // quiet zone en módulos
+  margin: z.number().int().min(0).max(10).default(2), // quiet zone in modules
   style: qrStyleSchema.prefault({}),
   logo: logoSchema.optional(),
   frame: frameSchema.optional(),

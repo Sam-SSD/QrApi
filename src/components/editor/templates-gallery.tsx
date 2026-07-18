@@ -54,7 +54,11 @@ export function TemplatesGallery({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side={side}
-        className={side === "bottom" ? "max-h-[80dvh] overflow-y-auto" : "w-96 overflow-y-auto sm:max-w-md"}
+        className={
+          side === "bottom"
+            ? "max-h-[80dvh] overflow-y-auto"
+            : "w-96 overflow-y-auto sm:max-w-md"
+        }
       >
         <SheetHeader>
           <SheetTitle>{t("title")}</SheetTitle>
@@ -75,7 +79,7 @@ export function TemplatesGallery({
                       applyTemplate(template);
                       onOpenChange(false);
                     }}
-                    className="group flex flex-col gap-2 rounded-lg border border-line bg-surface p-3 text-left transition-all duration-150 hover:border-primary/40 hover:shadow-raised hover:ring-1 hover:ring-primary/30"
+                    className="group flex flex-col gap-2 rounded-lg border border-line bg-surface p-3 text-left transition-all duration-150 hover:border-primary/40 hover:ring-1 hover:shadow-raised hover:ring-primary/30"
                   >
                     {svg && (
                       <div

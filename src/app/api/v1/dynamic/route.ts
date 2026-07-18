@@ -29,7 +29,7 @@ export function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
 }
 
-/** Crea un QR dinámico. El QR imagen se obtiene con GET /api/v1/qr?data={redirectUrl}. */
+/** Creates a dynamic QR. The QR image is obtained via GET /api/v1/qr?data={redirectUrl}. */
 export async function POST(request: NextRequest) {
   const auth = await authenticateApi(request);
   if (auth.response) return auth.response;
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
   );
 }
 
-/** Lista los QR dinámicos del dueño de la API key. */
+/** Lists the dynamic QRs owned by the API key's user. */
 export async function GET(request: NextRequest) {
   const auth = await authenticateApi(request);
   if (auth.response) return auth.response;

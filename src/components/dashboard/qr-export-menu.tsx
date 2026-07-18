@@ -11,13 +11,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { exportQr, copyQrToClipboard, type ExportFormat } from "@/lib/qr/export";
+import {
+  exportQr,
+  copyQrToClipboard,
+  type ExportFormat,
+} from "@/lib/qr/export";
 
 const FORMATS: ExportFormat[] = ["png", "svg", "jpg", "pdf"];
 
 /**
- * Menú de exportación de un QR guardado: descarga en el formato elegido
- * (PNG/SVG/JPG/PDF) o copia la imagen al portapapeles.
+ * Export menu of a saved QR: downloads in the chosen format
+ * (PNG/SVG/JPG/PDF) or copies the image to the clipboard.
  */
 export function QrExportMenu({
   getSvg,

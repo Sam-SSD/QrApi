@@ -15,7 +15,7 @@ export default async function DynamicQrPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) return null; // el layout ya redirige
+  if (!session) return null; // the layout already redirects
 
   const rows = await prisma.dynamicQr.findMany({
     where: { userId: session.user.id },
@@ -31,10 +31,9 @@ export default async function DynamicQrPage({
     active: row.active,
     scanCount: row.scanCount,
     createdAt: row.createdAt.getTime(),
-    // Config visual guardada como { dynamic: true, config } en QrCode.config
-    config:
-      (row.qrCode?.config as { config?: unknown } | null)?.config ?? null,
-    // Para el enlace de edición del diseño (null si se creó por API)
+    // Visual config stored as { dynamic: true, config } in QrCode.config
+    config: (row.qrCode?.config as { config?: unknown } | null)?.config ?? null,
+    // For the design edit link (null when created through the API)
     qrCodeId: row.qrCode?.id ?? null,
   }));
 

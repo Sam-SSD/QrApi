@@ -7,7 +7,7 @@ const METHOD_STYLES: Record<string, string> = {
   DELETE: "border-destructive/40 bg-destructive/10 text-destructive",
 };
 
-/** Chip mono de método HTTP con color semántico (GET/POST/PATCH/DELETE). */
+/** Mono HTTP method chip with semantic color (GET/POST/PATCH/DELETE). */
 export function MethodBadge({
   method,
   className,

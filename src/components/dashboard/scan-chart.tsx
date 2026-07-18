@@ -1,9 +1,9 @@
 /**
- * Gráfico de barras de escaneos por día en SVG puro (cero dependencias).
- * Server Component: recibe los datos ya agregados y solo dibuja.
+ * Bar chart of scans per day in pure SVG (zero dependencies).
+ * Server Component: it receives pre-aggregated data and only draws.
  */
 export interface ScanChartPoint {
-  /** Etiqueta corta del día, p. ej. "12/07". */
+  /** Short day label, e.g. "12/07". */
   label: string;
   count: number;
 }
@@ -18,7 +18,7 @@ export function ScanChart({ points }: { points: ScanChartPoint[] }) {
   const barW = points.length > 0 ? W / points.length - barGap : 0;
   const chartH = H - PAD_BOTTOM - PAD_TOP;
 
-  // Etiquetas del eje X: primera, media y última para no saturar.
+  // X-axis labels: first, middle and last to avoid clutter.
   const labelIdx = new Set(
     [0, Math.floor(points.length / 2), points.length - 1].filter((i) => i >= 0),
   );
@@ -30,7 +30,7 @@ export function ScanChart({ points }: { points: ScanChartPoint[] }) {
       role="img"
       aria-label={points.map((p) => `${p.label}: ${p.count}`).join(", ")}
     >
-      {/* línea base */}
+      {/* baseline */}
       <line
         x1="0"
         y1={H - PAD_BOTTOM}

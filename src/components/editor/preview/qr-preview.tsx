@@ -9,10 +9,10 @@ import { SITE_URL } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 /**
- * QR fantasma para el estado vacío. Se genera una sola vez desde el motor real
- * (matriz QR bien formada) en lugar de dibujar celdas a mano, y se atenúa con
- * opacidad de contenedor. Colores muted fijos porque `hexColor` no admite
- * `currentColor` (no se puede tematizar por tokens dentro del SVG).
+ * Ghost QR for the empty state. Generated once from the real engine
+ * (well-formed QR matrix) instead of drawing cells by hand, and dimmed via
+ * container opacity. Fixed muted colors because `hexColor` does not accept
+ * `currentColor` (tokens can't theme inside the SVG).
  */
 const GHOST_SVG = renderQrSvg(
   SITE_URL,
@@ -43,7 +43,7 @@ export interface QrPreviewProps {
   config: QrConfig;
   empty: boolean;
   invalid: boolean;
-  /** Callback con el último SVG renderizado correctamente. */
+  /** Callback with the last successfully rendered SVG. */
   onRender?: (svg: string | null) => void;
   className?: string;
 }

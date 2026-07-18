@@ -37,7 +37,9 @@ function NavLink({
       onClick={onClick}
       className={cn(
         "text-sm font-medium transition-colors duration-150",
-        active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+        active
+          ? "text-foreground"
+          : "text-muted-foreground hover:text-foreground",
         className,
       )}
     >
@@ -56,7 +58,7 @@ export function Header() {
   ];
 
   return (
-    <header className="glass sticky top-0 z-50 border-x-0 border-t-0">
+    <header className="sticky top-0 z-50 border-x-0 border-t-0 glass">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <div className="flex items-center gap-8">
           <Link href="/" aria-label="QrAPI">

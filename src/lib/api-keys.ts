@@ -4,7 +4,7 @@ import type { ApiKey } from "@prisma/client";
 
 export const API_KEY_PREFIX = "qra_";
 
-/** Genera un token nuevo. Solo se muestra completo UNA vez. */
+/** Generates a new token. Shown in full only ONCE. */
 export function generateApiToken(): {
   token: string;
   prefix: string;
@@ -26,7 +26,7 @@ export type ApiKeyVerification =
   | { ok: true; apiKey: ApiKey }
   | { ok: false; reason: "missing" | "invalid" | "revoked" | "expired" };
 
-/** Verifica un header Authorization: Bearer qra_... */
+/** Verifies an Authorization: Bearer qra_... header. */
 export async function verifyApiToken(
   authorization: string | null,
 ): Promise<ApiKeyVerification> {
@@ -47,7 +47,7 @@ export async function verifyApiToken(
     return { ok: false, reason: "expired" };
   }
 
-  // Estadísticas fire-and-forget: no bloquean la respuesta
+  // Fire-and-forget stats: they never block the response
   void prisma.apiKey
     .update({
       where: { id: apiKey.id },

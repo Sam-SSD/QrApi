@@ -18,7 +18,10 @@ import { useQrStore } from "@/stores/qr-store";
 import { PayloadForm } from "./payload-forms";
 import { cn } from "@/lib/utils";
 
-const TYPE_ICONS: Record<QrPayloadType, React.ComponentType<{ className?: string; strokeWidth?: number }>> = {
+const TYPE_ICONS: Record<
+  QrPayloadType,
+  React.ComponentType<{ className?: string; strokeWidth?: number }>
+> = {
   text: Type,
   url: Globe,
   email: Mail,

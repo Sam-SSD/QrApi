@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-/** Marca de GitHub (Lucide ya no incluye iconos de marcas). */
+/** GitHub mark (Lucide no longer ships brand icons). */
 export function GithubIcon({ className }: { className?: string }) {
   return (
     <svg

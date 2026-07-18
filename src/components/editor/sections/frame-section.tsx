@@ -15,7 +15,7 @@ export function FrameSection() {
   const setFrame = useQrStore((s) => s.setFrame);
   const patchFrame = useQrStore((s) => s.patchFrame);
 
-  // Selecciona un estilo (crea el marco si no existía) o lo quita ("none").
+  // Selects a style (creates the frame if missing) or removes it ("none").
   function selectStyle(style: QrFrame["style"] | "none") {
     if (style === "none") {
       setFrame(undefined);
@@ -35,8 +35,8 @@ export function FrameSection() {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Selector de estilo siempre visible, con "Ninguno" como primera opción:
-          elegir un estilo crea el marco y muestra sus controles al instante. */}
+      {/* Always-visible style selector, with "None" as the first option:
+          picking a style creates the frame and shows its controls instantly. */}
       <div className="flex flex-col gap-2">
         <span className="text-sm font-medium">{t("style")}</span>
         <div
@@ -94,7 +94,7 @@ export function FrameSection() {
             />
           </div>
 
-          {/* Posición de la banda de texto */}
+          {/* Text band position */}
           <div className="flex flex-col gap-2">
             <span className="text-sm font-medium">{t("position")}</span>
             <div
@@ -132,7 +132,7 @@ export function FrameSection() {
             onChange={(color) => patchFrame({ color })}
           />
 
-          {/* Color del texto: automático (contraste) o manual */}
+          {/* Text color: automatic (contrast) or manual */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="frame-text-auto">{t("autoContrast")}</Label>

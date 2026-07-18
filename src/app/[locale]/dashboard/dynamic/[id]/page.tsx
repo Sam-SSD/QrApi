@@ -17,7 +17,7 @@ import { DynamicPasswordForm } from "@/components/dashboard/dynamic-password-for
 
 const RANGES = [7, 30, 90] as const;
 
-/** Agrega timestamps por día (UTC) sobre los últimos `days` días. */
+/** Aggregates timestamps per day (UTC) over the last `days` days. */
 function aggregateByDay(
   timestamps: Date[],
   locale: string,
@@ -91,7 +91,7 @@ export default async function DynamicQrDetailPage({
   const { locale, id } = await params;
   setRequestLocale(locale);
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) return null; // el layout ya redirige
+  if (!session) return null; // the layout already redirects
   const t = await getTranslations("dashboard.dynamic");
 
   const { days: daysParam } = await searchParams;
@@ -99,7 +99,7 @@ export default async function DynamicQrDetailPage({
     ? Number(daysParam)
     : 30;
 
-  // Ownership en la propia query: un id ajeno es un 404, no un 403.
+  // Ownership in the query itself: someone else's id is a 404, not a 403.
   const dynamic = await prisma.dynamicQr.findUnique({
     where: { id, userId: session.user.id },
   });

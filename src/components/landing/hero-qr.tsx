@@ -2,8 +2,8 @@ import { createMatrix, isDark, isFinderZone } from "@/lib/qr/matrix";
 import { SITE_URL } from "@/lib/constants";
 
 /**
- * QR real del hero, renderizado en el servidor módulo a módulo para poder
- * animar la entrada con stagger radial vía CSS (sin JavaScript).
+ * Real hero QR, server-rendered module by module so the entrance can be
+ * animated with a radial stagger via CSS (no JavaScript).
  */
 export function HeroQr() {
   const matrix = createMatrix(SITE_URL, "M");

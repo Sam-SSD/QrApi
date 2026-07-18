@@ -2,20 +2,20 @@ import { createMatrix, isDark, isFinderZone, type QrMatrix } from "./matrix";
 import type { QrConfig, QrGradient } from "./schema";
 
 /**
- * Renderer SVG isomorfo: matriz + config → string SVG.
- * Corre igual en el navegador (preview del editor) y en Node (API pública).
+ * Isomorphic SVG renderer: matrix + config → SVG string.
+ * Runs identically in the browser (editor preview) and in Node (public API).
  */
 
-const FRAME_PAD = 3; // unidades (módulos) de padding del marco
-const FRAME_BAND = 7; // unidades de la banda de texto del marco
+const FRAME_PAD = 3; // frame padding in units (modules)
+const FRAME_BAND = 7; // frame text band height in units
 
-// ---------- Helpers de geometría ----------
+// ---------- Geometry helpers ----------
 
 function round(n: number): string {
   return Number(n.toFixed(3)).toString();
 }
 
-/** Path de rectángulo con radio independiente por esquina [tl, tr, br, bl]. */
+/** Rectangle path with an independent radius per corner [tl, tr, br, bl]. */
 function roundedRectPath(
   x: number,
   y: number,
@@ -50,7 +50,7 @@ function circlePath(cx: number, cy: number, r: number): string {
   );
 }
 
-// ---------- Módulos (dots) ----------
+// ---------- Modules (dots) ----------
 
 interface Neighbors {
   top: boolean;
@@ -98,8 +98,8 @@ function modulePath(
       ]);
     }
     case "vertical-line": {
-      // Barra vertical: extremos redondeados salvo donde hay vecino contiguo,
-      // para que módulos apilados se fundan en una sola línea continua.
+      // Vertical bar: rounded ends except where a contiguous neighbor exists,
+      // so stacked modules merge into a single continuous line.
       const w = 0.62;
       const rTop = n.top ? 0 : 0.31;
       const rBottom = n.bottom ? 0 : 0.31;
@@ -130,7 +130,7 @@ function modulePath(
   }
 }
 
-/** Estrella de `points` puntas centrada en (cx,cy). */
+/** Star with `points` tips centered at (cx,cy). */
 function starPath(
   cx: number,
   cy: number,
@@ -149,7 +149,7 @@ function starPath(
   return `M${coords.join("L")}z`;
 }
 
-/** Cruz (signo +) inscrita en la celda (x,y) con grosor de brazo `t`. */
+/** Cross (+ sign) inscribed in the cell (x,y) with arm thickness `t`. */
 function plusPath(x: number, y: number, t: number): string {
   const arm = (1 - t) / 2;
   const x0 = round(x + arm);
@@ -161,7 +161,7 @@ function plusPath(x: number, y: number, t: number): string {
   );
 }
 
-/** Rombo inscrito en la celda, centrado en (cx,cy) con radio `r`. */
+/** Diamond inscribed in the cell, centered at (cx,cy) with radius `r`. */
 function diamondPath(cx: number, cy: number, r: number): string {
   return (
     `M${round(cx)},${round(cy - r)}` +
@@ -175,10 +175,11 @@ function diamondPath(cx: number, cy: number, r: number): string {
 
 type Radii = [number, number, number, number];
 
-/** Radios [exterior, interior] del anillo del finder por estilo. */
-function finderRadii(
-  style: QrConfig["style"]["cornersSquare"]["style"],
-): { out: Radii; inn: Radii } {
+/** [outer, inner] radii of the finder ring per style. */
+function finderRadii(style: QrConfig["style"]["cornersSquare"]["style"]): {
+  out: Radii;
+  inn: Radii;
+} {
   switch (style) {
     case "square":
       return { out: [0, 0, 0, 0], inn: [0, 0, 0, 0] };
@@ -186,11 +187,11 @@ function finderRadii(
       return { out: [1.9, 1.9, 1.9, 1.9], inn: [1.2, 1.2, 1.2, 1.2] };
     case "extra-rounded":
       return { out: [3, 3, 3, 3], inn: [2.2, 2.2, 2.2, 2.2] };
-    case "outpoint": // TL y BR en punta, TR y BL redondeadas (leaf/gota)
+    case "outpoint": // TL and BR pointed, TR and BL rounded (leaf/drop)
       return { out: [0, 2.6, 0, 2.6], inn: [0, 1.8, 0, 1.8] };
-    case "inpoint": // espejo: TR y BL en punta
+    case "inpoint": // mirrored: TR and BL pointed
       return { out: [2.6, 0, 2.6, 0], inn: [1.8, 0, 1.8, 0] };
-    case "classy": // una esquina en punta y la opuesta redondeada
+    case "classy": // one pointed corner and the opposite one rounded
       return { out: [0, 1.6, 0, 1.6], inn: [0, 1.1, 0, 1.1] };
   }
 }
@@ -200,12 +201,14 @@ function cornerSquarePath(
   x: number,
   y: number,
 ): string {
-  // anillo 7×7 con hueco 5×5 (fill-rule evenodd)
+  // 7×7 ring with a 5×5 hole (fill-rule evenodd)
   const { out, inn } = finderRadii(style);
-  return roundedRectPath(x, y, 7, 7, out) + roundedRectPath(x + 1, y + 1, 5, 5, inn);
+  return (
+    roundedRectPath(x, y, 7, 7, out) + roundedRectPath(x + 1, y + 1, 5, 5, inn)
+  );
 }
 
-/** Placa sólida con la silueta exterior del finder (para imagen de fondo). */
+/** Solid plate with the finder's outer silhouette (for background images). */
 function finderPlatePath(
   style: QrConfig["style"]["cornersSquare"]["style"],
   x: number,
@@ -227,12 +230,12 @@ function cornerDotPath(
     case "rounded":
       return roundedRectPath(x + 2, y + 2, 3, 3, [1, 1, 1, 1]);
     case "diamond":
-      // Rombo ajustado al centro 3×3 del finder (convexo → escaneable).
+      // Diamond fitted to the finder's 3×3 center (convex → scannable).
       return diamondPath(x + 3.5, y + 3.5, 1.7);
   }
 }
 
-// ---------- Gradientes ----------
+// ---------- Gradients ----------
 
 function gradientDef(
   id: string,
@@ -260,7 +263,7 @@ function gradientDef(
   return `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${round(cx - dx)}" y1="${round(cy - dy)}" x2="${round(cx + dx)}" y2="${round(cy + dy)}">${stops}</linearGradient>`;
 }
 
-// ---------- Contraste ----------
+// ---------- Contrast ----------
 
 export function getContrastColor(hex: string): string {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -278,13 +281,13 @@ function escapeXml(text: string): string {
     .replace(/"/g, "&quot;");
 }
 
-// ---------- Marcos ----------
+// ---------- Frames ----------
 
 /**
- * Descriptor de layout del marco. `bandY` es el borde superior de la banda de
- * texto; `qrBoxY`/`qrBoxH` delimitan la caja del QR (todo dentro de la región
- * `pad`). Con position="bottom" los valores son byte-idénticos al layout
- * histórico (banda abajo), preservando los 5 estilos y sus tests.
+ * Frame layout descriptor. `bandY` is the top edge of the text band;
+ * `qrBoxY`/`qrBoxH` delimit the QR box (all inside the `pad` region).
+ * With position="bottom" the values are byte-identical to the historical
+ * layout (band at the bottom), preserving the 5 styles and their tests.
  */
 interface FrameLayout {
   pad: number;
@@ -292,7 +295,7 @@ interface FrameLayout {
   position: "bottom" | "top";
   bandY: number;
   bandCenterY: number;
-  /** Y del borde superior de la caja del QR (para dibujar el borde del marco). */
+  /** Y of the QR box's top edge (used to draw the frame border). */
   qrBoxY: number;
   qrBoxH: number;
 }
@@ -301,7 +304,7 @@ function frameLayout(
   frame: NonNullable<QrConfig["frame"]>,
   totalH: number,
 ): FrameLayout {
-  // banner-top y scanner-brackets fuerzan su propia geometría.
+  // banner-top and scanner-brackets force their own geometry.
   const band = frame.style === "scanner-brackets" ? 0 : FRAME_BAND;
   const position: "bottom" | "top" =
     frame.style === "banner-top" ? "top" : frame.position;
@@ -321,10 +324,10 @@ function renderFrame(
   const text = escapeXml(frame.text);
   const L = frameLayout(frame, totalH);
   const bandCenterY = L.bandCenterY;
-  // Color del texto. Si el usuario lo define, se respeta SIEMPRE. Si no, el
-  // default depende del estilo: los que tienen banda sólida usan contraste;
-  // los "sin banda" (neon/minimal/elegant/scanner-brackets) usan el color del
-  // marco, que es lo legible sobre el fondo del QR.
+  // Text color. If the user sets it, it is ALWAYS respected. Otherwise the
+  // default depends on the style: solid-band styles use contrast; the
+  // "bandless" ones (neon/minimal/elegant/scanner-brackets) use the frame
+  // color, which is what stays readable over the QR background.
   const bandStyles = [
     "modern",
     "classic",
@@ -339,7 +342,7 @@ function renderFrame(
       ? getContrastColor(frame.color)
       : frame.color);
   let spacing = frame.style === "elegant" ? 0.9 : 0.45;
-  // Auto-ajuste: reducir la fuente si el texto no cabe en el ancho disponible.
+  // Auto-fit: shrink the font when the text does not fit the available width.
   const maxTextWidth = totalW - 10;
   const estimateWidth = (size: number) =>
     frame.text.length * (size * 0.62 + spacing);
@@ -409,12 +412,12 @@ function renderFrame(
       };
     }
     case "speech-bubble": {
-      // Bocadillo: rect redondeado que encierra el QR + banda inferior con cola.
+      // Speech bubble: rounded rect enclosing the QR + bottom band with a tail.
       const bannerW = Math.min(totalW - 6, estimateWidth(fontSize) + 8);
       const bx = (totalW - bannerW) / 2;
       const by = L.bandY + 0.5;
       const bh = L.band - 1.5;
-      // Cola triangular saliendo hacia abajo desde el centro de la banda.
+      // Triangular tail pointing down from the center of the band.
       const tailCx = totalW / 2;
       const tail = `<polygon points="${round(tailCx - 1.6)},${round(by + bh)} ${round(tailCx + 1.6)},${round(by + bh)} ${round(tailCx)},${round(by + bh + 2)}" fill="${frame.color}"/>`;
       return {
@@ -427,14 +430,14 @@ function renderFrame(
       };
     }
     case "badge": {
-      // Insignia: cinta tipo sello bajo el QR con borde festoneado (fila de
-      // círculos) — firma estructural que librsvg rasteriza fiable, a
-      // diferencia de textPath. Texto recto centrado.
+      // Badge: seal-like ribbon under the QR with a scalloped edge (row of
+      // circles) — a structural signature librsvg rasterizes reliably,
+      // unlike textPath. Straight centered text.
       const ribY = L.bandY + (L.position === "top" ? 0.9 : 0);
       const ribH = L.band - 1.5;
       const ribX = 2.5;
       const ribW = totalW - 5;
-      // Festón: círculos solapando el borde exterior de la cinta.
+      // Scallop: circles overlapping the ribbon's outer edge.
       const scallopEdge = L.position === "top" ? ribY + ribH : ribY;
       const scallopR = 0.9;
       const nScallops = Math.max(6, Math.round(ribW / (scallopR * 2)));
@@ -455,11 +458,11 @@ function renderFrame(
       };
     }
     case "ticket": {
-      // Cupón: borde dasheado + muescas semicirculares a los lados de la banda.
+      // Coupon: dashed edge + semicircular notches at the sides of the band.
       const notchY = L.bandY;
       const notchR = 1.4;
-      // Las muescas "recortan" el ticket; blanco funciona sobre el fondo claro
-      // habitual de este estilo (contraste vía la línea dasheada).
+      // The notches "cut out" the ticket; white works over this style's usual
+      // light background (contrast comes from the dashed line).
       const bg = "#ffffff";
       return {
         defs: "",
@@ -473,9 +476,9 @@ function renderFrame(
       };
     }
     case "scanner-brackets": {
-      // Cuatro esquinas en "L" (visor de cámara), sin borde ni banda; texto
-      // en un pie fuera de la caja del QR no aplica (band=0), así que el texto
-      // va centrado bajo la última fila, dentro del pad inferior.
+      // Four "L" corners (camera viewfinder), no border or band; a caption
+      // outside the QR box does not apply (band=0), so the text is centered
+      // below the last row, inside the bottom pad.
       const m = 1.2;
       const len = Math.max(4, totalW * 0.16);
       const sw = 1.2;
@@ -497,10 +500,10 @@ function renderFrame(
   }
 }
 
-// ---------- Render principal ----------
+// ---------- Main render ----------
 
 export interface RenderOptions {
-  /** Ancho en px del atributo width del SVG (height proporcional). */
+  /** Width in px for the SVG width attribute (height stays proportional). */
   width?: number;
 }
 
@@ -509,8 +512,8 @@ export function renderQrSvg(
   config: QrConfig,
   options: RenderOptions = {},
 ): string {
-  // Con imagen de fondo se fuerza EC=H (recupera ~30%): red de seguridad de
-  // escaneabilidad independientemente del ecLevel elegido en la config.
+  // With a background image EC=H is forced (~30% recovery): a scanability
+  // safety net regardless of the ecLevel chosen in the config.
   const ecLevel = config.style.background.image ? "H" : config.ecLevel;
   const matrix = createMatrix(data, ecLevel);
   return renderMatrixSvg(matrix, config, options);
@@ -526,12 +529,12 @@ export function renderMatrixSvg(
   const qrUnits = n + 2 * margin;
 
   const hasFrame = Boolean(frame);
-  // scanner-brackets no lleva banda de texto separada (band=0).
+  // scanner-brackets has no separate text band (band=0).
   const frameBand =
     frame && frame.style !== "scanner-brackets" ? FRAME_BAND : 0;
   const totalW = qrUnits + (hasFrame ? 2 * FRAME_PAD : 0);
   const totalH = qrUnits + (hasFrame ? 2 * FRAME_PAD + frameBand : 0);
-  // La banda va arriba si position="top" (o banner-top); entonces el QR baja.
+  // The band goes on top when position="top" (or banner-top); the QR shifts down.
   const bandOnTop =
     hasFrame &&
     frame !== undefined &&
@@ -539,7 +542,7 @@ export function renderMatrixSvg(
   const qrX = hasFrame ? FRAME_PAD : 0;
   const qrY = hasFrame ? FRAME_PAD + (bandOnTop ? frameBand : 0) : 0;
 
-  // Colores (con inversión opcional)
+  // Colors (with optional inversion)
   const invert = effects?.invert ?? false;
   const rawDot = style.dots.color;
   const rawBg = style.background.color;
@@ -554,10 +557,12 @@ export function renderMatrixSvg(
     defs.push(gradientDef("qra-dots", gradient, qrBox));
     dotsFill = "url(#qra-dots)";
   }
-  // Gradiente en las esquinas (finders); si no, color propio o herencia de dots.
+  // Corner (finder) gradient; otherwise own color or inherited from dots.
   let cornerSquareFill = style.cornersSquare.color ?? dotsFill;
   if (style.cornersSquare.gradient) {
-    defs.push(gradientDef("qra-corner-sq", style.cornersSquare.gradient, qrBox));
+    defs.push(
+      gradientDef("qra-corner-sq", style.cornersSquare.gradient, qrBox),
+    );
     cornerSquareFill = "url(#qra-corner-sq)";
   }
   let cornerDotFill = style.cornersDot.color ?? dotsFill;
@@ -566,7 +571,7 @@ export function renderMatrixSvg(
     cornerDotFill = "url(#qra-corner-dot)";
   }
 
-  // Excavación para el logo
+  // Logo excavation
   let excavation: { min: number; max: number } | null = null;
   if (logo) {
     const logoModules = n * logo.sizeRatio;
@@ -586,7 +591,7 @@ export function renderMatrixSvg(
     );
   };
 
-  // Path de módulos de datos
+  // Data module path
   const parts: string[] = [];
   for (let row = 0; row < n; row++) {
     for (let col = 0; col < n; col++) {
@@ -635,7 +640,7 @@ export function renderMatrixSvg(
     )
     .join("");
 
-  // Efectos
+  // Effects
   let dotsFilter = "";
   if (effects?.glow) {
     defs.push(
@@ -659,7 +664,7 @@ export function renderMatrixSvg(
     logoSvg += `<image x="${round(x + imgInset)}" y="${round(y + imgInset)}" width="${round(sizeUnits - 2 * imgInset)}" height="${round(sizeUnits - 2 * imgInset)}" href="${logo.dataUri}" preserveAspectRatio="xMidYMid meet"/>`;
   }
 
-  // Marco
+  // Frame
   let frameDefs = "";
   let frameBody = "";
   if (frame) {
@@ -668,7 +673,7 @@ export function renderMatrixSvg(
     frameBody = rendered.body;
   }
 
-  // ----- Fondo (color / gradiente / imagen con salvaguardas) -----
+  // ----- Background (color / gradient / image with safeguards) -----
   const bgImage = style.background.image;
   const bgGradient = style.background.gradient;
   let background = "";
@@ -683,21 +688,21 @@ export function renderMatrixSvg(
     }
   }
 
-  // Capas de imagen de fondo: imagen (cover) → scrim tenue. La escaneabilidad
-  // se garantiza con las placas de los finder + el EC=H forzado, sin cubrir
-  // toda la imagen (la foto queda visible entre los módulos).
+  // Background image layers: image (cover) → subtle scrim. Scanability is
+  // guaranteed by the finder plates + the forced EC=H, without covering the
+  // whole image (the photo stays visible between the modules).
   let bgImageLayers = "";
   let finderPlates = "";
   if (bgImage) {
-    // El scrim empuja el contraste hacia el color OPUESTO a los módulos:
-    // puntos oscuros → scrim claro (aclara la foto), puntos claros → oscuro.
+    // The scrim pushes contrast toward the color OPPOSITE to the modules:
+    // dark dots → light scrim (lightens the photo), light dots → dark scrim.
     const scrimColor = getContrastColor(dotColor);
     bgImageLayers =
       `<image x="0" y="0" width="${round(totalW)}" height="${round(totalH)}" href="${bgImage.dataUri}" preserveAspectRatio="xMidYMid slice"/>` +
       `<rect x="0" y="0" width="${round(totalW)}" height="${round(totalH)}" fill="${scrimColor}" opacity="${round(bgImage.opacity)}"/>`;
-    // Placas "sagradas" bajo los 3 finder patterns: toman la SILUETA del estilo
-    // de esquina (mismos radios) para no sobresalir como cuadros por los lados.
-    // Color: tinte muestreado de la imagen (aclarado) si existe; si no, blanco.
+    // "Sacred" plates under the 3 finder patterns: they take the SILHOUETTE of
+    // the corner style (same radii) so they don't stick out as boxes.
+    // Color: tint sampled from the image (lightened) if present; else white.
     const plateColor = bgImage.tint ?? bgColor;
     finderPlates = finders
       .map(
@@ -714,7 +719,9 @@ export function renderMatrixSvg(
 
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${round(totalW)} ${round(totalH)}"${sizeAttrs} role="img">` +
-    (defs.length || frameDefs ? `<defs>${defs.join("")}${frameDefs}</defs>` : "") +
+    (defs.length || frameDefs
+      ? `<defs>${defs.join("")}${frameDefs}</defs>`
+      : "") +
     background +
     bgImageLayers +
     `<g${groupOpacity}>` +

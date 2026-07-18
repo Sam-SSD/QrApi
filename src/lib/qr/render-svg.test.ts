@@ -13,7 +13,7 @@ import {
 import { TEMPLATES, GRADIENT_PRESETS } from "./templates";
 import { buildPayload } from "./payloads";
 
-/** Rasteriza un SVG y lo decodifica con ZXing. Devuelve el texto o null. */
+/** Rasterizes an SVG and decodes it with ZXing. Returns the text or null. */
 async function decodeSvg(svg: string, size = 512): Promise<string | null> {
   const { data, info } = await sharp(Buffer.from(svg))
     .resize(size, size, { fit: "contain", background: "#ffffff" })
@@ -23,7 +23,11 @@ async function decodeSvg(svg: string, size = 512): Promise<string | null> {
     .toBuffer({ resolveWithObject: true });
   const results = await readBarcodes(
     {
-      data: new Uint8ClampedArray(data.buffer, data.byteOffset, data.byteLength),
+      data: new Uint8ClampedArray(
+        data.buffer,
+        data.byteOffset,
+        data.byteLength,
+      ),
       width: info.width,
       height: info.height,
       colorSpace: "srgb",
@@ -39,12 +43,12 @@ function config(overrides: Record<string, unknown> = {}): QrConfig {
   return qrConfigSchema.parse(overrides);
 }
 
-// 1×1 px PNG rojo para probar logos
+// 1×1 px red PNG to test logos
 const RED_PIXEL_PNG =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
 
 describe("renderQrSvg", () => {
-  it("genera un SVG válido", () => {
+  it("generates a valid SVG", () => {
     const svg = renderQrSvg(DATA, config());
     expect(svg).toMatch(/^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
     expect(svg).toContain("viewBox");
@@ -52,7 +56,7 @@ describe("renderQrSvg", () => {
   });
 
   for (const style of DOT_STYLES) {
-    it(`estilo de puntos "${style}" es escaneable`, async () => {
+    it(`dot style "${style}" is scannable`, async () => {
       const svg = renderQrSvg(
         DATA,
         config({ style: { dots: { style, color: "#18181b" } } }),
@@ -61,7 +65,7 @@ describe("renderQrSvg", () => {
     });
   }
 
-  it("gradiente lineal es escaneable", async () => {
+  it("linear gradient is scannable", async () => {
     const svg = renderQrSvg(
       DATA,
       config({
@@ -77,7 +81,7 @@ describe("renderQrSvg", () => {
     expect(await decodeSvg(svg)).toBe(DATA);
   });
 
-  it("gradiente radial es escaneable", async () => {
+  it("radial gradient is scannable", async () => {
     const svg = renderQrSvg(
       DATA,
       config({
@@ -93,7 +97,7 @@ describe("renderQrSvg", () => {
     expect(await decodeSvg(svg)).toBe(DATA);
   });
 
-  it("gradiente de marca (brand) es escaneable", async () => {
+  it("brand gradient is scannable", async () => {
     const svg = renderQrSvg(
       DATA,
       config({
@@ -109,7 +113,7 @@ describe("renderQrSvg", () => {
     expect(await decodeSvg(svg)).toBe(DATA);
   });
 
-  it("estilos de esquina personalizados son escaneables", async () => {
+  it("custom corner styles are scannable", async () => {
     const svg = renderQrSvg(
       DATA,
       config({
@@ -124,7 +128,7 @@ describe("renderQrSvg", () => {
   });
 
   for (const style of CORNER_SQUARE_STYLES) {
-    it(`estilo de esquina "${style}" es escaneable`, async () => {
+    it(`corner style "${style}" is scannable`, async () => {
       const svg = renderQrSvg(
         DATA,
         config({
@@ -139,7 +143,7 @@ describe("renderQrSvg", () => {
   }
 
   for (const style of CORNER_DOT_STYLES) {
-    it(`punto de esquina "${style}" es escaneable`, async () => {
+    it(`corner dot "${style}" is scannable`, async () => {
       const svg = renderQrSvg(
         DATA,
         config({
@@ -154,7 +158,7 @@ describe("renderQrSvg", () => {
   }
 
   for (const style of FRAME_STYLES) {
-    it(`marco "${style}" es escaneable`, async () => {
+    it(`frame "${style}" is scannable`, async () => {
       const svg = renderQrSvg(
         DATA,
         config({ frame: { style, text: "ESCANÉAME", color: "#4f46e5" } }),
@@ -163,7 +167,7 @@ describe("renderQrSvg", () => {
     });
   }
 
-  it("marco con position=top es escaneable", async () => {
+  it("frame with position=top is scannable", async () => {
     const svg = renderQrSvg(
       DATA,
       config({
@@ -178,15 +182,21 @@ describe("renderQrSvg", () => {
     expect(await decodeSvg(svg, 700)).toBe(DATA);
   });
 
-  // Aserciones de distinción: exhaustividad prueba que la rama existe; esto
-  // prueba que emite SU forma y no la de otro estilo (evita copy-paste erróneo).
-  it("cada estilo nuevo emite su primitiva distintiva", () => {
+  // Distinction assertions: exhaustiveness proves the branch exists; this
+  // proves it emits ITS shape and not another style's (catches bad copy-paste).
+  it("each new style emits its distinctive primitive", () => {
     const square = renderQrSvg(
       DATA,
       config({ style: { dots: { style: "square", color: "#18181b" } } }),
     );
     const squarePath = square.match(/<path d="([^"]+)"/)?.[1] ?? "";
-    for (const style of ["star", "plus", "diamond", "vertical-line", "horizontal-line"] as const) {
+    for (const style of [
+      "star",
+      "plus",
+      "diamond",
+      "vertical-line",
+      "horizontal-line",
+    ] as const) {
       const svg = renderQrSvg(
         DATA,
         config({ style: { dots: { style, color: "#18181b" } } }),
@@ -194,17 +204,19 @@ describe("renderQrSvg", () => {
       const path = svg.match(/<path d="([^"]+)"/)?.[1] ?? "";
       expect(path, `dots ${style}`).not.toBe(squarePath);
     }
-    // Marcos con primitivas propias
+    // Frames with their own primitives
     const bubble = renderQrSvg(
       DATA,
-      config({ frame: { style: "speech-bubble", text: "HOLA", color: "#4f46e5" } }),
+      config({
+        frame: { style: "speech-bubble", text: "HOLA", color: "#4f46e5" },
+      }),
     );
     expect(bubble).toContain("<polygon");
     const badge = renderQrSvg(
       DATA,
       config({ frame: { style: "badge", text: "HOLA", color: "#4f46e5" } }),
     );
-    // Festón de la cinta: varios círculos (firma isomórfica, no textPath).
+    // Ribbon scallop: several circles (isomorphic signature, not textPath).
     expect((badge.match(/<circle/g) ?? []).length).toBeGreaterThanOrEqual(6);
     const ticket = renderQrSvg(
       DATA,
@@ -213,14 +225,16 @@ describe("renderQrSvg", () => {
     expect(ticket).toContain("stroke-dasharray");
     const brackets = renderQrSvg(
       DATA,
-      config({ frame: { style: "scanner-brackets", text: "HOLA", color: "#4f46e5" } }),
+      config({
+        frame: { style: "scanner-brackets", text: "HOLA", color: "#4f46e5" },
+      }),
     );
     expect(brackets).toContain("stroke-linecap");
   });
 
-  it("el color de texto del marco se respeta en todos los estilos", () => {
-    // Incluye estilos sin banda (minimal/neon/elegant) que antes ignoraban
-    // textColor y usaban frame.color.
+  it("the frame text color is respected in every style", () => {
+    // Includes bandless styles (minimal/neon/elegant) that used to ignore
+    // textColor and use frame.color.
     for (const style of ["modern", "minimal", "neon", "elegant"] as const) {
       const svg = renderQrSvg(
         DATA,
@@ -233,17 +247,17 @@ describe("renderQrSvg", () => {
           },
         }),
       );
-      // El texto lleva el color pedido y NO cae al color del marco.
+      // The text carries the requested color and does NOT fall back to the frame color.
       expect(svg, style).toContain('fill="#ff0000"');
-      expect(svg, `${style} no usa frame.color en texto`).toMatch(
+      expect(svg, `${style} does not use frame.color for text`).toMatch(
         /fill="#ff0000"[^>]*>HOLA<\/text>/,
       );
     }
   });
 
-  it("el texto de los marcos con banda contrasta por defecto (sin textColor)", () => {
-    // Estilos con banda sólida: el texto por defecto NO puede ser del color de
-    // la banda (seria invisible). Captura regresiones como speech-bubble.
+  it("banded frame text contrasts by default (no textColor)", () => {
+    // Solid-band styles: the default text can NOT be the band color (it
+    // would be invisible). Catches regressions like speech-bubble.
     for (const style of [
       "modern",
       "classic",
@@ -257,16 +271,17 @@ describe("renderQrSvg", () => {
         config({ frame: { style, text: "HOLA", color: "#4f46e5" } }),
       );
       const fill = svg.match(/<text[^>]*fill="([^"]+)"[^>]*>HOLA<\/text>/)?.[1];
-      expect(fill, `${style} texto`).toBeDefined();
-      expect(fill?.toLowerCase(), `${style} texto no es el color de banda`).not.toBe(
-        "#4f46e5",
-      );
+      expect(fill, `${style} text`).toBeDefined();
+      expect(
+        fill?.toLowerCase(),
+        `${style} text is not the band color`,
+      ).not.toBe("#4f46e5");
     }
   });
 
-  it("imagen de fondo con salvaguardas mantiene el QR escaneable", async () => {
-    // La imagen se ve entre los módulos (no hay placa global); la escaneabilidad
-    // la garantizan las placas de finder + el EC=H forzado.
+  it("background image with safeguards keeps the QR scannable", async () => {
+    // The image shows between the modules (no global plate); scanability is
+    // guaranteed by the finder plates + the forced EC=H.
     const svg = renderQrSvg(
       DATA,
       config({
@@ -281,13 +296,15 @@ describe("renderQrSvg", () => {
       }),
     );
     expect(svg).toContain("<image");
-    // 3 placas de finder como <path> con la silueta del anillo (color de fondo).
-    expect((svg.match(/<path d="[^"]+" fill="#ffffff"\/>/g) ?? []).length).toBe(3);
+    // 3 finder plates as <path> with the ring silhouette (background color).
+    expect((svg.match(/<path d="[^"]+" fill="#ffffff"\/>/g) ?? []).length).toBe(
+      3,
+    );
     expect(await decodeSvg(svg, 700)).toBe(DATA);
   });
 
-  it("imagen de fondo fuerza ecLevel H aunque la config pida L", async () => {
-    // Con EC=L y foto detrás el decode fallaría; el motor debe forzar H.
+  it("background image forces ecLevel H even when the config asks for L", async () => {
+    // With EC=L and a photo behind, decoding would fail; the engine must force H.
     const svg = renderQrSvg(
       DATA,
       config({
@@ -305,7 +322,7 @@ describe("renderQrSvg", () => {
     expect(await decodeSvg(svg, 700)).toBe(DATA);
   });
 
-  it("las placas de finder usan el tinte muestreado y siguen escaneando", async () => {
+  it("finder plates use the sampled tint and still scan", async () => {
     const svg = renderQrSvg(
       DATA,
       config({
@@ -317,24 +334,29 @@ describe("renderQrSvg", () => {
             image: {
               dataUri: RED_PIXEL_PNG,
               opacity: 0.35,
-              tint: "#e6d4f0", // tinte pálido de ejemplo
+              tint: "#e6d4f0", // sample pale tint
             },
           },
         },
       }),
     );
-    // Las 3 placas de finder usan el tinte (no blanco).
-    expect((svg.match(/<path d="[^"]+" fill="#e6d4f0"\/>/g) ?? []).length).toBe(3);
+    // The 3 finder plates use the tint (not white).
+    expect((svg.match(/<path d="[^"]+" fill="#e6d4f0"\/>/g) ?? []).length).toBe(
+      3,
+    );
     expect(await decodeSvg(svg, 700)).toBe(DATA);
   });
 
-  it("gradiente en fondo y esquinas es escaneable", async () => {
+  it("gradient on background and corners is scannable", async () => {
     const svg = renderQrSvg(
       DATA,
       config({
         style: {
           dots: { style: "rounded", color: "#18181b" },
-          cornersSquare: { style: "extra-rounded", gradient: GRADIENT_PRESETS.brand },
+          cornersSquare: {
+            style: "extra-rounded",
+            gradient: GRADIENT_PRESETS.brand,
+          },
           cornersDot: { style: "dot", gradient: GRADIENT_PRESETS.brand },
           background: { color: "#ffffff", transparent: false },
         },
@@ -344,7 +366,7 @@ describe("renderQrSvg", () => {
     expect(await decodeSvg(svg)).toBe(DATA);
   });
 
-  it("logo con excavación mantiene el QR escaneable (ecLevel H)", async () => {
+  it("logo with excavation keeps the QR scannable (ecLevel H)", async () => {
     const svg = renderQrSvg(
       DATA,
       config({
@@ -356,18 +378,18 @@ describe("renderQrSvg", () => {
     expect(await decodeSvg(svg)).toBe(DATA);
   });
 
-  it("marco no rompe la escaneabilidad", async () => {
+  it("frame does not break scanability", async () => {
     const svg = renderQrSvg(
       DATA,
       config({
         frame: { style: "modern", text: "ESCANÉAME", color: "#4f46e5" },
       }),
     );
-    // el marco añade banda inferior: rasterizar más grande para compensar
+    // the frame adds a bottom band: rasterize larger to compensate
     expect(await decodeSvg(svg, 640)).toBe(DATA);
   });
 
-  it("colores invertidos escanean (fondo oscuro, puntos claros)", async () => {
+  it("inverted colors scan (dark background, light dots)", async () => {
     const svg = renderQrSvg(
       DATA,
       config({
@@ -377,21 +399,21 @@ describe("renderQrSvg", () => {
         },
       }),
     );
-    // jsQR soporta inversión
+    // jsQR supports inversion
     const result = await decodeSvg(svg);
     expect(result === DATA || result === null).toBe(true);
   });
 
-  it("todas las plantillas generan QRs escaneables", async () => {
+  it("every template generates scannable QRs", async () => {
     for (const template of TEMPLATES) {
       const data = buildPayload(template.payload);
       const svg = renderQrSvg(data, template.config);
       const decoded = await decodeSvg(svg, 700);
-      expect(decoded, `plantilla ${template.id}`).toBe(data);
+      expect(decoded, `template ${template.id}`).toBe(data);
     }
   }, 30_000);
 
-  it("escapa texto del marco (sin inyección XML)", () => {
+  it("escapes frame text (no XML injection)", () => {
     const svg = renderQrSvg(
       DATA,
       config({
@@ -406,13 +428,15 @@ describe("renderQrSvg", () => {
     expect(svg).toContain("&lt;script&gt;");
   });
 
-  it("lanza si los datos exceden la capacidad", () => {
-    expect(() => renderQrSvg("x".repeat(4000), config({ ecLevel: "H" }))).toThrow();
+  it("throws when the data exceeds capacity", () => {
+    expect(() =>
+      renderQrSvg("x".repeat(4000), config({ ecLevel: "H" })),
+    ).toThrow();
   });
 });
 
 describe("getContrastColor", () => {
-  it("blanco sobre colores oscuros, oscuro sobre claros", () => {
+  it("white over dark colors, dark over light ones", () => {
     expect(getContrastColor("#09090b")).toBe("#ffffff");
     expect(getContrastColor("#f4f4f5")).toBe("#0b0b14");
   });

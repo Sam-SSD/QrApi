@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
-/** Scroll-reveal ligero con IntersectionObserver (sin librerías). */
+/** Lightweight scroll-reveal with IntersectionObserver (no libraries). */
 export function Reveal({
   children,
   className,

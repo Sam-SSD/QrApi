@@ -9,7 +9,7 @@ import {
 import { useQrStore } from "@/stores/qr-store";
 import { cn } from "@/lib/utils";
 
-/** Rect con radio por esquina [tl, tr, br, bl] — mismo trazado que el motor. */
+/** Rect with per-corner radius [tl, tr, br, bl] — same path as the engine. */
 function roundedRectThumb(
   x: number,
   y: number,
@@ -33,7 +33,7 @@ function roundedRectThumb(
     .join("");
 }
 
-/** Path de estrella para las miniaturas. */
+/** Star path for the thumbnails. */
 function starThumbPath(
   cx: number,
   cy: number,
@@ -50,7 +50,7 @@ function starThumbPath(
   return `M${coords.join("L")}z`;
 }
 
-/** Miniaturas SVG de cada estilo de puntos (patrón 3×3 ilustrativo). */
+/** SVG thumbnails for each dot style (illustrative 3×3 pattern). */
 function DotStyleThumb({ style }: { style: (typeof DOT_STYLES)[number] }) {
   const cells: Array<[number, number]> = [
     [0, 0],
@@ -85,11 +85,25 @@ function DotStyleThumb({ style }: { style: (typeof DOT_STYLES)[number] }) {
         );
       case "vertical-line":
         return (
-          <rect key={`${x}-${y}`} x={px + 2} y={py} width={4} height={8} rx={2} />
+          <rect
+            key={`${x}-${y}`}
+            x={px + 2}
+            y={py}
+            width={4}
+            height={8}
+            rx={2}
+          />
         );
       case "horizontal-line":
         return (
-          <rect key={`${x}-${y}`} x={px} y={py + 2} width={8} height={4} rx={2} />
+          <rect
+            key={`${x}-${y}`}
+            x={px}
+            y={py + 2}
+            width={8}
+            height={4}
+            rx={2}
+          />
         );
       case "star":
         return (
@@ -107,10 +121,7 @@ function DotStyleThumb({ style }: { style: (typeof DOT_STYLES)[number] }) {
         );
       case "diamond":
         return (
-          <path
-            key={`${x}-${y}`}
-            d={`M${px + 4},${py}l4,4l-4,4l-4,-4z`}
-          />
+          <path key={`${x}-${y}`} d={`M${px + 4},${py}l4,4l-4,4l-4,-4z`} />
         );
     }
   };
@@ -126,7 +137,7 @@ function CornerSquareThumb({
 }: {
   style: (typeof CORNER_SQUARE_STYLES)[number];
 }) {
-  // Radios por esquina [tl, tr, br, bl] que reflejan cada estilo del motor.
+  // Per-corner radii [tl, tr, br, bl] mirroring each engine style.
   const radii: Record<
     (typeof CORNER_SQUARE_STYLES)[number],
     [number, number, number, number]
@@ -136,7 +147,7 @@ function CornerSquareThumb({
     "extra-rounded": [10, 10, 10, 10],
     outpoint: [0, 9, 0, 9], // TL y BR en punta
     inpoint: [9, 0, 9, 0], // TR y BL en punta
-    classy: [0, 7, 0, 7], // una punta y su opuesta redondeada
+    classy: [0, 7, 0, 7], // one pointed corner, the opposite one rounded
   };
   return (
     <svg viewBox="0 0 30 30" className="size-7" aria-hidden="true">
@@ -192,7 +203,11 @@ function StylePicker<T extends string>({
   return (
     <div className="flex flex-col gap-2">
       <span className="text-sm font-medium">{label}</span>
-      <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-1.5">
+      <div
+        role="radiogroup"
+        aria-label={label}
+        className="flex flex-wrap gap-1.5"
+      >
         {options.map((option) => {
           const active = option === value;
           return (

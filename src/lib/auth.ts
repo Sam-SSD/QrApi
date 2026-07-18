@@ -50,7 +50,7 @@ export const auth = betterAuth({
 
 export type Session = typeof auth.$Infer.Session;
 
-/** Proveedores OAuth activos según las env vars presentes. */
+/** OAuth providers active according to the env vars present. */
 export function activeOAuthProviders(): Array<"github" | "google"> {
   const providers: Array<"github" | "google"> = [];
   if (env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET)

@@ -1,12 +1,12 @@
 /**
- * URL pública donde corre la app, desde NEXT_PUBLIC_SITE_URL (validada en
- * src/env.ts). Se lee process.env directamente — no `env` — porque este
- * módulo también se importa en client components y Next solo inlina las
- * NEXT_PUBLIC_* referenciadas de forma literal.
+ * Public URL where the app runs, from NEXT_PUBLIC_SITE_URL (validated in
+ * src/env.ts). process.env is read directly — not `env` — because this
+ * module is also imported in client components and Next only inlines
+ * NEXT_PUBLIC_* vars referenced literally.
  */
 export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
 ).replace(/\/+$/, "");
 
-/** Límite de tamaño (bytes) para imágenes subidas (logo e imagen de fondo). */
+/** Size limit (bytes) for uploaded images (logo and background image). */
 export const MAX_IMAGE_BYTES = 500_000;
