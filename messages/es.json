@@ -1,7 +1,7 @@
 {
   "common": {
     "appName": "QrAPI",
-    "tagline": "Forja códigos QR que no parecen códigos QR.",
+    "tagline": "Diseñados para destacar. Hechos para durar.",
     "loading": "Cargando…",
     "save": "Guardar",
     "cancel": "Cancelar",
@@ -28,7 +28,7 @@
     "openMenu": "Abrir menú"
   },
   "footer": {
-    "description": "Generador de códigos QR con editor visual y API para developers.",
+    "description": "Códigos QR permanentes con editor visual y API para developers.",
     "product": "Producto",
     "developers": "Developers",
     "apiDocs": "Documentación de la API",
@@ -38,52 +38,52 @@
   },
   "landing": {
     "badge": "QR dinámicos con analíticas",
-    "heroTitle": "Forja códigos QR que no parecen códigos QR.",
-    "heroSubtitle": "Editor visual con gradientes, logos y marcos. Export vectorial. API para developers. Gratis y sin marcas de agua.",
-    "ctaPrimary": "Crear QR gratis",
-    "ctaSecondary": "Ver la API",
+    "heroTitle": "Diseñados para destacar. Hechos para durar.",
+    "heroSubtitle": "Crea códigos QR con identidad propia que permanecen activos para siempre: editor visual con gradientes, logos y marcos, exportación vectorial y una API REST para integrarlos en tu producto. Sin vencimientos ni marcas de agua.",
+    "ctaPrimary": "Crea tu QR gratis",
+    "ctaSecondary": "Explorar la API",
     "features": {
-      "title": "Todo lo que necesitas, sin pagar nada",
-      "subtitle": "Las funciones que otros esconden tras un plan de pago, aquí son gratis y para siempre.",
+      "title": "Todo lo que necesitas, sin letra pequeña",
+      "subtitle": "Herramientas de nivel profesional y códigos que permanecen activos, disponibles desde el primer día.",
       "customization": {
         "title": "Personalización total",
         "description": "5 estilos de puntos, esquinas configurables, gradientes lineales y radiales, marcos con texto y tu logo en el centro."
       },
       "types": {
         "title": "8 tipos de contenido",
-        "description": "URL, texto, email, teléfono, SMS, WiFi, vCard y crypto — con formularios dedicados que generan el formato estándar correcto."
+        "description": "URL, texto, email, teléfono, SMS, WiFi, vCard y crypto, cada uno con un formulario dedicado que genera el formato estándar correcto."
       },
       "vector": {
-        "title": "Export vectorial real",
-        "description": "SVG puro escalable a cualquier tamaño, PNG y JPG hasta 4096 px, y PDF listo para imprimir."
+        "title": "Exportación vectorial real",
+        "description": "SVG puro escalable a cualquier tamaño, PNG y JPG hasta 4096 px y PDF con calidad de imprenta."
       },
       "history": {
         "title": "Historial y plantillas",
-        "description": "Tus últimos QRs guardados en el navegador, plantillas prediseñadas y tu biblioteca personal con una cuenta gratis."
+        "description": "Tus últimos diseños guardados en el navegador, plantillas prediseñadas y una biblioteca personal con tu cuenta gratuita."
       },
       "api": {
         "title": "API REST para developers",
-        "description": "Genera QRs estilizados desde tu código con una petición HTTP. Regístrate, crea tu token y listo."
+        "description": "Genera códigos QR estilizados desde tu aplicación con una sola petición HTTP. Autenticación con token y respuestas consistentes."
       },
       "privacy": {
-        "title": "100% privado",
-        "description": "El editor genera todo en tu navegador: tus datos nunca salen de tu máquina. Sin telemetría ni rastreadores."
+        "title": "Privado por diseño",
+        "description": "El editor genera todo en tu navegador: tus datos nunca salen de tu equipo. Sin telemetría ni rastreadores."
       }
     },
     "showcase": {
       "title": "Un QR para cada marca",
-      "subtitle": "Haz clic en cualquier ejemplo para abrirlo en el editor.",
+      "subtitle": "Explora los ejemplos y ábrelos directamente en el editor.",
       "useTemplate": "Usar la plantilla {name}"
     },
     "developer": {
       "title": "Un endpoint. Cualquier estilo.",
-      "subtitle": "Autentícate con tu token y recibe PNG, SVG o JPEG con todos los estilos del editor. Rate limits generosos y errores JSON claros.",
+      "subtitle": "Autentícate con tu token y recibe PNG, SVG o JPEG con todos los estilos del editor. Límites de uso generosos y errores JSON claros.",
       "cta": "Leer la documentación"
     },
     "finalCta": {
-      "title": "Tu próximo QR no tiene por qué ser feo",
-      "subtitle": "Diséñalo en el editor o genéralo desde tu código con la API. Gratis, sin marcas de agua y listo para imprimir.",
-      "ctaPrimary": "Crear QR gratis",
+      "title": "Diseña hoy. Escanea para siempre.",
+      "subtitle": "Créalo en el editor o genéralo desde tu código con la API. Sin vencimientos, sin marcas de agua y listo para imprimir.",
+      "ctaPrimary": "Empieza a diseñar",
       "ctaSecondary": "Explorar la API"
     }
   },

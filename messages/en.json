@@ -1,7 +1,7 @@
 {
   "common": {
     "appName": "QrAPI",
-    "tagline": "Forge QR codes that don't look like QR codes.",
+    "tagline": "Designed to stand out. Built to last.",
     "loading": "Loading…",
     "save": "Save",
     "cancel": "Cancel",
@@ -28,7 +28,7 @@
     "openMenu": "Open menu"
   },
   "footer": {
-    "description": "QR code generator with a visual editor and a developer API.",
+    "description": "Permanent QR codes with a visual editor and a developer API.",
     "product": "Product",
     "developers": "Developers",
     "apiDocs": "API documentation",
@@ -38,41 +38,41 @@
   },
   "landing": {
     "badge": "Dynamic QRs with analytics",
-    "heroTitle": "Forge QR codes that don't look like QR codes.",
-    "heroSubtitle": "Visual editor with gradients, logos and frames. Vector export. Developer API. Free, no watermarks.",
-    "ctaPrimary": "Create a free QR",
+    "heroTitle": "Designed to stand out. Built to last.",
+    "heroSubtitle": "Create QR codes with an identity of their own that stay active forever: a visual editor with gradients, logos and frames, vector export and a REST API to integrate them into your product. No expirations, no watermarks.",
+    "ctaPrimary": "Create your QR for free",
     "ctaSecondary": "Explore the API",
     "features": {
-      "title": "Everything you need, for free",
-      "subtitle": "The features others hide behind a paywall are free here, forever.",
+      "title": "Everything you need, no fine print",
+      "subtitle": "Professional-grade tools and codes that stay active, available from day one.",
       "customization": {
         "title": "Full customization",
         "description": "5 dot styles, configurable corners, linear and radial gradients, frames with text and your logo in the center."
       },
       "types": {
         "title": "8 content types",
-        "description": "URL, text, email, phone, SMS, WiFi, vCard and crypto — with dedicated forms that generate the correct standard format."
+        "description": "URL, text, email, phone, SMS, WiFi, vCard and crypto, each with a dedicated form that produces the correct standard format."
       },
       "vector": {
         "title": "True vector export",
-        "description": "Pure scalable SVG, PNG and JPG up to 4096 px, and print-ready PDF."
+        "description": "Pure scalable SVG, PNG and JPG up to 4096 px, and press-quality PDF."
       },
       "history": {
         "title": "History and templates",
-        "description": "Your latest QRs saved in the browser, ready-made templates and your personal library with a free account."
+        "description": "Your latest designs saved in the browser, ready-made templates and a personal library with your free account."
       },
       "api": {
         "title": "REST API for developers",
-        "description": "Generate styled QRs from your code with one HTTP request. Sign up, create your token and go."
+        "description": "Generate styled QR codes from your application with a single HTTP request. Token authentication and consistent responses."
       },
       "privacy": {
-        "title": "100% private",
+        "title": "Private by design",
         "description": "The editor generates everything in your browser: your data never leaves your machine. No telemetry, no trackers."
       }
     },
     "showcase": {
       "title": "A QR for every brand",
-      "subtitle": "Click any example to open it in the editor.",
+      "subtitle": "Explore the examples and open them directly in the editor.",
       "useTemplate": "Use the {name} template"
     },
     "developer": {
@@ -81,9 +81,9 @@
       "cta": "Read the docs"
     },
     "finalCta": {
-      "title": "Your next QR doesn't have to be ugly",
-      "subtitle": "Design it in the editor or generate it from your code with the API. Free, no watermarks, print-ready.",
-      "ctaPrimary": "Create a free QR",
+      "title": "Design today. Scan forever.",
+      "subtitle": "Design it in the editor or generate it from your code with the API. No expirations, no watermarks, print-ready.",
+      "ctaPrimary": "Start designing",
       "ctaSecondary": "Explore the API"
     }
   },
