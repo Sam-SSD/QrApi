@@ -1,6 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { Plus, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -15,6 +17,14 @@ import { LabeledSlider } from "../controls/labeled-slider";
 import { GRADIENT_PRESETS } from "@/lib/qr/templates";
 import { useQrStore } from "@/stores/qr-store";
 import { cn } from "@/lib/utils";
+
+/** Reparte los offsets uniformemente entre 0 y 1 para una lista de colores. */
+function distributeStops(colors: string[]) {
+  return colors.map((color, i) => ({
+    offset: colors.length <= 1 ? 0 : i / (colors.length - 1),
+    color,
+  }));
+}
 
 export function StyleSection() {
   const t = useTranslations("editor.style");
@@ -79,38 +89,87 @@ export function StyleSection() {
 
       {gradient && (
         <div className="flex flex-col gap-4 rounded-lg border border-line bg-canvas-subtle p-3">
-          <div className="grid grid-cols-2 gap-3">
-            <ColorControl
-              id="style-grad-end"
-              label={t("gradientEnd")}
-              value={gradient.stops[gradient.stops.length - 1].color}
-              onChange={(color) =>
-                setGradient({
-                  ...gradient,
-                  stops: [
-                    { offset: 0, color: dots.color },
-                    { offset: 1, color },
-                  ],
-                })
-              }
-            />
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="style-grad-type">{t("gradientType")}</Label>
-              <Select
-                value={gradient.type}
-                onValueChange={(v) =>
-                  setGradient({ ...gradient, type: v as "linear" | "radial" })
+          {/* Paradas de color (2-4), con offsets distribuidos uniformemente */}
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium">{t("stops")}</span>
+            {gradient.stops.map((stop, i) => (
+              <div key={i} className="flex items-end gap-2">
+                <div className="flex-1">
+                  <ColorControl
+                    id={`style-grad-stop-${i}`}
+                    label={t("stopLabel", { index: i + 1 })}
+                    value={stop.color}
+                    onChange={(color) =>
+                      setGradient({
+                        ...gradient,
+                        stops: gradient.stops.map((s, idx) =>
+                          idx === i ? { ...s, color } : s,
+                        ),
+                      })
+                    }
+                  />
+                </div>
+                {gradient.stops.length > 2 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="size-9 shrink-0 text-destructive hover:text-destructive"
+                    aria-label={t("removeStop", { index: i + 1 })}
+                    onClick={() =>
+                      setGradient({
+                        ...gradient,
+                        stops: distributeStops(
+                          gradient.stops
+                            .filter((_, idx) => idx !== i)
+                            .map((s) => s.color),
+                        ),
+                      })
+                    }
+                  >
+                    <Trash2 className="size-4" strokeWidth={1.75} />
+                  </Button>
+                )}
+              </div>
+            ))}
+            {gradient.stops.length < 4 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="self-start"
+                onClick={() =>
+                  setGradient({
+                    ...gradient,
+                    stops: distributeStops([
+                      ...gradient.stops.map((s) => s.color),
+                      gradient.stops[gradient.stops.length - 1].color,
+                    ]),
+                  })
                 }
               >
-                <SelectTrigger id="style-grad-type" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="linear">{t("gradientLinear")}</SelectItem>
-                  <SelectItem value="radial">{t("gradientRadial")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+                <Plus className="size-4" strokeWidth={1.75} />
+                {t("addStop")}
+              </Button>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="style-grad-type">{t("gradientType")}</Label>
+            <Select
+              value={gradient.type}
+              onValueChange={(v) =>
+                setGradient({ ...gradient, type: v as "linear" | "radial" })
+              }
+            >
+              <SelectTrigger id="style-grad-type" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="linear">{t("gradientLinear")}</SelectItem>
+                <SelectItem value="radial">{t("gradientRadial")}</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           {gradient.type === "linear" && (
             <LabeledSlider
