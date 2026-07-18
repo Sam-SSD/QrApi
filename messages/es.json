@@ -500,6 +500,22 @@
   "docs": {
     "title": "Documentación de la API",
     "subtitle": "Genera códigos QR estilizados desde tu código con una petición HTTP.",
+    "anchor": "Enlace directo a esta sección",
+    "code": {
+      "token": "qra_TU_TOKEN",
+      "exampleUrl": "https://ejemplo.com",
+      "campaign": "Campaña",
+      "promoUrl": "https://ejemplo.com/promo",
+      "newTargetUrl": "https://ejemplo.com/nuevo-destino",
+      "wifiSsid": "MiRed",
+      "wifiPassword": "clave123",
+      "wifiText": "WIFI GRATIS",
+      "postDataComment": "\"data\" acepta contenido crudo; usa \"payload\" para tipos estructurados",
+      "dynStep1": "1) Crear el QR dinámico",
+      "dynStep2": "2) Obtener la imagen: codifica redirectUrl con el endpoint de generación",
+      "dynStep2Js": "2) created.redirectUrl es lo que se codifica en la imagen",
+      "dynStep3": "3) Cambiar el destino más tarde, sin reimprimir el código"
+    },
     "nav": {
       "intro": "Introducción",
       "quickstart": "Inicio rápido",
@@ -510,24 +526,41 @@
       "dynamic": "QR dinámicos",
       "errors": "Errores",
       "rateLimits": "Límites",
-      "tryIt": "Pruébala"
+      "tryIt": "Pruébala",
+      "sub": {
+        "generate-get": "GET — simple",
+        "generate-post": "POST — completo",
+        "generate-response": "La respuesta",
+        "params-get": "Query GET",
+        "params-post": "Body POST",
+        "dynamic-endpoints": "Endpoints",
+        "dynamic-example": "Flujo completo",
+        "dynamic-responses": "Respuestas"
+      }
     },
     "dynamic": {
       "body": "Un QR dinámico codifica una URL corta de redirección propia cuyo destino puedes cambiar en cualquier momento sin regenerar ni reimprimir el código. Cada escaneo se registra con país y tipo de dispositivo para las estadísticas. Gestión completa vía API con tu misma clave.",
+      "endpointsTitle": "Endpoints",
+      "exampleTitle": "Flujo completo",
+      "responsesTitle": "Respuestas",
+      "createResponseLabel": "201 · POST /api/v1/dynamic",
+      "detailResponseLabel": "200 · GET /api/v1/dynamic/:id",
       "colEndpoint": "Endpoint",
       "colDescription": "Descripción",
       "rows": {
-        "create": "Crea un QR dinámico con título y URL de destino; devuelve id, slug y redirectUrl",
+        "create": "Crea un QR dinámico con título y URL de destino; responde 201 con id, slug y redirectUrl",
         "list": "Lista tus QR dinámicos con su contador de escaneos",
-        "get": "Detalle de uno, con estadísticas agregadas por país y dispositivo",
+        "get": "Detalle de uno, con analytics agregados por país y dispositivo",
         "patch": "Edita targetUrl y/o active (pausar) sin regenerar el código",
         "delete": "Elimina el QR dinámico y su historial de escaneos"
       },
       "note": "La imagen del QR se obtiene con el endpoint de generación codificando la redirectUrl. Los destinos deben ser http(s)."
     },
     "intro": {
-      "body": "La API de QrAPI expone un único endpoint que genera códigos QR con todos los estilos del editor: gradientes, formas de puntos, esquinas personalizadas, logos y marcos. Devuelve la imagen directamente (PNG, SVG o JPEG), lista para usar.",
-      "baseUrl": "URL base"
+      "body": "La API de QrAPI genera códigos QR con todos los estilos del editor — gradientes, formas de puntos, esquinas personalizadas, logos, imagen de fondo y marcos — y devuelve la imagen directamente (PNG, SVG o JPEG), lista para usar. También gestiona QR dinámicos con analytics.",
+      "baseUrl": "URL base",
+      "qrEndpoint": "Generación de imágenes QR",
+      "dynamicEndpoint": "QR dinámicos y analytics"
     },
     "quickstart": {
       "body": "De cero a tu primer QR en menos de un minuto.",
@@ -544,39 +577,64 @@
       "warning": "Trata tu clave como una contraseña: no la publiques en repositorios ni la uses desde el navegador en producción."
     },
     "generate": {
-      "getTitle": "GET — caso simple",
+      "getTitle": "Caso simple",
       "getBody": "Para QRs básicos, pasa los parámetros en la query string. Ideal para probar rápido.",
-      "postTitle": "POST — control total",
-      "postBody": "Para gradientes, esquinas personalizadas, logos y marcos, envía un body JSON. Puedes pasar `data` (texto crudo) o `payload` (objeto tipado que construye el formato estándar por ti: WiFi, vCard, email…)."
+      "postTitle": "Control total",
+      "postBody": "Para gradientes, esquinas personalizadas, logos, imagen de fondo y marcos, envía un body JSON. Puedes pasar `data` (texto crudo) o `payload` (objeto tipado que construye el formato estándar por ti: WiFi, vCard, email…).",
+      "responseTitle": "La respuesta",
+      "responseBody": "El endpoint devuelve la imagen directamente en el body, sin JSON intermedio. Toda respuesta incluye los headers de rate limit; un 429 añade Retry-After en segundos."
     },
     "params": {
       "getTitle": "Parámetros GET (query string)",
       "postTitle": "Body POST (JSON)",
+      "postNote": "El body debe incluir exactamente uno de data o payload. Las filas de tipo object se expanden para ver sus subcampos.",
       "name": "Parámetro",
       "type": "Tipo",
       "default": "Default",
       "description": "Descripción",
+      "required": "requerido",
+      "toggle": "Ver subcampos",
       "rows": {
         "data": "Contenido a codificar (máx. 2953 caracteres)",
-        "payload": "Objeto tipado alternativo a data, con type: wifi | vcard | email | url | text | phone | sms | crypto, más los campos de cada tipo",
-        "format": "Formato de salida: png, svg o jpeg",
+        "payload": "Objeto tipado alternativo a data: construye el formato estándar por ti (WiFi, vCard, email…)",
+        "payloadType": "Tipo de payload; cada tipo añade sus propios campos (ssid, phone, address…)",
+        "format": "Formato de salida",
         "size": "Ancho en píxeles (64–2048). Ignorado en svg",
         "ecLevel": "Corrección de errores: L (7%), M (15%), Q (25%), H (30%)",
         "margin": "Zona de silencio en módulos (0–10)",
         "dotsStyle": "Forma de los puntos",
         "dotsColor": "Color hex de los puntos",
         "bgColor": "Color hex del fondo",
-        "cornersSquareStyle": "Estilo del marco de las esquinas (square, rounded, extra-rounded, outpoint, inpoint, classy)",
-        "cornersDotStyle": "Estilo del centro de las esquinas (square, dot, rounded, diamond)",
+        "cornersSquareStyle": "Estilo del marco de las 3 esquinas de posicionamiento",
+        "cornersDotStyle": "Estilo del centro de las esquinas",
         "transparent": "Fondo transparente (solo png/svg)",
-        "frameStyle": "Marco (GET): modern, classic, neon, minimal, elegant, speech-bubble, badge, ticket, scanner-brackets, banner-top",
-        "frameText": "Texto del marco (GET, máx. 30 caracteres)",
-        "frameColor": "Color hex del marco (GET)",
-        "style": "Objeto de estilo completo: dots (con gradient), cornersSquare y cornersDot (con gradient), background (con gradient e image)",
-        "logo": "Logo centrado: dataUri (base64, máx. 500 KB), sizeRatio (0.1–0.35), margin, background",
-        "backgroundImage": "Imagen de fondo (solo POST): style.background.image con dataUri (png/jpeg/webp), opacity y tint. Fuerza corrección de errores H",
-        "frame": "Marco decorativo: style, text, color, textColor y position (bottom/top) opcionales",
-        "effects": "Efectos: invert, glow, opacity"
+        "frameStyle": "Añade un marco decorativo con el estilo indicado",
+        "frameText": "Texto del marco (máx. 30 caracteres)",
+        "frameColor": "Color hex del marco",
+        "frameTextColor": "Color hex del texto del marco; si falta se calcula el contraste automáticamente",
+        "framePosition": "Posición de la banda del marco",
+        "style": "Objeto de estilo completo; expándelo para ver los subcampos",
+        "styleDots": "Forma (style), color hex y gradient opcional de los puntos",
+        "styleCornersSquare": "Estilo, color y gradient del marco de las esquinas; hereda dots.color si falta",
+        "styleCornersDot": "Estilo, color y gradient del centro de las esquinas",
+        "styleBackground": "Fondo: color, transparent, gradient opcional e image (imagen de fondo)",
+        "gradientShape": "Gradiente: type linear o radial, rotation 0–360 y stops con 2–4 paradas de offset 0–1 y color hex",
+        "logo": "Logo centrado sobre el QR; sube ecLevel si el logo es grande",
+        "logoDataUri": "Data URI base64 del logo (png, jpeg, svg o webp, máx. ~500 KB)",
+        "logoSizeRatio": "Tamaño del logo como proporción del ancho del QR (0.1–0.35)",
+        "logoMargin": "Módulos excavados alrededor del logo (0–4)",
+        "logoBackground": "Placa blanca detrás del logo",
+        "backgroundImage": "Imagen de fondo detrás del QR: dataUri (png/jpeg/webp), opacity del velo de contraste y tint de las placas de esquina. Fuerza corrección de errores H",
+        "frame": "Marco decorativo con texto; expándelo para ver los subcampos",
+        "frameStyleSub": "Estilo del marco",
+        "frameTextSub": "Texto del marco (máx. 30 caracteres)",
+        "frameColorSub": "Color hex del marco",
+        "frameTextColorSub": "Color del texto; contraste automático si falta",
+        "framePositionSub": "Banda abajo (bottom) o arriba (top)",
+        "effects": "Efectos globales; expándelo para ver los subcampos",
+        "effectsInvert": "Invierte los colores de puntos y fondo",
+        "effectsGlow": "Halo suave alrededor de los puntos",
+        "effectsOpacity": "Opacidad global de los módulos (0.1–1)"
       }
     },
     "styles": {
@@ -601,16 +659,26 @@
         "body_too_large": "El body supera 1 MB",
         "invalid_json": "El body no es JSON válido",
         "data_too_long": "El contenido no cabe en un QR con ese nivel de corrección",
-        "rate_limited": "Límite de peticiones superado (mira Retry-After)"
+        "rate_limited": "Límite de peticiones superado (mira Retry-After)",
+        "limit_reached": "Alcanzaste el máximo de 100 QR dinámicos por cuenta",
+        "not_found": "El QR dinámico no existe o no pertenece a tu clave"
       }
     },
     "rateLimits": {
-      "body": "Cada clave de API tiene estos límites. Toda respuesta incluye los headers X-RateLimit-Limit, X-RateLimit-Remaining y X-RateLimit-Reset; un 429 añade Retry-After en segundos.",
+      "body": "Cada clave de API tiene estos límites, compartidos por todos los endpoints.",
       "perMinute": "peticiones por minuto",
-      "perDay": "peticiones por día"
+      "perDay": "peticiones por día",
+      "headerMeaning": "Significado",
+      "headers": {
+        "limit": "Límite de la ventana del minuto actual",
+        "remaining": "Peticiones restantes en la ventana",
+        "reset": "Epoch en segundos en que se reinicia la ventana",
+        "retryAfter": "Solo en 429: segundos a esperar antes de reintentar"
+      }
     },
     "tryIt": {
       "body": "Pega tu clave de API y genera un QR real contra esta instancia. La clave no se guarda en ningún sitio.",
+      "tokenSample": "qra_TU_TOKEN",
       "tokenLabel": "Tu clave de API",
       "dataLabel": "Contenido",
       "run": "Generar",
