@@ -25,6 +25,7 @@ interface ResponseMeta {
   status: number;
   limit: string | null;
   remaining: string | null;
+  ms: number;
 }
 
 export function TryIt() {
@@ -53,9 +54,9 @@ export function TryIt() {
 
   const curl = useMemo(() => {
     const base = origin || SITE_URL;
-    const bearer = token.trim() || "qra_TU_TOKEN";
+    const bearer = token.trim() || t("tokenSample");
     return `curl "${base}/api/v1/qr?${query}" \\\n  -H "Authorization: Bearer ${bearer}" \\\n  -o qr.${format === "jpeg" ? "jpg" : format}`;
-  }, [origin, query, token, format]);
+  }, [origin, query, token, format, t]);
 
   async function run(event: React.FormEvent) {
     event.preventDefault();
@@ -63,6 +64,7 @@ export function TryIt() {
     setError(null);
     setMeta(null);
     try {
+      const started = performance.now();
       const response = await fetch(`/api/v1/qr?${query}`, {
         headers: { Authorization: `Bearer ${token.trim()}` },
       });
@@ -70,6 +72,7 @@ export function TryIt() {
         status: response.status,
         limit: response.headers.get("X-RateLimit-Limit"),
         remaining: response.headers.get("X-RateLimit-Remaining"),
+        ms: Math.round(performance.now() - started),
       });
       if (!response.ok) {
         const body = await response.json().catch(() => null);
@@ -218,6 +221,9 @@ export function TryIt() {
                 className={meta.status < 400 ? "text-success" : "text-destructive"}
               >
                 {meta.status}
+              </Badge>
+              <Badge variant="outline" className="text-muted-foreground">
+                {meta.ms} ms
               </Badge>
               {meta.limit && meta.remaining && (
                 <Badge variant="outline" className="text-muted-foreground">

@@ -1,10 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "qrapi:docs-lang";
+const SYNC_EVENT = "qrapi:docs-lang-change";
 
+/**
+ * Tabs de lenguaje sincronizadas: cambiar el lenguaje en un grupo lo cambia
+ * en todos los grupos de la página (CustomEvent) y persiste (localStorage).
+ */
 export function LanguageTabs({
   tabs,
 }: {
@@ -12,17 +17,36 @@ export function LanguageTabs({
   tabs: Array<{ id: string; label: string; content: React.ReactNode }>;
 }) {
   const [active, setActive] = useState(tabs[0].id);
+  const uid = useId();
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored && tabs.some((tab) => tab.id === stored)) setActive(stored);
+    if (stored && stored !== tabs[0].id && tabs.some((tab) => tab.id === stored)) {
+      setActive(stored);
+      // aplicar la pestaña guardada cambia la altura de los paneles y puede
+      // desplazar un deep-link (#ancla) ya resuelto: re-anclar tras el cambio
+      const hash = window.location.hash.slice(1);
+      if (hash) {
+        requestAnimationFrame(() => {
+          document.getElementById(hash)?.scrollIntoView();
+        });
+      }
+    }
+
+    function onSync(event: Event) {
+      const id = (event as CustomEvent<string>).detail;
+      if (tabs.some((tab) => tab.id === id)) setActive(id);
+    }
+    window.addEventListener(SYNC_EVENT, onSync);
+    return () => window.removeEventListener(SYNC_EVENT, onSync);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function select(id: string) {
     setActive(id);
     localStorage.setItem(STORAGE_KEY, id);
+    window.dispatchEvent(new CustomEvent(SYNC_EVENT, { detail: id }));
   }
 
   function onKeyDown(event: React.KeyboardEvent, index: number) {
@@ -44,9 +68,9 @@ export function LanguageTabs({
               tabRefs.current[index] = el;
             }}
             role="tab"
-            id={`tab-${tab.id}`}
+            id={`tab-${uid}-${tab.id}`}
             aria-selected={tab.id === active}
-            aria-controls={`tabpanel-${tab.id}`}
+            aria-controls={`tabpanel-${uid}-${tab.id}`}
             tabIndex={tab.id === active ? 0 : -1}
             onClick={() => select(tab.id)}
             onKeyDown={(event) => onKeyDown(event, index)}
@@ -66,8 +90,8 @@ export function LanguageTabs({
           key={tab.id}
           hidden={tab.id !== active}
           role="tabpanel"
-          id={`tabpanel-${tab.id}`}
-          aria-labelledby={`tab-${tab.id}`}
+          id={`tabpanel-${uid}-${tab.id}`}
+          aria-labelledby={`tab-${uid}-${tab.id}`}
         >
           {tab.content}
         </div>
