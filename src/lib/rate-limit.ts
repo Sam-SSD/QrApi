@@ -6,14 +6,14 @@ export interface RateLimitResult {
   allowed: boolean;
   limit: number;
   remaining: number;
-  /** Epoch en segundos en el que se reinicia la ventana agotada. */
+  /** Epoch in seconds at which the exhausted window resets. */
   resetAt: number;
   retryAfterSeconds?: number;
 }
 
 /**
- * Ventana fija en Postgres con UPSERT atómico. Autocontenido (sin Redis):
- * una única query por ventana, apta para self-hosting con varias instancias.
+ * Fixed window in Postgres with an atomic UPSERT. Self-contained (no Redis):
+ * a single query per window, safe for multi-instance deployments.
  */
 async function bumpWindow(
   apiKeyId: string,
@@ -29,7 +29,9 @@ async function bumpWindow(
   return rows[0]?.count ?? 1;
 }
 
-export async function checkRateLimit(apiKeyId: string): Promise<RateLimitResult> {
+export async function checkRateLimit(
+  apiKeyId: string,
+): Promise<RateLimitResult> {
   const now = new Date();
   const minuteStart = new Date(Math.floor(now.getTime() / 60_000) * 60_000);
   const dayStart = new Date(
@@ -41,7 +43,7 @@ export async function checkRateLimit(apiKeyId: string): Promise<RateLimitResult>
     bumpWindow(apiKeyId, "day", dayStart),
   ]);
 
-  // Limpieza perezosa: ~1 de cada 100 requests borra ventanas viejas
+  // Lazy cleanup: ~1 in 100 requests deletes old windows
   if (Math.random() < 0.01) {
     const cutoff = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
     void prisma.rateLimitWindow

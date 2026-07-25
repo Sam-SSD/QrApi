@@ -21,6 +21,7 @@ model User {
   accounts      Account[]
   apiKeys       ApiKey[]
   qrCodes       QrCode[]
+  dynamicQrs    DynamicQr[]
 
   @@map("user")
 }
@@ -46,7 +47,7 @@ model Account {
   providerId            String // "credential" | "github" | "google"
   userId                String
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  password              String? // hash scrypt — solo providerId = "credential"
+  password              String? // scrypt hash — only for providerId = "credential"
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -73,15 +74,15 @@ model Verification {
   @@map("verification")
 }
 
-// ---------- Dominio QRForge ----------
+// ---------- QrAPI domain ----------
 
 model ApiKey {
   id           String    @id @default(cuid())
   userId       String
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   name         String
-  prefix       String // primeros 12 chars visibles: "qrf_a1B2c3D4"
-  keyHash      String    @unique // SHA-256 hex del token completo
+  prefix       String // first 12 visible chars: "qra_a1B2c3D4"
+  keyHash      String    @unique // SHA-256 hex of the full token
   scopes       String[]  @default(["qr:generate"])
   expiresAt    DateTime?
   lastUsedAt   DateTime?
@@ -105,18 +106,62 @@ enum QrContentType {
 }
 
 model QrCode {
-  id        String        @id @default(cuid())
-  userId    String
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name      String
-  type      QrContentType
-  data      String        @db.Text // payload final codificado
-  config    Json // QrConfig validado por zod (lib/qr/schema.ts)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  id           String        @id @default(cuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  type         QrContentType
+  data         String        @db.Text // final encoded payload
+  config       Json // QrConfig validated with zod (lib/qr/schema.ts)
+  // For dynamic QRs, points to the DynamicQr whose slug encodes this `data`.
+  dynamicQrId  String?       @unique
+  dynamicQr    DynamicQr?    @relation(fields: [dynamicQrId], references: [id], onDelete: SetNull)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
   @@index([userId, createdAt(sort: Desc)])
   @@map("qr_code")
+}
+
+// ---------- Dynamic QRs ----------
+
+model DynamicQr {
+  id           String      @id @default(cuid())
+  slug         String      @unique // short base62; encoded in the QR as /r/{slug}
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title        String
+  targetUrl    String      @db.Text // destination editable without regenerating the QR
+  active       Boolean     @default(true) // pause without deleting
+  expiresAt    DateTime?
+  passwordHash String? // optional
+  scanCount    Int         @default(0) // denormalized counter
+  qrCode       QrCode? // optional 1:1 back-relation
+  scans        ScanEvent[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("dynamic_qr")
+}
+
+model ScanEvent {
+  id          String    @id @default(cuid())
+  dynamicQrId String
+  dynamicQr   DynamicQr @relation(fields: [dynamicQrId], references: [id], onDelete: Cascade)
+  timestamp   DateTime  @default(now())
+  country     String? // ISO-2, country level
+  region      String?
+  deviceType  String? // "mobile" | "tablet" | "desktop" | "bot"
+  os          String?
+  browser     String?
+  referrer    String?
+  ipHash      String? // HMAC-SHA256(ip + daily salt); never the raw IP
+
+  @@index([dynamicQrId, timestamp])
+  @@index([dynamicQrId, country])
+  @@index([dynamicQrId, deviceType])
+  @@map("scan_event")
 }
 
 model RateLimitWindow {

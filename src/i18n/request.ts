@@ -11,5 +11,9 @@ export default getRequestConfig(async ({ requestLocale }) => {
   return {
     locale,
     messages: (await import(`../../messages/${locale}.json`)).default,
+    // Global reference for format.relativeTime: a single instant per
+    // request, inherited by NextIntlClientProvider (avoids the
+    // ENVIRONMENT_FALLBACK fallback and hydration mismatches).
+    now: new Date(),
   };
 });

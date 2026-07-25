@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { routing } from "@/i18n/routing";
+import { SITE_URL } from "@/lib/constants";
 
-const BASE_URL = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
+const BASE_URL = SITE_URL;
 
 const PAGES = ["", "/generator", "/docs/api", "/login", "/register"];
 
@@ -13,7 +14,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: page === "" ? 1 : page === "/generator" ? 0.9 : 0.7,
     alternates: {
       languages: Object.fromEntries(
-        routing.locales.map((locale) => [locale, `${BASE_URL}/${locale}${page}`]),
+        routing.locales.map((locale) => [
+          locale,
+          `${BASE_URL}/${locale}${page}`,
+        ]),
       ),
     },
   }));

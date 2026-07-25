@@ -12,7 +12,9 @@ import {
 import { buildPayload } from "@/lib/qr/payloads";
 import type { QrTemplate } from "@/lib/qr/templates";
 
-// ---------- Campos por tipo ----------
+type QrBgImage = NonNullable<QrConfig["style"]["background"]["image"]>;
+
+// ---------- Fields per type ----------
 
 export interface FieldsMap {
   text: { text: string };
@@ -59,7 +61,7 @@ export const DEFAULT_FIELDS: FieldsMap = {
   crypto: { currency: "bitcoin", address: "", amount: "" },
 };
 
-/** Convierte los campos del formulario en un candidato de payload (sin vacíos). */
+/** Turns the form fields into a payload candidate (empty values dropped). */
 function fieldsToPayloadInput(
   type: QrPayloadType,
   fields: FieldsMap,
@@ -78,13 +80,29 @@ function fieldsToPayloadInput(
   return cleaned;
 }
 
+/**
+ * Inverse of fieldsToPayloadInput: rebuilds the form fields from a saved
+ * payload (to edit an account QR). Fields missing from the payload keep
+ * their default.
+ */
+export function payloadToFields(payload: QrPayload): Partial<FieldsMap> {
+  const { type, ...rest } = payload;
+  const base = structuredClone(DEFAULT_FIELDS[type]) as Record<string, unknown>;
+  for (const [key, value] of Object.entries(rest)) {
+    if (!(key in base)) continue;
+    // crypto.amount is a number in the payload but a string in the form
+    base[key] = typeof value === "number" ? String(value) : value;
+  }
+  return { [type]: base } as Partial<FieldsMap>;
+}
+
 export interface PayloadResult {
-  /** Cadena final a codificar, o null si el formulario está vacío/inválido. */
+  /** Final string to encode, or null when the form is empty/invalid. */
   data: string | null;
   payload: QrPayload | null;
-  /** true si el usuario aún no ha escrito nada significativo. */
+  /** true while the user hasn't typed anything meaningful yet. */
   empty: boolean;
-  /** Errores por campo (clave = nombre de campo). */
+  /** Per-field errors (key = field name). */
   issues: Record<string, string>;
 }
 
@@ -93,7 +111,7 @@ export function computePayload(
   fields: FieldsMap,
 ): PayloadResult {
   const input = fieldsToPayloadInput(type, fields);
-  const empty = Object.keys(input).length <= 1; // solo "type"
+  const empty = Object.keys(input).length <= 1; // only "type"
   if (empty) {
     return { data: null, payload: null, empty: true, issues: {} };
   }
@@ -138,6 +156,9 @@ interface QrEditorState {
   setBgColor: (color: string) => void;
   setBgTransparent: (transparent: boolean) => void;
   setGradient: (gradient: QrGradient | undefined) => void;
+  setBgGradient: (gradient: QrGradient | undefined) => void;
+  setBgImage: (image: QrBgImage | undefined) => void;
+  patchBgImage: (patch: Partial<QrBgImage>) => void;
   setCornersSquare: (
     patch: Partial<QrConfig["style"]["cornersSquare"]>,
   ) => void;
@@ -214,6 +235,49 @@ export const useQrStore = create<QrEditorState>((set) => ({
         },
       },
     })),
+
+  setBgGradient: (gradient) =>
+    set((s) => ({
+      config: {
+        ...s.config,
+        style: {
+          ...s.config.style,
+          background: { ...s.config.style.background, gradient },
+        },
+      },
+    })),
+
+  setBgImage: (image) =>
+    set((s) => ({
+      config: {
+        ...s.config,
+        // When a background image is set, bump to EC=H for maximum
+        // scanability (mirrors the logo auto-bump); the render forces it too.
+        ecLevel: image && s.config.ecLevel !== "H" ? "H" : s.config.ecLevel,
+        style: {
+          ...s.config.style,
+          background: { ...s.config.style.background, image },
+        },
+      },
+    })),
+
+  patchBgImage: (patch) =>
+    set((s) =>
+      s.config.style.background.image
+        ? {
+            config: {
+              ...s.config,
+              style: {
+                ...s.config.style,
+                background: {
+                  ...s.config.style.background,
+                  image: { ...s.config.style.background.image, ...patch },
+                },
+              },
+            },
+          }
+        : s,
+    ),
 
   setCornersSquare: (patch) =>
     set((s) => ({

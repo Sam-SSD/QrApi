@@ -2,13 +2,13 @@ import qrcode from "qrcode";
 import type { QrConfig } from "./schema";
 
 export interface QrMatrix {
-  /** Módulos por lado (sin quiet zone). */
+  /** Modules per side (without quiet zone). */
   size: number;
-  /** true = módulo oscuro. Índice: row * size + col. */
+  /** true = dark module. Index: row * size + col. */
   modules: Uint8Array;
 }
 
-/** Genera la matriz de módulos del QR. Lanza si los datos no caben. */
+/** Generates the QR module matrix. Throws if the data does not fit. */
 export function createMatrix(
   data: string,
   ecLevel: QrConfig["ecLevel"],
@@ -28,8 +28,8 @@ export function isDark(matrix: QrMatrix, row: number, col: number): boolean {
 }
 
 /**
- * Zonas de los tres finder patterns (7×7 en las esquinas).
- * El renderer las dibuja aparte con los estilos de esquina.
+ * Zones of the three finder patterns (7×7 at the corners).
+ * The renderer draws them separately with the corner styles.
  */
 export function isFinderZone(size: number, row: number, col: number): boolean {
   const inTopLeft = row < 7 && col < 7;

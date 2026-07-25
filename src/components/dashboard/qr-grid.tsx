@@ -2,11 +2,12 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useFormatter, useTranslations } from "next-intl";
-import { Copy, Download, QrCode, Trash2 } from "lucide-react";
+import { Copy, Pencil, QrCode, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { QrExportMenu } from "./qr-export-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,16 +19,19 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { renderQrSvg } from "@/lib/qr/render-svg";
-import { exportQr } from "@/lib/qr/export";
 import { qrConfigSchema, type QrConfig } from "@/lib/qr/schema";
-import { deleteQrCode, duplicateQrCode, renameQrCode } from "@/actions/qr-codes";
+import {
+  deleteQrCode,
+  duplicateQrCode,
+  renameQrCode,
+} from "@/actions/qr-codes";
 
 export interface SavedQr {
   id: string;
   name: string;
   type: string;
   data: string;
-  /** { payload, config } tal como se guardó en DB. */
+  /** { payload, config } exactly as stored in the DB. */
   config: { payload?: unknown; config?: unknown };
   createdAt: number;
 }
@@ -60,6 +64,7 @@ function QrCardPreview({ item }: { item: SavedQr }) {
 
 function QrCard({ item }: { item: SavedQr }) {
   const t = useTranslations("dashboard.qr");
+  const tCommon = useTranslations("common");
   const format = useFormatter();
   const [pending, startTransition] = useTransition();
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -81,11 +86,14 @@ function QrCard({ item }: { item: SavedQr }) {
     });
   }
 
-  async function handleDownload() {
+  function getSvg(): string | null {
     const config = parseConfig(item);
-    if (!config) return;
-    const svg = renderQrSvg(item.data, config);
-    await exportQr(svg, "png", { width: 1024, filename: item.name });
+    if (!config) return null;
+    try {
+      return renderQrSvg(item.data, config);
+    } catch {
+      return null;
+    }
   }
 
   return (
@@ -108,16 +116,19 @@ function QrCard({ item }: { item: SavedQr }) {
           {format.relativeTime(item.createdAt)}
         </span>
       </div>
-      <div className="flex items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100 max-lg:opacity-100">
+      <div className="flex items-center gap-1 opacity-0 transition-opacity duration-150 group-focus-within:opacity-100 group-hover:opacity-100 max-lg:opacity-100">
+        <QrExportMenu getSvg={getSvg} filename={item.name} />
         <Button
           type="button"
           variant="ghost"
           size="icon"
           className="size-8"
-          aria-label={t("download")}
-          onClick={handleDownload}
+          aria-label={t("edit")}
+          asChild
         >
-          <Download className="size-4" strokeWidth={1.75} />
+          <Link href={`/generator?edit=${item.id}`}>
+            <Pencil className="size-4" strokeWidth={1.75} />
+          </Link>
         </Button>
         <Button
           type="button"
@@ -156,7 +167,7 @@ function QrCard({ item }: { item: SavedQr }) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel />
+            <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={() =>
@@ -165,7 +176,9 @@ function QrCard({ item }: { item: SavedQr }) {
                   toast.success(t("deleted"));
                 })
               }
-            />
+            >
+              {tCommon("delete")}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

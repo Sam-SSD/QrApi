@@ -9,7 +9,48 @@ import {
 import { useQrStore } from "@/stores/qr-store";
 import { cn } from "@/lib/utils";
 
-/** Miniaturas SVG de cada estilo de puntos (patrón 3×3 ilustrativo). */
+/** Rect with per-corner radius [tl, tr, br, bl] — same path as the engine. */
+function roundedRectThumb(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  [tl, tr, br, bl]: [number, number, number, number],
+): string {
+  return [
+    `M${x + tl},${y}`,
+    `h${w - tl - tr}`,
+    tr ? `a${tr},${tr} 0 0 1 ${tr},${tr}` : "",
+    `v${h - tr - br}`,
+    br ? `a${br},${br} 0 0 1 ${-br},${br}` : "",
+    `h${-(w - br - bl)}`,
+    bl ? `a${bl},${bl} 0 0 1 ${-bl},${-bl}` : "",
+    `v${-(h - bl - tl)}`,
+    tl ? `a${tl},${tl} 0 0 1 ${tl},${-tl}` : "",
+    "z",
+  ]
+    .filter(Boolean)
+    .join("");
+}
+
+/** Star path for the thumbnails. */
+function starThumbPath(
+  cx: number,
+  cy: number,
+  outer: number,
+  inner: number,
+  points: number,
+): string {
+  const coords: string[] = [];
+  for (let i = 0; i < points * 2; i++) {
+    const r = i % 2 === 0 ? outer : inner;
+    const a = (Math.PI / points) * i - Math.PI / 2;
+    coords.push(`${cx + Math.cos(a) * r},${cy + Math.sin(a) * r}`);
+  }
+  return `M${coords.join("L")}z`;
+}
+
+/** SVG thumbnails for each dot style (illustrative 3×3 pattern). */
 function DotStyleThumb({ style }: { style: (typeof DOT_STYLES)[number] }) {
   const cells: Array<[number, number]> = [
     [0, 0],
@@ -42,6 +83,46 @@ function DotStyleThumb({ style }: { style: (typeof DOT_STYLES)[number] }) {
         return (
           <rect key={`${x}-${y}`} x={px} y={py} width={8} height={8} rx={4} />
         );
+      case "vertical-line":
+        return (
+          <rect
+            key={`${x}-${y}`}
+            x={px + 2}
+            y={py}
+            width={4}
+            height={8}
+            rx={2}
+          />
+        );
+      case "horizontal-line":
+        return (
+          <rect
+            key={`${x}-${y}`}
+            x={px}
+            y={py + 2}
+            width={8}
+            height={4}
+            rx={2}
+          />
+        );
+      case "star":
+        return (
+          <path
+            key={`${x}-${y}`}
+            d={starThumbPath(px + 4, py + 4, 4, 1.7, 5)}
+          />
+        );
+      case "plus":
+        return (
+          <path
+            key={`${x}-${y}`}
+            d={`M${px + 2.8},${py}h2.4v2.8h2.8v2.4h-2.8v2.8h-2.4v-2.8h-2.8v-2.4h2.8z`}
+          />
+        );
+      case "diamond":
+        return (
+          <path key={`${x}-${y}`} d={`M${px + 4},${py}l4,4l-4,4l-4,-4z`} />
+        );
     }
   };
   return (
@@ -56,15 +137,22 @@ function CornerSquareThumb({
 }: {
   style: (typeof CORNER_SQUARE_STYLES)[number];
 }) {
-  const rx = style === "square" ? 0 : style === "rounded" ? 6 : 10;
+  // Per-corner radii [tl, tr, br, bl] mirroring each engine style.
+  const radii: Record<
+    (typeof CORNER_SQUARE_STYLES)[number],
+    [number, number, number, number]
+  > = {
+    square: [0, 0, 0, 0],
+    rounded: [6, 6, 6, 6],
+    "extra-rounded": [10, 10, 10, 10],
+    outpoint: [0, 9, 0, 9], // TL y BR en punta
+    inpoint: [9, 0, 9, 0], // TR y BL en punta
+    classy: [0, 7, 0, 7], // one pointed corner, the opposite one rounded
+  };
   return (
     <svg viewBox="0 0 30 30" className="size-7" aria-hidden="true">
-      <rect
-        x={3}
-        y={3}
-        width={24}
-        height={24}
-        rx={rx}
+      <path
+        d={roundedRectThumb(3, 3, 24, 24, radii[style])}
         fill="none"
         stroke="currentColor"
         strokeWidth={4}
@@ -82,6 +170,8 @@ function CornerDotThumb({
     <svg viewBox="0 0 30 30" className="size-7 fill-current" aria-hidden="true">
       {style === "dot" ? (
         <circle cx={15} cy={15} r={8} />
+      ) : style === "diamond" ? (
+        <path d="M15,6 L24,15 L15,24 L6,15 z" />
       ) : (
         <rect
           x={7}
@@ -113,7 +203,11 @@ function StylePicker<T extends string>({
   return (
     <div className="flex flex-col gap-2">
       <span className="text-sm font-medium">{label}</span>
-      <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-1.5">
+      <div
+        role="radiogroup"
+        aria-label={label}
+        className="flex flex-wrap gap-1.5"
+      >
         {options.map((option) => {
           const active = option === value;
           return (

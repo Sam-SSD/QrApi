@@ -54,7 +54,7 @@ function CreateKeyDialog({
 
   function close() {
     onOpenChange(false);
-    // limpiar el token de la memoria del componente al cerrar
+    // clear the token from component memory on close
     setTimeout(() => {
       setToken(null);
       setName("");
@@ -163,6 +163,7 @@ function CreateKeyDialog({
 
 function KeyRow({ row }: { row: ApiKeyRow }) {
   const t = useTranslations("dashboard.keys");
+  const tCommon = useTranslations("common");
   const format = useFormatter();
   const [confirmRevoke, setConfirmRevoke] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -184,7 +185,8 @@ function KeyRow({ row }: { row: ApiKeyRow }) {
       </div>
       <div className="flex flex-col gap-0.5 text-right text-xs text-ink-faint">
         <span>
-          {t("created")}: {format.dateTime(row.createdAt, { dateStyle: "medium" })}
+          {t("created")}:{" "}
+          {format.dateTime(row.createdAt, { dateStyle: "medium" })}
         </span>
         <span>
           {t("lastUsed")}:{" "}
@@ -215,7 +217,7 @@ function KeyRow({ row }: { row: ApiKeyRow }) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel />
+            <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={() =>
@@ -224,7 +226,9 @@ function KeyRow({ row }: { row: ApiKeyRow }) {
                   toast.success(t("revoked"));
                 })
               }
-            />
+            >
+              {t("revoke")}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

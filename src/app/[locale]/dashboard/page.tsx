@@ -13,10 +13,12 @@ export default async function DashboardPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) return null; // el layout ya redirige
+  if (!session) return null; // the layout already redirects
 
   const rows = await prisma.qrCode.findMany({
-    where: { userId: session.user.id },
+    // Dynamic QRs have their own view (dashboard/dynamic); only static ones
+    // here, whose config includes `payload` for the grid preview.
+    where: { userId: session.user.id, dynamicQrId: null },
     orderBy: { createdAt: "desc" },
   });
 

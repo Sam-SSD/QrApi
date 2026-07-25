@@ -1,7 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Logo } from "@/components/brand/logo";
-import { GITHUB_URL } from "@/lib/constants";
 
 export function Footer() {
   const t = useTranslations("footer");
@@ -48,32 +47,12 @@ export function Footer() {
                 {t("apiDocs")}
               </Link>
             </li>
-            <li>
-              <a
-                href={GITHUB_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="transition-colors hover:text-foreground"
-              >
-                {tNav("github")}
-              </a>
-            </li>
-            <li>
-              <a
-                href={`${GITHUB_URL}/blob/main/LICENSE`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="transition-colors hover:text-foreground"
-              >
-                {t("license")}
-              </a>
-            </li>
           </ul>
         </div>
       </div>
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 text-xs text-ink-faint sm:px-6">
-          <span>QRForge · {t("license")}</span>
+          <span>© 2026 QrAPI · {t("rights")}</span>
         </div>
       </div>
     </footer>

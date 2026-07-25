@@ -1,10 +1,10 @@
 "use client";
 
-import { Menu } from "lucide-react";
-import { GithubIcon } from "@/components/brand/github-icon";
+import { LayoutDashboard, LogOut, Menu } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { Link, usePathname } from "@/i18n/navigation";
+import { signOut, useSession } from "@/lib/auth-client";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,8 +18,6 @@ import { ThemeToggle } from "./theme-toggle";
 import { LocaleSwitcher } from "./locale-switcher";
 import { UserMenu } from "./user-menu";
 import { cn } from "@/lib/utils";
-
-import { GITHUB_URL } from "@/lib/constants";
 
 function NavLink({
   href,
@@ -40,7 +38,9 @@ function NavLink({
       onClick={onClick}
       className={cn(
         "text-sm font-medium transition-colors duration-150",
-        active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+        active
+          ? "text-foreground"
+          : "text-muted-foreground hover:text-foreground",
         className,
       )}
     >
@@ -52,6 +52,8 @@ function NavLink({
 export function Header() {
   const t = useTranslations("nav");
   const [open, setOpen] = useState(false);
+  const { data: session, isPending } = useSession();
+  const router = useRouter();
 
   const links = [
     { href: "/generator", label: t("generator") },
@@ -59,10 +61,10 @@ export function Header() {
   ];
 
   return (
-    <header className="glass sticky top-0 z-50 border-x-0 border-t-0">
+    <header className="sticky top-0 z-50 border-x-0 border-t-0 glass">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <div className="flex items-center gap-8">
-          <Link href="/" aria-label="QRForge">
+          <Link href="/" aria-label="QrAPI">
             <Logo />
           </Link>
           <nav className="hidden items-center gap-6 md:flex">
@@ -75,16 +77,6 @@ export function Header() {
         </div>
 
         <div className="hidden items-center gap-1 md:flex">
-          <Button variant="ghost" size="icon" asChild>
-            <a
-              href={GITHUB_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={t("github")}
-            >
-              <GithubIcon className="size-5" />
-            </a>
-          </Button>
           <ThemeToggle />
           <LocaleSwitcher />
           <div className="ml-2">
@@ -118,29 +110,49 @@ export function Header() {
                     {link.label}
                   </NavLink>
                 ))}
-                <a
-                  href={GITHUB_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-base font-medium text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {t("github")}
-                </a>
               </nav>
               <div className="mt-auto flex flex-col gap-2 p-4">
                 <div className="flex justify-start">
                   <LocaleSwitcher />
                 </div>
-                <Button variant="outline" asChild>
-                  <Link href="/login" onClick={() => setOpen(false)}>
-                    {t("login")}
-                  </Link>
-                </Button>
-                <Button asChild>
-                  <Link href="/register" onClick={() => setOpen(false)}>
-                    {t("register")}
-                  </Link>
-                </Button>
+                {isPending ? (
+                  <div className="h-9 animate-pulse rounded-md bg-muted" />
+                ) : session ? (
+                  <>
+                    <Button asChild>
+                      <Link href="/dashboard" onClick={() => setOpen(false)}>
+                        <LayoutDashboard className="size-4" strokeWidth={1.75} />
+                        {t("dashboard")}
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="text-destructive hover:text-destructive"
+                      onClick={async () => {
+                        await signOut();
+                        setOpen(false);
+                        router.push("/");
+                        router.refresh();
+                      }}
+                    >
+                      <LogOut className="size-4" strokeWidth={1.75} />
+                      {t("logout")}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" asChild>
+                      <Link href="/login" onClick={() => setOpen(false)}>
+                        {t("login")}
+                      </Link>
+                    </Button>
+                    <Button asChild>
+                      <Link href="/register" onClick={() => setOpen(false)}>
+                        {t("register")}
+                      </Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </SheetContent>
           </Sheet>

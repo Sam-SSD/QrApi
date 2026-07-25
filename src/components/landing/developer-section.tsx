@@ -4,13 +4,14 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { renderQrSvg } from "@/lib/qr/render-svg";
 import { qrConfigSchema } from "@/lib/qr/schema";
+import { SITE_URL } from "@/lib/constants";
 import { Reveal } from "./reveal";
 
-const CURL_EXAMPLE = `curl "https://tu-dominio.com/api/v1/qr" \\
-  -H "Authorization: Bearer qrf_TU_TOKEN" \\
+const CURL_EXAMPLE = `curl "${SITE_URL}/api/v1/qr" \\
+  -H "Authorization: Bearer qra_TU_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "data": "https://qrforge.dev",
+    "data": "${SITE_URL}",
     "format": "png",
     "size": 512,
     "style": {
@@ -32,7 +33,7 @@ export function DeveloperSection() {
   const t = useTranslations("landing.developer");
 
   const resultSvg = renderQrSvg(
-    "https://qrforge.dev",
+    SITE_URL,
     qrConfigSchema.parse({
       style: {
         dots: {
@@ -54,9 +55,9 @@ export function DeveloperSection() {
   );
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
+    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
       <div className="grid items-center gap-10 lg:grid-cols-[1.2fr_1fr]">
-        <Reveal>
+        <Reveal className="min-w-0">
           <h2 className="text-3xl font-semibold tracking-[-0.02em] text-balance md:text-4xl">
             {t("title")}
           </h2>
@@ -68,14 +69,14 @@ export function DeveloperSection() {
             </Link>
           </Button>
         </Reveal>
-        <Reveal delay={100}>
+        <Reveal delay={100} className="min-w-0">
           <div className="relative">
             <pre className="overflow-x-auto rounded-xl border border-line bg-canvas-subtle p-5 font-mono text-xs leading-relaxed text-muted-foreground shadow-raised">
               <code>{CURL_EXAMPLE}</code>
             </pre>
             <div
               aria-hidden="true"
-              className="absolute -right-4 -bottom-6 w-28 rotate-6 overflow-hidden rounded-lg border border-line shadow-raised md:w-36 [&_svg]:block [&_svg]:h-auto [&_svg]:w-full"
+              className="absolute -right-4 -bottom-6 hidden w-28 rotate-6 overflow-hidden rounded-lg border border-line shadow-raised sm:block md:w-36 [&_svg]:block [&_svg]:h-auto [&_svg]:w-full"
               dangerouslySetInnerHTML={{ __html: resultSvg }}
             />
           </div>

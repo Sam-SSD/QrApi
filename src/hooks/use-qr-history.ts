@@ -13,12 +13,16 @@ export interface HistoryItem {
   config: QrConfig;
 }
 
-const STORAGE_KEY = "qrforge:history";
+const STORAGE_KEY = "qrapi:history";
+// pre-rebrand key: read only when the new one is missing, cleared on persist
+const LEGACY_STORAGE_KEY = "qrforge:history";
 const MAX_ITEMS = 20;
 
 function readHistory(): HistoryItem[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw =
+      localStorage.getItem(STORAGE_KEY) ??
+      localStorage.getItem(LEGACY_STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
@@ -37,13 +41,14 @@ export function useQrHistory() {
   const persist = useCallback((next: HistoryItem[]) => {
     setItems(next);
     try {
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     } catch {
-      // cuota llena: descartar el más antiguo y reintentar una vez
+      // quota full: drop the oldest entries and retry once
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(next.slice(0, 10)));
       } catch {
-        /* sin persistencia */
+        /* no persistence */
       }
     }
   }, []);
@@ -51,7 +56,7 @@ export function useQrHistory() {
   const add = useCallback(
     (item: Omit<HistoryItem, "id" | "createdAt">) => {
       const current = readHistory();
-      // evita duplicados consecutivos del mismo payload+config
+      // avoids consecutive duplicates of the same payload+config
       const fingerprint = JSON.stringify([item.data, item.config]);
       if (
         current[0] &&

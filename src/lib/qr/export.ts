@@ -1,8 +1,8 @@
 import { PDFDocument } from "pdf-lib";
 
 /**
- * Exportación client-side: SVG real, PNG/JPG vía canvas, PDF vía pdf-lib.
- * Todas parten del string SVG del renderer isomorfo.
+ * Client-side export: raw SVG, PNG/JPG via canvas, PDF via pdf-lib.
+ * All start from the isomorphic renderer's SVG string.
  */
 
 export type ExportFormat = "png" | "jpg" | "svg" | "pdf";
@@ -61,7 +61,7 @@ export async function exportQr(
   format: ExportFormat,
   options: { width: number; filename?: string },
 ): Promise<void> {
-  const filename = options.filename ?? "qrforge";
+  const filename = options.filename ?? "qrapi";
 
   switch (format) {
     case "svg": {
@@ -81,7 +81,7 @@ export async function exportQr(
     }
     case "jpg": {
       const canvas = await svgToCanvas(svg, options.width);
-      // JPG no soporta transparencia: fondo blanco
+      // JPG has no transparency: white background
       const ctx = canvas.getContext("2d");
       if (ctx) {
         ctx.globalCompositeOperation = "destination-over";
@@ -100,7 +100,7 @@ export async function exportQr(
       const pngBytes = new Uint8Array(await pngBlob.arrayBuffer());
       const pdf = await PDFDocument.create();
       const image = await pdf.embedPng(pngBytes);
-      // Página A4 en puntos con el QR centrado
+      // A4 page in points with the QR centered
       const pageW = 595.28;
       const pageH = 841.89;
       const maxSide = pageW - 120;
@@ -132,7 +132,5 @@ export async function copyQrToClipboard(
 ): Promise<void> {
   const canvas = await svgToCanvas(svg, width);
   const blob = await canvasToBlob(canvas, "image/png");
-  await navigator.clipboard.write([
-    new ClipboardItem({ "image/png": blob }),
-  ]);
+  await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
 }

@@ -1,11 +1,11 @@
 <div align="center">
 
-# QRForge
+# QrAPI
 
 **Forja códigos QR que no parecen códigos QR.**
 *Forge QR codes that don't look like QR codes.*
 
-Generador de códigos QR open source con editor visual, exportación vectorial real y API REST para developers.
+Generador de códigos QR con editor visual, exportación vectorial real y API REST para developers.
 
 [Español](#español) · [English](#english)
 
@@ -35,8 +35,8 @@ Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · PostgreS
 Requisitos: Node.js 20+, Docker Desktop.
 
 ```bash
-git clone https://github.com/qrforge/qrforge.git
-cd qrforge
+git clone https://github.com/Sam-SSD/QrApi.git
+cd QrApi
 npm install
 
 # 1. Copia las variables de entorno y genera un secret
@@ -64,6 +64,7 @@ npm run dev
 | `DATABASE_URL` | Sí | Conexión Postgres (el compose usa el puerto **5433**) |
 | `BETTER_AUTH_SECRET` | Sí | Secret de sesiones (mín. 32 chars) |
 | `BETTER_AUTH_URL` | Sí | URL pública de la app |
+| `NEXT_PUBLIC_SITE_URL` | No | URL base pública (default `http://localhost:3000`; cambiarla requiere rebuild) |
 | `SMTP_HOST/PORT/USER/PASSWORD/FROM` | Sí (dev: Mailpit) | Envío de emails de verificación |
 | `GITHUB_CLIENT_ID/SECRET` | No | Activa login con GitHub |
 | `GOOGLE_CLIENT_ID/SECRET` | No | Activa login con Google |
@@ -73,7 +74,7 @@ npm run dev
 
 ```bash
 curl "http://localhost:3000/api/v1/qr?data=hola&format=png&size=512&dotsStyle=rounded" \
-  -H "Authorization: Bearer qrf_TU_TOKEN" -o qr.png
+  -H "Authorization: Bearer qra_TU_TOKEN" -o qr.png
 ```
 
 Regístrate, crea tu token en **Panel → Claves API** y consulta la documentación completa en `/es/docs/api` (parámetros, estilos, errores y ejemplos en curl/JavaScript/Python).
@@ -112,8 +113,8 @@ El corazón es un **motor QR SVG isomorfo** (`src/lib/qr/`): `qrcode` aporta sol
 Requirements: Node.js 20+, Docker Desktop.
 
 ```bash
-git clone https://github.com/qrforge/qrforge.git
-cd qrforge
+git clone https://github.com/Sam-SSD/QrApi.git
+cd QrApi
 npm install
 cp .env.example .env   # set BETTER_AUTH_SECRET (32+ chars)
 npm run db:up          # Postgres + Mailpit
@@ -127,7 +128,7 @@ App at http://localhost:3000 — dev verification emails at http://localhost:802
 
 ```bash
 curl "http://localhost:3000/api/v1/qr?data=hello&format=png&size=512&dotsStyle=rounded" \
-  -H "Authorization: Bearer qrf_YOUR_TOKEN" -o qr.png
+  -H "Authorization: Bearer qra_YOUR_TOKEN" -o qr.png
 ```
 
 Sign up, create a token under **Dashboard → API keys**, and read the full documentation at `/en/docs/api`.
@@ -140,4 +141,5 @@ The core is an **isomorphic SVG QR engine** (`src/lib/qr/`): `qrcode` provides o
 
 ## Licencia / License
 
-MIT
+Software propietario · Todos los derechos reservados.
+Proprietary software · All rights reserved.

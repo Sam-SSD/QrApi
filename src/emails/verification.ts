@@ -1,11 +1,11 @@
 export function verificationEmail(params: { name: string; url: string }) {
   const { name, url } = params;
   return {
-    subject: "Verifica tu cuenta de QRForge / Verify your QRForge account",
+    subject: "Verifica tu cuenta de QrAPI / Verify your QrAPI account",
     text: [
       `Hola ${name},`,
       "",
-      "Confirma tu dirección de correo para activar tu cuenta de QRForge:",
+      "Confirma tu dirección de correo para activar tu cuenta de QrAPI:",
       url,
       "",
       "Si no creaste esta cuenta, ignora este mensaje.",
@@ -14,7 +14,7 @@ export function verificationEmail(params: { name: string; url: string }) {
       "",
       `Hi ${name},`,
       "",
-      "Confirm your email address to activate your QRForge account:",
+      "Confirm your email address to activate your QrAPI account:",
       url,
       "",
       "If you didn't create this account, you can ignore this message.",
@@ -29,7 +29,7 @@ export function verificationEmail(params: { name: string; url: string }) {
             <tr>
               <td style="padding-bottom:24px;">
                 <span style="font-size:20px;font-weight:600;color:#f4f4f5;letter-spacing:-0.02em;">
-                  <span style="color:#818cf8;">qr</span>forge
+                  <span style="color:#818cf8;">Qr</span>Api
                 </span>
               </td>
             </tr>

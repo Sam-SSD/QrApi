@@ -11,7 +11,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { useQrStore, computePayload } from "@/stores/qr-store";
+import { useQrStore, computePayload, type QrSnapshot } from "@/stores/qr-store";
 import { renderQrSvg } from "@/lib/qr/render-svg";
 import { useQrHistory } from "@/hooks/use-qr-history";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -20,6 +20,7 @@ import { ContentSection } from "./panel/content-section";
 import { StyleSection } from "./sections/style-section";
 import { ShapeSection } from "./sections/shape-section";
 import { LogoSection } from "./sections/logo-section";
+import { BackgroundImageSection } from "./sections/background-image-section";
 import { FrameSection } from "./sections/frame-section";
 import { AdvancedSection } from "./sections/advanced-section";
 import { QrPreview } from "./preview/qr-preview";
@@ -30,13 +31,37 @@ import { TemplatesGallery } from "./templates-gallery";
 import { HistoryDrawer } from "./history-drawer";
 import { ShortcutsDialog } from "./shortcuts-dialog";
 
-export function QrEditor({ initialTemplateId }: { initialTemplateId?: string }) {
+/** Saved QR being edited from the dashboard. */
+export interface EditingQr {
+  id: string;
+  name: string;
+  dynamic: boolean;
+}
+
+export function QrEditor({
+  initialTemplateId,
+  initialSnapshot,
+  editing,
+}: {
+  initialTemplateId?: string;
+  initialSnapshot?: QrSnapshot;
+  editing?: EditingQr;
+}) {
   const t = useTranslations("editor");
   const type = useQrStore((s) => s.type);
   const fields = useQrStore((s) => s.fields);
   const config = useQrStore((s) => s.config);
   const reset = useQrStore((s) => s.reset);
   const applyTemplate = useQrStore((s) => s.applyTemplate);
+  const loadSnapshot = useQrStore((s) => s.loadSnapshot);
+
+  // Loads the saved QR (edit mode) exactly once.
+  const appliedSnapshot = useRef(false);
+  useEffect(() => {
+    if (appliedSnapshot.current || !initialSnapshot) return;
+    loadSnapshot(initialSnapshot);
+    appliedSnapshot.current = true;
+  }, [initialSnapshot, loadSnapshot]);
 
   const [templatesOpen, setTemplatesOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -45,7 +70,7 @@ export function QrEditor({ initialTemplateId }: { initialTemplateId?: string }) 
   const isMobile = useMediaQuery("(max-width: 1023px)");
   const lastSvgRef = useRef<string | null>(null);
 
-  // Preset inicial vía ?preset= (enlaces desde la landing)
+  // Initial preset via ?preset= (links from the landing page)
   const appliedInitial = useRef(false);
   useEffect(() => {
     if (appliedInitial.current || !initialTemplateId) return;
@@ -78,9 +103,13 @@ export function QrEditor({ initialTemplateId }: { initialTemplateId?: string }) 
     });
   }, [payload.data, type, fields, config, history]);
 
-  // Atajos de teclado
+  // Keyboard shortcuts
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
+      // Some synthetic events (autofill, password managers) arrive without
+      // `key`; without this guard, key.toLowerCase() would throw.
+      if (!event.key) return;
+
       const target = event.target as HTMLElement;
       const typing =
         target.tagName === "INPUT" ||
@@ -96,7 +125,11 @@ export function QrEditor({ initialTemplateId }: { initialTemplateId?: string }) 
       } else if (event.ctrlKey && event.key.toLowerCase() === "h") {
         event.preventDefault();
         setHistoryOpen((v) => !v);
-      } else if (event.ctrlKey && !event.shiftKey && event.key.toLowerCase() === "s") {
+      } else if (
+        event.ctrlKey &&
+        !event.shiftKey &&
+        event.key.toLowerCase() === "s"
+      ) {
         event.preventDefault();
         document.getElementById("qr-download-trigger")?.click();
       }
@@ -118,12 +151,14 @@ export function QrEditor({ initialTemplateId }: { initialTemplateId?: string }) 
       />
       {payload.data && <ScanCheck config={config} />}
       {!payload.empty && Object.keys(payload.issues).length > 0 && (
-        <p className="text-center text-xs text-warning">{t("preview.invalid")}</p>
+        <p className="text-center text-xs text-warning">
+          {t("preview.invalid")}
+        </p>
       )}
       <div id="qr-export-bar" className="flex flex-col gap-2">
         <ExportBar
           getSvg={getSvg}
-          filename={`qrforge-${type}`}
+          filename={`qrapi-${type}`}
           disabled={!payload.data}
           onExported={saveToHistory}
         />
@@ -131,6 +166,7 @@ export function QrEditor({ initialTemplateId }: { initialTemplateId?: string }) 
           payload={payload.payload}
           config={config}
           disabled={!payload.data}
+          editing={editing}
         />
       </div>
     </div>
@@ -181,9 +217,9 @@ export function QrEditor({ initialTemplateId }: { initialTemplateId?: string }) 
           </div>
 
           <div className="grid gap-8 lg:grid-cols-[1fr_minmax(420px,480px)]">
-            {/* En móvil la preview va primero y es sticky */}
+            {/* On mobile the preview goes first and is sticky */}
             {isMobile && (
-              <div className="glass sticky top-16 z-30 -mx-4 rounded-none border-x-0 px-4 py-3 sm:-mx-6 sm:px-6">
+              <div className="sticky top-16 z-30 -mx-4 rounded-none border-x-0 px-4 py-3 glass sm:-mx-6 sm:px-6">
                 <div className="mx-auto max-w-60">
                   <QrPreview
                     data={payload.data}
@@ -202,7 +238,7 @@ export function QrEditor({ initialTemplateId }: { initialTemplateId?: string }) 
 
               <Accordion
                 type="multiple"
-                defaultValue={["style"]}
+                defaultValue={["style", "frame"]}
                 className="rounded-xl border border-line bg-surface px-5"
               >
                 <AccordionItem value="style">
@@ -223,6 +259,14 @@ export function QrEditor({ initialTemplateId }: { initialTemplateId?: string }) 
                     <LogoSection />
                   </AccordionContent>
                 </AccordionItem>
+                <AccordionItem value="backgroundImage">
+                  <AccordionTrigger>
+                    {t("backgroundImage.title")}
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <BackgroundImageSection />
+                  </AccordionContent>
+                </AccordionItem>
                 <AccordionItem value="frame">
                   <AccordionTrigger>{t("frame.title")}</AccordionTrigger>
                   <AccordionContent>
@@ -237,7 +281,7 @@ export function QrEditor({ initialTemplateId }: { initialTemplateId?: string }) 
                 </AccordionItem>
               </Accordion>
 
-              {/* Barra de export en móvil (abajo, siempre visible) */}
+              {/* Export bar on mobile (bottom, always visible) */}
               {isMobile && previewPanel}
             </div>
 

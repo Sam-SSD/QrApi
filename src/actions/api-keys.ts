@@ -35,7 +35,7 @@ export async function createApiKey(name: string) {
   });
 
   revalidatePath("/[locale]/dashboard", "layout");
-  // El token completo solo viaja aquí, una única vez.
+  // The full token travels only here, exactly once.
   return { id: created.id, token, prefix };
 }
 

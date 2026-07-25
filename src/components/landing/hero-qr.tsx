@@ -1,12 +1,12 @@
 import { createMatrix, isDark, isFinderZone } from "@/lib/qr/matrix";
-import { GITHUB_URL } from "@/lib/constants";
+import { SITE_URL } from "@/lib/constants";
 
 /**
- * QR real del hero, renderizado en el servidor módulo a módulo para poder
- * animar la entrada con stagger radial vía CSS (sin JavaScript).
+ * Real hero QR, server-rendered module by module so the entrance can be
+ * animated with a radial stagger via CSS (no JavaScript).
  */
 export function HeroQr() {
-  const matrix = createMatrix(GITHUB_URL, "M");
+  const matrix = createMatrix(SITE_URL, "M");
   const n = matrix.size;
   const center = n / 2;
   const maxDistance = Math.hypot(center, center);

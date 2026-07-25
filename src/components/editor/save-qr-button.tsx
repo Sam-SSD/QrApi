@@ -9,29 +9,37 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { saveQrCode } from "@/actions/qr-codes";
+import { saveQrCode, updateSavedQr } from "@/actions/qr-codes";
+import { createDynamicQr, updateDynamicDesign } from "@/actions/dynamic-qr";
 import type { QrConfig, QrPayload } from "@/lib/qr/schema";
+import type { EditingQr } from "./qr-editor";
 
 export function SaveQrButton({
   payload,
   config,
   disabled,
+  editing,
 }: {
   payload: QrPayload | null;
   config: QrConfig;
   disabled: boolean;
+  /** When present, the button updates this saved QR instead of creating one. */
+  editing?: EditingQr;
 }) {
   const t = useTranslations("dashboard.save");
   const tQr = useTranslations("dashboard.qr");
   const { data: session, isPending } = useSession();
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
+  const [name, setName] = useState(editing?.name ?? "");
+  const [dynamic, setDynamic] = useState(false);
+  const [targetUrl, setTargetUrl] = useState("");
   const [pending, startTransition] = useTransition();
 
   if (isPending) return null;
@@ -49,13 +57,30 @@ export function SaveQrButton({
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
-    if (!payload) return;
+    const title = name.trim() || t("namePlaceholder");
     startTransition(async () => {
       try {
-        await saveQrCode({ name: name.trim() || t("namePlaceholder"), payload, config });
-        toast.success(tQr("saved"));
+        if (editing) {
+          // Edit mode: update the existing record.
+          if (editing.dynamic) {
+            await updateDynamicDesign(editing.id, config);
+          } else {
+            if (!payload) return;
+            await updateSavedQr(editing.id, { name: title, payload, config });
+          }
+        } else if (dynamic) {
+          await createDynamicQr({ title, targetUrl: targetUrl.trim(), config });
+        } else {
+          if (!payload) return;
+          await saveQrCode({ name: title, payload, config });
+        }
+        toast.success(editing ? t("updated") : tQr("saved"));
         setOpen(false);
-        setName("");
+        if (!editing) {
+          setName("");
+          setTargetUrl("");
+          setDynamic(false);
+        }
       } catch (error) {
         toast.error(
           error instanceof Error && error.message === "LIMIT_REACHED"
@@ -66,37 +91,85 @@ export function SaveQrButton({
     });
   }
 
+  // Dynamic mode only needs a valid targetUrl; static needs a payload.
+  const canSubmit = editing
+    ? editing.dynamic || Boolean(payload)
+    : dynamic
+      ? targetUrl.trim().length > 0
+      : Boolean(payload);
+
   return (
     <>
       <Button
         type="button"
         variant="outline"
         className="w-full"
-        disabled={disabled}
+        disabled={disabled && !editing?.dynamic}
         onClick={() => setOpen(true)}
       >
         <Save className="size-4" strokeWidth={1.75} />
-        {t("button")}
+        {editing ? t("editButton") : t("button")}
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>{t("title")}</DialogTitle>
+            <DialogTitle>{editing ? t("editTitle") : t("title")}</DialogTitle>
           </DialogHeader>
           <form onSubmit={submit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="save-qr-name">{t("nameLabel")}</Label>
-              <Input
-                id="save-qr-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder={t("namePlaceholder")}
-                maxLength={80}
-                autoFocus
-              />
-            </div>
-            <Button type="submit" disabled={pending}>
-              {t("submit")}
+            {/* Dynamic QR names are managed in the dashboard; only design here. */}
+            {!editing?.dynamic && (
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="save-qr-name">{t("nameLabel")}</Label>
+                <Input
+                  id="save-qr-name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={t("namePlaceholder")}
+                  maxLength={80}
+                  autoFocus
+                />
+              </div>
+            )}
+
+            {/* Static vs dynamic: create-time only (the mode is not editable) */}
+            {!editing && (
+              <div className="flex items-start justify-between gap-3 rounded-lg border border-line bg-canvas-subtle p-3">
+                <div className="flex flex-col gap-0.5">
+                  <Label htmlFor="save-qr-dynamic">{t("dynamicLabel")}</Label>
+                  <span className="text-xs text-muted-foreground">
+                    {t("dynamicHint")}
+                  </span>
+                </div>
+                <Switch
+                  id="save-qr-dynamic"
+                  checked={dynamic}
+                  onCheckedChange={setDynamic}
+                />
+              </div>
+            )}
+
+            {!editing && dynamic && (
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="save-qr-target">{t("targetUrlLabel")}</Label>
+                <Input
+                  id="save-qr-target"
+                  type="url"
+                  inputMode="url"
+                  value={targetUrl}
+                  onChange={(e) => setTargetUrl(e.target.value)}
+                  placeholder="https://ejemplo.com"
+                />
+              </div>
+            )}
+
+            {editing?.dynamic && (
+              <p className="text-sm text-muted-foreground">
+                {t("editDynamicHint")}
+              </p>
+            )}
+
+            <Button type="submit" disabled={pending || !canSubmit}>
+              {editing ? t("editSubmit") : t("submit")}
             </Button>
           </form>
         </DialogContent>

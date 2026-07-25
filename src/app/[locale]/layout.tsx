@@ -9,6 +9,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { SITE_URL } from "@/lib/constants";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -34,10 +35,10 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "common" });
 
   return {
-    metadataBase: new URL(process.env.BETTER_AUTH_URL ?? "http://localhost:3000"),
+    metadataBase: new URL(SITE_URL),
     title: {
-      default: `QRForge — ${t("tagline")}`,
-      template: "%s | QRForge",
+      default: `QrAPI — ${t("tagline")}`,
+      template: "%s | QrAPI",
     },
     description: t("tagline"),
     alternates: {

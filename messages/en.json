@@ -1,7 +1,7 @@
 {
   "common": {
-    "appName": "QRForge",
-    "tagline": "Forge QR codes that don't look like QR codes.",
+    "appName": "QrAPI",
+    "tagline": "Designed to stand out. Built to last.",
     "loading": "Loading…",
     "save": "Save",
     "cancel": "Cancel",
@@ -23,69 +23,68 @@
     "login": "Sign in",
     "register": "Sign up",
     "logout": "Sign out",
-    "github": "GitHub",
     "toggleTheme": "Toggle theme",
     "toggleLocale": "Change language",
     "openMenu": "Open menu"
   },
   "footer": {
-    "description": "Open source QR code generator with a visual editor and a developer API.",
+    "description": "Permanent QR codes with a visual editor and a developer API.",
     "product": "Product",
     "developers": "Developers",
     "apiDocs": "API documentation",
-    "selfHost": "Self-hosting",
-    "license": "MIT License",
+    "rights": "All rights reserved",
     "language": "Language",
     "theme": "Theme"
   },
   "landing": {
-    "badge": "Open source · MIT",
-    "heroTitle": "Forge QR codes that don't look like QR codes.",
-    "heroSubtitle": "Visual editor with gradients, logos and frames. Vector export. Developer API. Free and open source.",
-    "ctaPrimary": "Create a free QR",
+    "badge": "Dynamic QRs with analytics",
+    "heroTitle": "Designed to stand out. Built to last.",
+    "heroSubtitle": "Create QR codes with an identity of their own that stay active forever: a visual editor with gradients, logos and frames, vector export and a REST API to integrate them into your product. No expirations, no watermarks.",
+    "ctaPrimary": "Create your QR for free",
     "ctaSecondary": "Explore the API",
     "features": {
-      "title": "Everything you need, for free",
-      "subtitle": "The features others hide behind a paywall are free here, forever.",
+      "title": "Everything you need, no fine print",
+      "subtitle": "Professional-grade tools and codes that stay active, available from day one.",
       "customization": {
         "title": "Full customization",
         "description": "5 dot styles, configurable corners, linear and radial gradients, frames with text and your logo in the center."
       },
       "types": {
         "title": "8 content types",
-        "description": "URL, text, email, phone, SMS, WiFi, vCard and crypto — with dedicated forms that generate the correct standard format."
+        "description": "URL, text, email, phone, SMS, WiFi, vCard and crypto, each with a dedicated form that produces the correct standard format."
       },
       "vector": {
         "title": "True vector export",
-        "description": "Pure scalable SVG, PNG and JPG up to 4096 px, and print-ready PDF."
+        "description": "Pure scalable SVG, PNG and JPG up to 4096 px, and press-quality PDF."
       },
       "history": {
         "title": "History and templates",
-        "description": "Your latest QRs saved in the browser, ready-made templates and your personal library with a free account."
+        "description": "Your latest designs saved in the browser, ready-made templates and a personal library with your free account."
       },
       "api": {
         "title": "REST API for developers",
-        "description": "Generate styled QRs from your code with one HTTP request. Sign up, create your token and go."
+        "description": "Generate styled QR codes from your application with a single HTTP request. Token authentication and consistent responses."
       },
       "privacy": {
-        "title": "100% private",
-        "description": "The editor generates everything in your browser: your data never leaves your machine. Self-host in 5 minutes with Docker."
+        "title": "Private by design",
+        "description": "The editor generates everything in your browser: your data never leaves your machine. No telemetry, no trackers."
       }
     },
     "showcase": {
       "title": "A QR for every brand",
-      "subtitle": "Click any example to open it in the editor."
+      "subtitle": "Explore the examples and open them directly in the editor.",
+      "useTemplate": "Use the {name} template"
     },
     "developer": {
       "title": "One endpoint. Any style.",
       "subtitle": "Authenticate with your token and get PNG, SVG or JPEG with every editor style. Generous rate limits and clear JSON errors.",
       "cta": "Read the docs"
     },
-    "openSource": {
-      "title": "Truly open source",
-      "subtitle": "MIT licensed, no telemetry, self-hosted in 5 minutes with Docker Compose. If it helps you, leave a star.",
-      "cta": "View on GitHub",
-      "selfHost": "docker compose up -d && npm run dev"
+    "finalCta": {
+      "title": "Design today. Scan forever.",
+      "subtitle": "Design it in the editor or generate it from your code with the API. No expirations, no watermarks, print-ready.",
+      "ctaPrimary": "Start designing",
+      "ctaSecondary": "Explore the API"
     }
   },
   "auth": {
@@ -177,12 +176,17 @@
       "bgColor": "Background color",
       "transparentBg": "Transparent background",
       "useGradient": "Gradient",
-      "gradientEnd": "End color",
+      "stops": "Color stops",
+      "stopLabel": "Color {index}",
+      "addStop": "Add color",
+      "removeStop": "Remove color {index}",
       "gradientType": "Type",
       "gradientLinear": "Linear",
       "gradientRadial": "Radial",
       "gradientAngle": "Angle",
-      "presets": "Presets"
+      "presets": "Presets",
+      "useBgGradient": "Background gradient",
+      "bgGradientPresets": "Background presets"
     },
     "shape": {
       "title": "Shape",
@@ -192,7 +196,12 @@
         "dots": "Dots",
         "rounded": "Rounded",
         "classy": "Classy",
-        "extra-rounded": "Extra rounded"
+        "extra-rounded": "Extra rounded",
+        "vertical-line": "Vertical line",
+        "horizontal-line": "Horizontal line",
+        "star": "Star",
+        "plus": "Plus",
+        "diamond": "Diamond"
       },
       "cornerSquareStyle": "Corner frames",
       "cornerDotStyle": "Corner centers",
@@ -200,7 +209,11 @@
         "square": "Square",
         "rounded": "Rounded",
         "extra-rounded": "Extra rounded",
-        "dot": "Circle"
+        "dot": "Circle",
+        "outpoint": "Outer point",
+        "inpoint": "Inner point",
+        "classy": "Classy",
+        "diamond": "Diamond"
       }
     },
     "logo": {
@@ -215,20 +228,43 @@
       "tooBig": "Image exceeds 500 KB",
       "eccHint": "With a logo, high error correction (H) is recommended"
     },
+    "backgroundImage": {
+      "title": "Background image",
+      "upload": "Upload image",
+      "change": "Change image",
+      "remove": "Remove image",
+      "opacity": "Dimming",
+      "dropHint": "PNG, JPG or WEBP · max 500 KB",
+      "tooBig": "Image exceeds 500 KB",
+      "ecWarning": "Maximum error correction (H) is enforced so the QR stays scannable"
+    },
     "frame": {
       "title": "Frame",
       "enable": "Add frame",
       "style": "Style",
       "styles": {
+        "none": "None",
         "modern": "Modern",
         "classic": "Classic",
         "neon": "Neon",
         "minimal": "Minimal",
-        "elegant": "Elegant"
+        "elegant": "Elegant",
+        "speech-bubble": "Speech bubble",
+        "badge": "Badge",
+        "ticket": "Coupon",
+        "scanner-brackets": "Scanner",
+        "banner-top": "Top banner"
       },
       "text": "Frame text",
       "textPlaceholder": "SCAN ME",
-      "color": "Frame color"
+      "color": "Frame color",
+      "textColor": "Text color",
+      "autoContrast": "Automatic text color",
+      "position": "Text position",
+      "positions": {
+        "bottom": "Bottom",
+        "top": "Top"
+      }
     },
     "advanced": {
       "title": "Advanced",
@@ -271,13 +307,34 @@
       "title": "Templates",
       "subtitle": "Ready-made starting points to customize",
       "apply": "Use template",
+      "categories": {
+        "brand": "Identity",
+        "dark": "Dark mode",
+        "business": "Business",
+        "marketing": "Marketing",
+        "industry": "By industry"
+      },
       "names": {
+        "qrapi": "Brand",
+        "aurora": "Aurora",
+        "sticker": "Transparent sticker",
+        "neon": "Neon",
+        "midnight": "Midnight",
         "business": "Business card",
         "wifi": "Guest WiFi",
         "social": "Social profile",
         "payment": "Crypto payment",
         "event": "Event",
-        "email": "Email contact"
+        "sunset": "Sunset promo",
+        "email": "Email contact",
+        "photo": "Photo background",
+        "prisma": "Prism",
+        "restaurant": "Restaurant",
+        "eventpass": "Event pass",
+        "realestate": "Real estate",
+        "retail": "Retail",
+        "hotel": "Hotel",
+        "gym": "Gym"
       }
     },
     "history": {
@@ -303,8 +360,50 @@
     "greeting": "Hello, {name}",
     "tabs": {
       "qrCodes": "My QRs",
+      "dynamic": "Dynamic",
       "apiKeys": "API keys",
       "settings": "Account"
+    },
+    "dynamic": {
+      "empty": "No dynamic QRs yet",
+      "emptyHint": "Create one from the generator by enabling the dynamic QR option when saving",
+      "emptyCta": "Go to generator",
+      "activeLabel": "Active",
+      "paused": "QR paused",
+      "resumed": "QR resumed",
+      "linkCopied": "Link copied",
+      "scanCount": "{count} scans",
+      "targetLabel": "Destination URL (editable without reprinting)",
+      "targetUpdated": "Destination updated",
+      "targetInvalid": "Invalid URL",
+      "analytics": "Analytics",
+      "download": "Download QR",
+      "edit": "Edit design",
+      "deleteTitle": "Delete dynamic QR",
+      "deleteDescription": "{name} and its entire scan history will be deleted. The printed code will stop working.",
+      "deleted": "Dynamic QR deleted",
+      "back": "Back to dynamic QRs",
+      "statusActive": "Active",
+      "statusPaused": "Paused",
+      "totalScans": "Total scans",
+      "scansLastDays": "Scans in {days} days",
+      "chartTitle": "Scans per day (last {days} days)",
+      "byCountry": "By country",
+      "byDevice": "By device",
+      "unknown": "Unknown",
+      "rangeLabel": "Date range",
+      "rangeDays": "{days} days",
+      "exportCsv": "Export CSV",
+      "passwordTitle": "Scan password",
+      "passwordHint": "Optional: whoever scans the code will have to enter a password before being redirected",
+      "passwordActiveHint": "This QR is protected: scans ask for a password before redirecting",
+      "passwordLabel": "Password (min. 4 characters)",
+      "passwordChangeLabel": "New password",
+      "passwordSet": "Save",
+      "passwordRemove": "Remove protection",
+      "passwordSaved": "Password saved",
+      "passwordRemoved": "Protection removed",
+      "passwordTooShort": "Password must be at least 4 characters"
     },
     "settings": {
       "passwordTitle": "Change password",
@@ -328,6 +427,7 @@
       "emptyHint": "Create one in the generator and save it to your account",
       "emptyCta": "Create my first QR",
       "download": "Download PNG",
+      "edit": "Edit in generator",
       "duplicate": "Duplicate",
       "openInEditor": "Open in editor",
       "deleteTitle": "Delete this QR?",
@@ -338,13 +438,28 @@
       "saved": "QR saved to your account",
       "limitReached": "You have reached the limit of 100 saved QRs"
     },
+    "export": {
+      "download": "Download or copy",
+      "downloaded": "Downloaded as {format}",
+      "copied": "Image copied to clipboard",
+      "copyImage": "Copy image",
+      "failed": "Export failed"
+    },
     "save": {
       "button": "Save",
       "title": "Save to your account",
       "nameLabel": "Name",
       "namePlaceholder": "My QR",
       "submit": "Save QR",
-      "loginRequired": "Sign in to save your QRs"
+      "editButton": "Save changes",
+      "editTitle": "Update this QR",
+      "editSubmit": "Update",
+      "updated": "Changes saved",
+      "editDynamicHint": "The design will be updated; the dynamic QR link and destination stay the same.",
+      "loginRequired": "Sign in to save your QRs",
+      "dynamicLabel": "Dynamic QR",
+      "dynamicHint": "Change the destination without reprinting the code and see scan analytics",
+      "targetUrlLabel": "Destination URL"
     },
     "migrate": {
       "title": "You have {count} guest QRs in this browser",
@@ -383,19 +498,76 @@
   "docs": {
     "title": "API documentation",
     "subtitle": "Generate styled QR codes from your code with one HTTP request.",
+    "anchor": "Direct link to this section",
+    "code": {
+      "token": "qra_YOUR_TOKEN",
+      "exampleUrl": "https://example.com",
+      "campaign": "Campaign",
+      "promoUrl": "https://example.com/promo",
+      "newTargetUrl": "https://example.com/new-destination",
+      "wifiSsid": "MyNetwork",
+      "wifiPassword": "pass1234",
+      "wifiText": "FREE WIFI",
+      "postDataComment": "\"data\" takes raw content; use \"payload\" for structured types",
+      "dynStep1": "1) Create the dynamic QR",
+      "dynStep2": "2) Get the image: encode redirectUrl with the generation endpoint",
+      "dynStep2Js": "2) created.redirectUrl is what you encode in the image",
+      "dynStep3": "3) Change the destination later, without reprinting the code"
+    },
     "nav": {
       "intro": "Introduction",
+      "quickstart": "Quickstart",
       "auth": "Authentication",
       "generate": "Generate a QR",
       "params": "Parameters",
       "styles": "Styles",
+      "dynamic": "Dynamic QRs",
       "errors": "Errors",
       "rateLimits": "Rate limits",
-      "tryIt": "Try it"
+      "tryIt": "Try it",
+      "sub": {
+        "generate-get": "GET — simple",
+        "generate-post": "POST — full",
+        "generate-response": "The response",
+        "params-get": "GET query",
+        "params-post": "POST body",
+        "dynamic-endpoints": "Endpoints",
+        "dynamic-example": "Full flow",
+        "dynamic-responses": "Responses"
+      }
+    },
+    "dynamic": {
+      "body": "A dynamic QR encodes a short redirect URL of your own whose destination you can change at any time without regenerating or reprinting the code. Every scan is recorded with country and device type for analytics. Full management via API with your same key.",
+      "endpointsTitle": "Endpoints",
+      "exampleTitle": "Full flow",
+      "responsesTitle": "Responses",
+      "createResponseLabel": "201 · POST /api/v1/dynamic",
+      "detailResponseLabel": "200 · GET /api/v1/dynamic/:id",
+      "colEndpoint": "Endpoint",
+      "colDescription": "Description",
+      "rows": {
+        "create": "Creates a dynamic QR with a title and target URL; responds 201 with id, slug and redirectUrl",
+        "list": "Lists your dynamic QRs with their scan counts",
+        "get": "Detail of one, with aggregated analytics by country and device",
+        "patch": "Edits targetUrl and/or active (pause) without regenerating the code",
+        "delete": "Deletes the dynamic QR and its scan history"
+      },
+      "note": "The QR image is obtained from the generation endpoint by encoding the redirectUrl. Targets must be http(s)."
     },
     "intro": {
-      "body": "The QRForge API exposes a single endpoint that generates QR codes with every editor style: gradients, dot shapes, custom corners, logos and frames. It returns the image directly (PNG, SVG or JPEG), ready to use.",
-      "baseUrl": "Base URL"
+      "body": "The QrAPI API generates QR codes with every editor style — gradients, dot shapes, custom corners, logos, background image and frames — and returns the image directly (PNG, SVG or JPEG), ready to use. It also manages dynamic QRs with analytics.",
+      "baseUrl": "Base URL",
+      "qrEndpoint": "QR image generation",
+      "dynamicEndpoint": "Dynamic QRs & analytics"
+    },
+    "quickstart": {
+      "body": "From zero to your first QR in under a minute.",
+      "step1Title": "Create your API key",
+      "step1Body": "Sign up for free, go to Dashboard → API keys and generate a key. Copy it: it is shown only once.",
+      "step2Title": "Make your first request",
+      "step2Body": "Call GET /api/v1/qr with your key in the Authorization header and your content in the data parameter.",
+      "step3Title": "Save the image",
+      "step3Body": "The response is the image itself. Pick png, svg or jpeg with the format parameter and the size with size."
     },
     "auth": {
       "body": "Every request requires an API key in the Authorization header. Create yours for free from the dashboard: sign up, go to API keys and generate one. The full key is shown only once.",
@@ -403,35 +575,64 @@
       "warning": "Treat your key like a password: don't commit it to repositories or use it from the browser in production."
     },
     "generate": {
-      "getTitle": "GET — simple case",
+      "getTitle": "Simple case",
       "getBody": "For basic QRs, pass parameters in the query string. Great for quick testing.",
-      "postTitle": "POST — full control",
-      "postBody": "For gradients, custom corners, logos and frames, send a JSON body. You can pass `data` (raw text) or `payload` (a typed object that builds the standard format for you: WiFi, vCard, email…)."
+      "postTitle": "Full control",
+      "postBody": "For gradients, custom corners, logos, background image and frames, send a JSON body. You can pass `data` (raw text) or `payload` (a typed object that builds the standard format for you: WiFi, vCard, email…).",
+      "responseTitle": "The response",
+      "responseBody": "The endpoint returns the image directly in the body, with no JSON envelope. Every response includes the rate limit headers; a 429 adds Retry-After in seconds."
     },
     "params": {
       "getTitle": "GET parameters (query string)",
       "postTitle": "POST body (JSON)",
+      "postNote": "The body must include exactly one of data or payload. Rows typed object expand to show their subfields.",
       "name": "Parameter",
       "type": "Type",
       "default": "Default",
       "description": "Description",
+      "required": "required",
+      "toggle": "Show subfields",
       "rows": {
         "data": "Content to encode (max 2953 characters)",
-        "payload": "Typed object alternative to data, with type: wifi | vcard | email | url | text | phone | sms | crypto, plus each type's fields",
-        "format": "Output format: png, svg or jpeg",
+        "payload": "Typed object alternative to data: it builds the standard format for you (WiFi, vCard, email…)",
+        "payloadType": "Payload type; each type adds its own fields (ssid, phone, address…)",
+        "format": "Output format",
         "size": "Width in pixels (64–2048). Ignored for svg",
         "ecLevel": "Error correction: L (7%), M (15%), Q (25%), H (30%)",
         "margin": "Quiet zone in modules (0–10)",
         "dotsStyle": "Dot shape",
         "dotsColor": "Dot hex color",
         "bgColor": "Background hex color",
-        "cornersSquareStyle": "Corner frame style",
+        "cornersSquareStyle": "Style of the 3 positioning corner frames",
         "cornersDotStyle": "Corner center style",
         "transparent": "Transparent background (png/svg only)",
-        "style": "Full style object: dots (with gradient), cornersSquare, cornersDot, background",
-        "logo": "Centered logo: dataUri (base64, max 500 KB), sizeRatio (0.1–0.35), margin, background",
-        "frame": "Decorative frame: style, text, color, optional textColor",
-        "effects": "Effects: invert, glow, opacity"
+        "frameStyle": "Adds a decorative frame with the given style",
+        "frameText": "Frame text (max 30 characters)",
+        "frameColor": "Frame hex color",
+        "frameTextColor": "Frame text hex color; contrast is computed automatically when omitted",
+        "framePosition": "Position of the frame band",
+        "style": "Full style object; expand it to see the subfields",
+        "styleDots": "Shape (style), hex color and optional gradient of the dots",
+        "styleCornersSquare": "Style, color and gradient of the corner frames; inherits dots.color when omitted",
+        "styleCornersDot": "Style, color and gradient of the corner centers",
+        "styleBackground": "Background: color, transparent, optional gradient and image (background image)",
+        "gradientShape": "Gradient: type linear or radial, rotation 0–360 and stops with 2–4 entries of offset 0–1 and hex color",
+        "logo": "Logo centered over the QR; raise ecLevel for large logos",
+        "logoDataUri": "Base64 data URI of the logo (png, jpeg, svg or webp, max ~500 KB)",
+        "logoSizeRatio": "Logo size as a ratio of the QR width (0.1–0.35)",
+        "logoMargin": "Modules excavated around the logo (0–4)",
+        "logoBackground": "White plate behind the logo",
+        "backgroundImage": "Background image behind the QR: dataUri (png/jpeg/webp), contrast scrim opacity and corner plate tint. Forces error correction H",
+        "frame": "Decorative frame with text; expand it to see the subfields",
+        "frameStyleSub": "Frame style",
+        "frameTextSub": "Frame text (max 30 characters)",
+        "frameColorSub": "Frame hex color",
+        "frameTextColorSub": "Text color; automatic contrast when omitted",
+        "framePositionSub": "Band at the bottom or the top",
+        "effects": "Global effects; expand it to see the subfields",
+        "effectsInvert": "Inverts dot and background colors",
+        "effectsGlow": "Soft glow around the dots",
+        "effectsOpacity": "Global module opacity (0.1–1)"
       }
     },
     "styles": {
@@ -456,21 +657,38 @@
         "body_too_large": "Body exceeds 1 MB",
         "invalid_json": "Body is not valid JSON",
         "data_too_long": "The content does not fit in a QR at that correction level",
-        "rate_limited": "Rate limit exceeded (check Retry-After)"
+        "rate_limited": "Rate limit exceeded (check Retry-After)",
+        "limit_reached": "You reached the maximum of 100 dynamic QRs per account",
+        "not_found": "The dynamic QR does not exist or does not belong to your key"
       }
     },
     "rateLimits": {
-      "body": "Each API key has these limits. Every response includes the X-RateLimit-Limit, X-RateLimit-Remaining and X-RateLimit-Reset headers; a 429 adds Retry-After in seconds.",
+      "body": "Each API key has these limits, shared across all endpoints.",
       "perMinute": "requests per minute",
-      "perDay": "requests per day"
+      "perDay": "requests per day",
+      "headerMeaning": "Meaning",
+      "headers": {
+        "limit": "Limit of the current minute window",
+        "remaining": "Requests left in the window",
+        "reset": "Epoch in seconds when the window resets",
+        "retryAfter": "429 only: seconds to wait before retrying"
+      }
     },
     "tryIt": {
       "body": "Paste your API key and generate a real QR against this instance. The key is never stored anywhere.",
+      "tokenSample": "qra_YOUR_TOKEN",
       "tokenLabel": "Your API key",
       "dataLabel": "Content",
       "run": "Generate",
       "running": "Generating…",
-      "error": "The request failed"
+      "error": "The request failed",
+      "formatLabel": "Format",
+      "sizeLabel": "Size",
+      "styleLabel": "Dots",
+      "ecLabel": "Error correction",
+      "request": "Equivalent request",
+      "placeholder": "Your QR will appear here",
+      "quota": "{remaining} of {limit} left"
     }
   },
   "notFound": {

@@ -7,7 +7,7 @@ import { HeroQr } from "@/components/landing/hero-qr";
 import { FeatureGrid } from "@/components/landing/feature-grid";
 import { ShowcaseStrip } from "@/components/landing/showcase-strip";
 import { DeveloperSection } from "@/components/landing/developer-section";
-import { OpenSourceCta } from "@/components/landing/open-source-cta";
+import { FinalCta } from "@/components/landing/final-cta";
 
 export default async function HomePage({
   params,
@@ -22,7 +22,7 @@ export default async function HomePage({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "QRForge",
+    name: "QrAPI",
     applicationCategory: "DesignApplication",
     operatingSystem: "Web",
     description: t("heroSubtitle"),
@@ -42,25 +42,30 @@ export default async function HomePage({
       />
 
       {/* Hero */}
-      <section className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 md:py-28 lg:grid-cols-[1.15fr_1fr]">
+      <section className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 sm:py-20 md:py-28 lg:grid-cols-[1.15fr_1fr] lg:gap-12">
         <div className="flex flex-col items-start gap-6">
           <Badge variant="outline" className="gap-1.5 text-muted-foreground">
             {t("badge")}
           </Badge>
-          <h1 className="max-w-2xl text-4xl font-semibold tracking-[-0.03em] text-balance md:text-6xl">
+          <h1 className="max-w-2xl text-4xl font-semibold tracking-[-0.03em] text-balance sm:text-5xl md:text-6xl">
             {t("heroTitle")}
           </h1>
-          <p className="max-w-xl text-lg text-muted-foreground text-balance">
+          <p className="max-w-xl text-lg text-balance text-muted-foreground">
             {t("heroSubtitle")}
           </p>
-          <div className="flex flex-wrap items-center gap-3">
-            <Button size="lg" asChild>
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+            <Button size="lg" className="w-full sm:w-auto" asChild>
               <Link href="/generator">
                 {t("ctaPrimary")}
                 <ArrowRight strokeWidth={1.75} />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" asChild>
+            <Button
+              size="lg"
+              variant="outline"
+              className="w-full sm:w-auto"
+              asChild
+            >
               <Link href="/docs/api">
                 <Braces strokeWidth={1.75} />
                 {t("ctaSecondary")}
@@ -78,7 +83,7 @@ export default async function HomePage({
       <FeatureGrid />
       <ShowcaseStrip />
       <DeveloperSection />
-      <OpenSourceCta />
+      <FinalCta />
     </>
   );
 }

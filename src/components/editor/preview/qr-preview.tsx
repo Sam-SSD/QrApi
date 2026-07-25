@@ -4,49 +4,37 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { AnimatePresence, m } from "motion/react";
 import { renderQrSvg } from "@/lib/qr/render-svg";
-import type { QrConfig } from "@/lib/qr/schema";
+import { qrConfigSchema, type QrConfig } from "@/lib/qr/schema";
+import { SITE_URL } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-/** QR fantasma para el estado vacío. */
+/**
+ * Ghost QR for the empty state. Generated once from the real engine
+ * (well-formed QR matrix) instead of drawing cells by hand, and dimmed via
+ * container opacity. Fixed muted colors because `hexColor` does not accept
+ * `currentColor` (tokens can't theme inside the SVG).
+ */
+const GHOST_SVG = renderQrSvg(
+  SITE_URL,
+  qrConfigSchema.parse({
+    ecLevel: "M",
+    margin: 1,
+    style: {
+      dots: { style: "rounded", color: "#c7c9d1" },
+      cornersSquare: { style: "extra-rounded", color: "#c7c9d1" },
+      cornersDot: { style: "dot", color: "#c7c9d1" },
+      background: { transparent: true },
+    },
+  }),
+);
+
 function GhostQr() {
-  const cells: Array<[number, number]> = [
-    [9, 1], [11, 1], [14, 1], [9, 3], [10, 4], [12, 4], [14, 3],
-    [1, 9], [3, 10], [4, 12], [2, 13], [5, 9], [6, 11], [1, 15],
-    [9, 9], [11, 10], [13, 12], [10, 13], [14, 14], [12, 15], [9, 15],
-    [15, 9], [16, 11], [15, 13], [11, 7], [13, 6], [7, 11], [7, 14],
-  ];
   return (
-    <svg viewBox="0 0 18 18" className="size-full" aria-hidden="true">
-      {[
-        [0, 0],
-        [11, 0],
-        [0, 11],
-      ].map(([x, y]) => (
-        <g key={`${x}-${y}`} className="fill-brand-soft stroke-primary/30">
-          <rect
-            x={x + 0.4}
-            y={y + 0.4}
-            width={6.2}
-            height={6.2}
-            rx={1.6}
-            fill="none"
-            strokeWidth={0.8}
-          />
-          <rect x={x + 2.2} y={y + 2.2} width={2.6} height={2.6} rx={0.7} />
-        </g>
-      ))}
-      {cells.map(([x, y]) => (
-        <rect
-          key={`${x}.${y}`}
-          x={x}
-          y={y}
-          width={1}
-          height={1}
-          rx={0.25}
-          className="fill-line"
-        />
-      ))}
-    </svg>
+    <div
+      aria-hidden="true"
+      className="size-full opacity-40 [&_svg]:block [&_svg]:h-auto [&_svg]:w-full"
+      dangerouslySetInnerHTML={{ __html: GHOST_SVG }}
+    />
   );
 }
 
@@ -55,7 +43,7 @@ export interface QrPreviewProps {
   config: QrConfig;
   empty: boolean;
   invalid: boolean;
-  /** Callback con el último SVG renderizado correctamente. */
+  /** Callback with the last successfully rendered SVG. */
   onRender?: (svg: string | null) => void;
   className?: string;
 }
