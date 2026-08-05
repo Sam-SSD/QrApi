@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { History, LayoutTemplate, RotateCcw } from "lucide-react";
+import { Code2, History, LayoutTemplate, RotateCcw } from "lucide-react";
 import { LazyMotion, domAnimation, MotionConfig } from "motion/react";
 import {
   Accordion,
@@ -30,6 +30,7 @@ import { SaveQrButton } from "./save-qr-button";
 import { TemplatesGallery } from "./templates-gallery";
 import { HistoryDrawer } from "./history-drawer";
 import { ShortcutsDialog } from "./shortcuts-dialog";
+import { ApiRequestDialog } from "@/components/qr/api-request-dialog";
 
 /** Saved QR being edited from the dashboard. */
 export interface EditingQr {
@@ -48,6 +49,7 @@ export function QrEditor({
   editing?: EditingQr;
 }) {
   const t = useTranslations("editor");
+  const tApi = useTranslations("apiRequest");
   const type = useQrStore((s) => s.type);
   const fields = useQrStore((s) => s.fields);
   const config = useQrStore((s) => s.config);
@@ -66,6 +68,7 @@ export function QrEditor({
   const [templatesOpen, setTemplatesOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const [apiDialogOpen, setApiDialogOpen] = useState(false);
   const history = useQrHistory();
   const isMobile = useMediaQuery("(max-width: 1023px)");
   const lastSvgRef = useRef<string | null>(null);
@@ -168,6 +171,16 @@ export function QrEditor({
           disabled={!payload.data}
           editing={editing}
         />
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          disabled={!payload.data}
+          onClick={() => setApiDialogOpen(true)}
+        >
+          <Code2 className="size-4" strokeWidth={1.75} />
+          {tApi("button")}
+        </Button>
       </div>
     </div>
   );
@@ -305,6 +318,13 @@ export function QrEditor({
           onClear={history.clear}
         />
         <ShortcutsDialog open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
+        <ApiRequestDialog
+          open={apiDialogOpen}
+          onOpenChange={setApiDialogOpen}
+          payload={payload.payload}
+          data={payload.data}
+          config={config}
+        />
       </MotionConfig>
     </LazyMotion>
   );

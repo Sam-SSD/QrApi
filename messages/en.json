@@ -16,6 +16,15 @@
     "search": "Search",
     "error": "Something went wrong. Please try again."
   },
+  "apiRequest": {
+    "button": "Copy API request",
+    "menuItem": "API request",
+    "title": "API request",
+    "tokenHint": "This request reproduces the QR via POST /api/v1/qr. Replace {token} with one of your API keys.",
+    "token": "qra_YOUR_TOKEN",
+    "getKey": "Manage API keys",
+    "tooLarge": "The request exceeds the API's 1 MB body limit because of the embedded images."
+  },
   "nav": {
     "generator": "Generator",
     "docs": "API",
