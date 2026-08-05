@@ -26,6 +26,15 @@ const envSchema = z.object({
   SMTP_PASSWORD: z.string().optional(),
   SMTP_FROM: z.string().default("QrAPI <no-reply@qrapi.local>"),
 
+  // Email verification toggle. "false" lets users register and sign in
+  // without confirming their email; those users are stored with
+  // emailVerified=true so re-enabling the flag later never locks them out.
+  // (z.coerce.boolean() is unusable here: the string "false" is truthy.)
+  AUTH_REQUIRE_EMAIL_VERIFICATION: z
+    .enum(["true", "false"])
+    .default("true")
+    .transform((v) => v === "true"),
+
   // Optional OAuth: providers activate only when their vars exist
   GITHUB_CLIENT_ID: z.string().optional(),
   GITHUB_CLIENT_SECRET: z.string().optional(),
