@@ -16,6 +16,15 @@
     "search": "Buscar",
     "error": "Algo salió mal. Inténtalo de nuevo."
   },
+  "apiRequest": {
+    "button": "Copiar petición API",
+    "menuItem": "Petición API",
+    "title": "Petición a la API",
+    "tokenHint": "Esta petición reproduce el QR con POST /api/v1/qr. Sustituye {token} por una de tus claves API.",
+    "token": "qra_TU_TOKEN",
+    "getKey": "Gestionar claves API",
+    "tooLarge": "La petición supera el límite de 1 MB del API por las imágenes incrustadas."
+  },
   "nav": {
     "generator": "Generador",
     "docs": "API",
