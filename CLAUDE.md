@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-Next.js 15 App Router + TypeScript + Tailwind v4 (tokens in `src/app/globals.css`, shadcn/ui in `src/components/ui`). PostgreSQL + Prisma (`prisma/schema.prisma`). Auth is better-auth (`src/lib/auth.ts`): email+password with mandatory email verification; GitHub/Google OAuth activate only when their env vars exist. i18n is next-intl with `/es` `/en` routes (`src/i18n/`); dashboard is guarded twice (optimistic cookie check in `src/middleware.ts` + real `getSession` in `dashboard/layout.tsx` and in every Server Action, which also filter by `userId` for ownership).
+Next.js 15 App Router + TypeScript + Tailwind v4 (tokens in `src/app/globals.css`, shadcn/ui in `src/components/ui`). PostgreSQL + Prisma (`prisma/schema.prisma`). Auth is better-auth (`src/lib/auth.ts`): email+password with email verification (toggle: `AUTH_REQUIRE_EMAIL_VERIFICATION`, default on; when off, new users are stored as verified); GitHub/Google OAuth activate only when their env vars exist. i18n is next-intl with `/es` `/en` routes (`src/i18n/`); dashboard is guarded twice (optimistic cookie check in `src/middleware.ts` + real `getSession` in `dashboard/layout.tsx` and in every Server Action, which also filter by `userId` for ownership).
 
 ### The isomorphic QR engine (core non-obvious pattern)
 

@@ -19,7 +19,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { renderQrSvg } from "@/lib/qr/render-svg";
-import { qrConfigSchema, type QrConfig } from "@/lib/qr/schema";
+import {
+  payloadSchema,
+  qrConfigSchema,
+  type QrConfig,
+} from "@/lib/qr/schema";
+import { ApiRequestDialog } from "@/components/qr/api-request-dialog";
 import {
   deleteQrCode,
   duplicateQrCode,
@@ -68,7 +73,15 @@ function QrCard({ item }: { item: SavedQr }) {
   const format = useFormatter();
   const [pending, startTransition] = useTransition();
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [apiDialogOpen, setApiDialogOpen] = useState(false);
   const [name, setName] = useState(item.name);
+
+  const apiRequest = useMemo(() => {
+    const config = parseConfig(item);
+    if (!config) return null;
+    const parsed = payloadSchema.safeParse(item.config?.payload);
+    return { config, payload: parsed.success ? parsed.data : null };
+  }, [item]);
 
   function commitRename() {
     const clean = name.trim();
@@ -117,7 +130,13 @@ function QrCard({ item }: { item: SavedQr }) {
         </span>
       </div>
       <div className="flex items-center gap-1 opacity-0 transition-opacity duration-150 group-focus-within:opacity-100 group-hover:opacity-100 max-lg:opacity-100">
-        <QrExportMenu getSvg={getSvg} filename={item.name} />
+        <QrExportMenu
+          getSvg={getSvg}
+          filename={item.name}
+          onCopyApiRequest={
+            apiRequest ? () => setApiDialogOpen(true) : undefined
+          }
+        />
         <Button
           type="button"
           variant="ghost"
@@ -157,6 +176,16 @@ function QrCard({ item }: { item: SavedQr }) {
           <Trash2 className="size-4" strokeWidth={1.75} />
         </Button>
       </div>
+
+      {apiRequest && (
+        <ApiRequestDialog
+          open={apiDialogOpen}
+          onOpenChange={setApiDialogOpen}
+          payload={apiRequest.payload}
+          data={item.data}
+          config={apiRequest.config}
+        />
+      )}
 
       <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <AlertDialogContent>

@@ -12,8 +12,10 @@ import { OAuthButtons } from "./oauth-buttons";
 
 export function RegisterForm({
   providers,
+  requireEmailVerification,
 }: {
   providers: Array<"github" | "google">;
+  requireEmailVerification: boolean;
 }) {
   const t = useTranslations("auth.register");
   const tCommon = useTranslations("common");
@@ -36,7 +38,10 @@ export function RegisterForm({
       name,
       email,
       password,
-      callbackURL: `/${locale}/verify-email?verified=true`,
+      // callbackURL only matters for the verification email link.
+      ...(requireEmailVerification
+        ? { callbackURL: `/${locale}/verify-email?verified=true` }
+        : {}),
     });
 
     if (authError) {
@@ -49,7 +54,13 @@ export function RegisterForm({
       return;
     }
 
-    router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+    if (requireEmailVerification) {
+      router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+    } else {
+      // autoSignIn already set the session cookie on the sign-up response.
+      router.push("/dashboard");
+      router.refresh();
+    }
   }
 
   return (

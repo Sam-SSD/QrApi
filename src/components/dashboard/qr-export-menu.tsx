@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Copy, Download } from "lucide-react";
+import { Code2, Copy, Download } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,11 +26,15 @@ const FORMATS: ExportFormat[] = ["png", "svg", "jpg", "pdf"];
 export function QrExportMenu({
   getSvg,
   filename,
+  onCopyApiRequest,
 }: {
   getSvg: () => string | null;
   filename: string;
+  /** When present, adds an "API request" item to the menu. */
+  onCopyApiRequest?: () => void;
 }) {
   const t = useTranslations("dashboard.export");
+  const tApi = useTranslations("apiRequest");
 
   async function run(action: () => Promise<void>, successMsg: string) {
     try {
@@ -82,6 +86,15 @@ export function QrExportMenu({
           <Copy className="size-4" strokeWidth={1.75} />
           {t("copyImage")}
         </DropdownMenuItem>
+        {onCopyApiRequest && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={onCopyApiRequest}>
+              <Code2 className="size-4" strokeWidth={1.75} />
+              {tApi("menuItem")}
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
