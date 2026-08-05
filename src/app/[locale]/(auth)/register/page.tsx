@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AuthCard } from "@/components/auth/auth-card";
 import { RegisterForm } from "@/components/auth/register-form";
-import { activeOAuthProviders } from "@/lib/auth";
+import { activeOAuthProviders, isEmailVerificationRequired } from "@/lib/auth";
 
 export async function generateMetadata({
   params,
@@ -25,7 +25,10 @@ export default async function RegisterPage({
 
   return (
     <AuthCard title={t("title")} subtitle={t("subtitle")}>
-      <RegisterForm providers={activeOAuthProviders()} />
+      <RegisterForm
+        providers={activeOAuthProviders()}
+        requireEmailVerification={isEmailVerificationRequired()}
+      />
     </AuthCard>
   );
 }
