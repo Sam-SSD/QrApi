@@ -54,7 +54,7 @@ function ProfileCard({ user }: { user: SettingsUser }) {
   return (
     <form
       onSubmit={submit}
-      className="flex max-w-md flex-col gap-4 rounded-xl border border-line bg-surface p-5"
+      className="flex flex-col gap-4 rounded-xl border border-line bg-surface p-5"
     >
       <h2 className="font-semibold">{t("profileTitle")}</h2>
       <div className="flex items-center gap-3">
@@ -135,7 +135,7 @@ function ChangePasswordCard() {
   return (
     <form
       onSubmit={submit}
-      className="flex max-w-md flex-col gap-4 rounded-xl border border-line bg-surface p-5"
+      className="flex flex-col gap-4 rounded-xl border border-line bg-surface p-5"
     >
       <h2 className="font-semibold">{t("passwordTitle")}</h2>
       <div className="flex flex-col gap-2">
@@ -202,7 +202,7 @@ function DangerZoneCard() {
   }
 
   return (
-    <div className="flex max-w-md flex-col gap-4 rounded-xl border border-destructive/30 bg-surface p-5">
+    <div className="flex flex-col gap-4 rounded-xl border border-destructive/30 bg-surface p-5 sm:flex-row sm:items-center sm:justify-between lg:col-span-2">
       <h2 className="flex items-center gap-2 font-semibold text-destructive">
         <TriangleAlert className="size-4" strokeWidth={1.75} />
         {t("dangerTitle")}
@@ -210,7 +210,7 @@ function DangerZoneCard() {
       <Button
         type="button"
         variant="outline"
-        className="self-start text-destructive hover:text-destructive"
+        className="self-start text-destructive hover:text-destructive sm:self-auto"
         onClick={() => setOpen(true)}
       >
         {t("deleteAccount")}
@@ -254,7 +254,7 @@ function DangerZoneCard() {
 
 export function SettingsSection({ user }: { user: SettingsUser }) {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="grid max-w-4xl gap-6 lg:grid-cols-2">
       <ProfileCard user={user} />
       <ChangePasswordCard />
       <DangerZoneCard />
