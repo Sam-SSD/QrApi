@@ -415,6 +415,13 @@
       "passwordTooShort": "La contraseña debe tener al menos 4 caracteres"
     },
     "settings": {
+      "profileTitle": "Perfil",
+      "nameLabel": "Nombre",
+      "emailLabel": "Correo electrónico",
+      "emailHint": "El correo electrónico no se puede cambiar.",
+      "saveProfile": "Guardar cambios",
+      "profileSaved": "Perfil actualizado",
+      "profileError": "No se pudo actualizar el perfil",
       "passwordTitle": "Cambiar contraseña",
       "currentPassword": "Contraseña actual",
       "newPassword": "Nueva contraseña",

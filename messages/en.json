@@ -415,6 +415,13 @@
       "passwordTooShort": "Password must be at least 4 characters"
     },
     "settings": {
+      "profileTitle": "Profile",
+      "nameLabel": "Name",
+      "emailLabel": "Email",
+      "emailHint": "Your email can't be changed.",
+      "saveProfile": "Save changes",
+      "profileSaved": "Profile updated",
+      "profileError": "Couldn't update your profile",
       "passwordTitle": "Change password",
       "currentPassword": "Current password",
       "newPassword": "New password",
