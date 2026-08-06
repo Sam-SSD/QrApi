@@ -433,7 +433,7 @@
       "changePassword": "Update password",
       "passwordChanged": "Password updated",
       "passwordError": "The current password is incorrect",
-      "revokeOthers": "Sign out on other devices",
+      "revokeOthersNotice": "Changing it will sign you out on all other devices.",
       "dangerTitle": "Danger zone",
       "deleteAccount": "Delete my account",
       "deleteTitle": "Delete your account?",

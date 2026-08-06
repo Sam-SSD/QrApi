@@ -1,15 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { after } from "next/server";
+import { randomBytes } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { parseUserAgent } from "@/lib/dynamic-qr/parse-ua";
 import { hashIp } from "@/lib/dynamic-qr/ip-hash";
 import { verifyPassword } from "@/lib/dynamic-qr/password";
+import { httpUrl } from "@/lib/dynamic-qr/redirect-url";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { SITE_URL } from "@/lib/constants";
 
 export const runtime = "nodejs";
 
+/**
+ * Password attempts allowed per slug. Far stricter than the public API budget:
+ * a human types a password a handful of times, a script tries thousands.
+ */
+const PASSWORD_ATTEMPT_LIMITS = { perMinute: 5, perDay: 100 };
+
 type DynamicRow = {
   id: string;
+  slug: string;
   targetUrl: string;
   active: boolean;
   expiresAt: Date | null;
@@ -21,6 +31,7 @@ async function findBySlug(slug: string): Promise<DynamicRow | null> {
     where: { slug },
     select: {
       id: true,
+      slug: true,
       targetUrl: true,
       active: true,
       expiresAt: true,
@@ -37,7 +48,24 @@ function isUnavailable(dynamic: DynamicRow | null): dynamic is null {
   );
 }
 
-const notFound = () => NextResponse.redirect(new URL("/es", SITE_URL), 302);
+/** Redirects are never cacheable: targetUrl is editable after the QR is printed. */
+const NO_STORE = { "Cache-Control": "no-store" };
+
+const notFound = () =>
+  NextResponse.redirect(new URL("/es", SITE_URL), {
+    status: 302,
+    headers: NO_STORE,
+  });
+
+/**
+ * Redirects to the stored target. Re-validates it on read: every write path
+ * already enforces http(s) via `httpUrl`, so this only guards against a row
+ * written outside them (a seed, a manual fix, future code).
+ */
+function redirectToTarget(targetUrl: string, status: 302 | 303) {
+  if (!httpUrl.safeParse(targetUrl).success) return notFound();
+  return NextResponse.redirect(targetUrl, { status, headers: NO_STORE });
+}
 
 /** Records the scan in after() so it never delays the redirect. */
 function recordScan(request: NextRequest, dynamicQrId: string) {
@@ -78,14 +106,19 @@ function recordScan(request: NextRequest, dynamicQrId: string) {
   });
 }
 
-/** Minimal interstitial page asking for the password (bilingual, no assets). */
+/**
+ * Minimal interstitial page asking for the password (bilingual, no assets).
+ * The inline <style> carries a per-response nonce so the page needs no
+ * 'unsafe-inline' in its own (deliberately tighter) CSP.
+ */
 function passwordPage(slug: string, error: boolean): NextResponse {
+  const nonce = randomBytes(16).toString("base64");
   const html = `<!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <meta name="robots" content="noindex"/>
 <title>QR protegido · QrAPI</title>
-<style>
+<style nonce="${nonce}">
   body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
     background:#09090b;color:#f4f4f5;font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
   .card{width:min(92vw,360px);background:#141419;border:1px solid rgba(255,255,255,.09);
@@ -109,7 +142,17 @@ function passwordPage(slug: string, error: boolean): NextResponse {
 </form></body></html>`;
   return new NextResponse(html, {
     status: error ? 401 : 200,
-    headers: { "Content-Type": "text/html; charset=utf-8" },
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      ...NO_STORE,
+      "Content-Security-Policy": [
+        "default-src 'none'",
+        `style-src 'nonce-${nonce}'`,
+        "form-action 'self'",
+        "frame-ancestors 'none'",
+        "base-uri 'none'",
+      ].join("; "),
+    },
   });
 }
 
@@ -125,10 +168,11 @@ export async function GET(
   const dynamic = await findBySlug(slug);
   if (isUnavailable(dynamic)) return notFound();
 
-  if (dynamic.passwordHash) return passwordPage(slug, false);
+  // dynamic.slug, not the request param: the DB value is known-safe base62.
+  if (dynamic.passwordHash) return passwordPage(dynamic.slug, false);
 
   recordScan(request, dynamic.id);
-  return NextResponse.redirect(dynamic.targetUrl, 302);
+  return redirectToTarget(dynamic.targetUrl, 302);
 }
 
 export async function POST(
@@ -142,16 +186,32 @@ export async function POST(
   if (!dynamic.passwordHash) {
     // Without a password there is nothing to verify: redirect just like GET.
     recordScan(request, dynamic.id);
-    return NextResponse.redirect(dynamic.targetUrl, 302);
+    return redirectToTarget(dynamic.targetUrl, 302);
+  }
+
+  // Before scrypt, not after: hashing is the expensive part an attacker would
+  // otherwise get for free on an unauthenticated route.
+  const rate = await checkRateLimit(
+    `r:${dynamic.slug}`,
+    PASSWORD_ATTEMPT_LIMITS,
+  );
+  if (!rate.allowed) {
+    return new NextResponse(null, {
+      status: 429,
+      headers: {
+        ...NO_STORE,
+        "Retry-After": String(rate.retryAfterSeconds ?? 60),
+      },
+    });
   }
 
   const form = await request.formData().catch(() => null);
   const password = String(form?.get("password") ?? "");
-  if (!password || !verifyPassword(password, dynamic.passwordHash)) {
-    return passwordPage(slug, true);
+  if (!password || !(await verifyPassword(password, dynamic.passwordHash))) {
+    return passwordPage(dynamic.slug, true);
   }
 
   recordScan(request, dynamic.id);
   // 303: after a POST, redirect to the destination with GET.
-  return NextResponse.redirect(dynamic.targetUrl, 303);
+  return redirectToTarget(dynamic.targetUrl, 303);
 }

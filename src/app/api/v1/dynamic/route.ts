@@ -6,6 +6,7 @@ import {
   authenticateApi,
   errorResponse,
   jsonResponse,
+  readJsonBody,
 } from "@/lib/api-helpers";
 import { createUniqueDynamicQr } from "@/lib/dynamic-qr/create";
 import { buildRedirectUrl, httpUrl } from "@/lib/dynamic-qr/redirect-url";
@@ -28,13 +29,10 @@ export async function POST(request: NextRequest) {
   const auth = await authenticateApi(request);
   if (auth.response) return auth.response;
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return errorResponse(415, "invalid_json", "Body must be valid JSON");
-  }
-  const parsed = createBodySchema.safeParse(body);
+  const read = await readJsonBody(request);
+  if (read.response) return read.response;
+
+  const parsed = createBodySchema.safeParse(read.body);
   if (!parsed.success) {
     return errorResponse(
       400,
