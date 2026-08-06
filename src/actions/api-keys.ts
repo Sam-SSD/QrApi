@@ -1,19 +1,11 @@
 "use server";
 
-import { headers } from "next/headers";
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { auth } from "@/lib/auth";
+import { requireSession, revalidateDashboard } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateApiToken } from "@/lib/api-keys";
 
 const MAX_KEYS_PER_USER = 10;
-
-async function requireSession() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) throw new Error("UNAUTHORIZED");
-  return session;
-}
 
 export async function createApiKey(name: string) {
   const session = await requireSession();
@@ -34,7 +26,7 @@ export async function createApiKey(name: string) {
     },
   });
 
-  revalidatePath("/[locale]/dashboard", "layout");
+  revalidateDashboard();
   // The full token travels only here, exactly once.
   return { id: created.id, token, prefix };
 }
@@ -45,7 +37,7 @@ export async function revokeApiKey(id: string) {
     where: { id, userId: session.user.id },
     data: { revokedAt: new Date() },
   });
-  revalidatePath("/[locale]/dashboard", "layout");
+  revalidateDashboard();
 }
 
 export async function deleteApiKey(id: string) {
@@ -53,5 +45,5 @@ export async function deleteApiKey(id: string) {
   await prisma.apiKey.delete({
     where: { id, userId: session.user.id },
   });
-  revalidatePath("/[locale]/dashboard", "layout");
+  revalidateDashboard();
 }

@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { verifyApiToken } from "@/lib/api-keys";
-import { checkRateLimit, type RateLimitResult } from "@/lib/rate-limit";
+import type { RateLimitResult } from "@/lib/rate-limit";
+import {
+  CORS_HEADERS,
+  authenticateApi,
+  errorResponse,
+  rateLimitHeaders,
+} from "@/lib/api-helpers";
 import { renderQrSvg } from "@/lib/qr/render-svg";
 import { rasterizeSvg } from "@/lib/qr/rasterize";
 import { buildPayload } from "@/lib/qr/payloads";
@@ -23,13 +28,6 @@ import {
 } from "@/lib/qr/api-schema";
 
 export const runtime = "nodejs";
-
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Authorization, Content-Type",
-  "Access-Control-Max-Age": "86400",
-};
 
 const getQuerySchema = z.object({
   data: z.string().min(1).max(MAX_QR_DATA_LENGTH),
@@ -53,66 +51,6 @@ const getQuerySchema = z.object({
   frameTextColor: hexColor.optional(),
   framePosition: z.enum(FRAME_POSITIONS).optional(),
 });
-
-// ---------- Response helpers ----------
-
-function errorResponse(
-  status: number,
-  code: string,
-  message: string,
-  details?: unknown,
-  extraHeaders: Record<string, string> = {},
-) {
-  return NextResponse.json(
-    { error: { code, message, ...(details ? { details } : {}) } },
-    { status, headers: { ...CORS_HEADERS, ...extraHeaders } },
-  );
-}
-
-function rateLimitHeaders(rate: RateLimitResult): Record<string, string> {
-  return {
-    "X-RateLimit-Limit": String(rate.limit),
-    "X-RateLimit-Remaining": String(rate.remaining),
-    "X-RateLimit-Reset": String(rate.resetAt),
-  };
-}
-
-async function authenticate(request: NextRequest) {
-  const verification = await verifyApiToken(
-    request.headers.get("authorization"),
-  );
-  if (!verification.ok) {
-    const responses = {
-      missing: errorResponse(
-        401,
-        "missing_token",
-        "Provide your API key: Authorization: Bearer qra_...",
-      ),
-      invalid: errorResponse(401, "invalid_token", "The API key is not valid"),
-      revoked: errorResponse(403, "revoked_token", "This API key was revoked"),
-      expired: errorResponse(403, "expired_token", "This API key has expired"),
-    } as const;
-    return { response: responses[verification.reason] };
-  }
-
-  const rate = await checkRateLimit(verification.apiKey.id);
-  if (!rate.allowed) {
-    return {
-      response: errorResponse(
-        429,
-        "rate_limited",
-        "Rate limit exceeded",
-        { limit: rate.limit, resetAt: rate.resetAt },
-        {
-          ...rateLimitHeaders(rate),
-          "Retry-After": String(rate.retryAfterSeconds ?? 60),
-        },
-      ),
-    };
-  }
-
-  return { rate };
-}
 
 async function respondWithQr(
   data: string,
@@ -163,7 +101,7 @@ export function OPTIONS() {
 }
 
 export async function GET(request: NextRequest) {
-  const auth = await authenticate(request);
+  const auth = await authenticateApi(request);
   if (auth.response) return auth.response;
 
   const query = Object.fromEntries(request.nextUrl.searchParams.entries());
@@ -213,7 +151,7 @@ export async function POST(request: NextRequest) {
     return errorResponse(413, "body_too_large", "Body must be under 1 MB");
   }
 
-  const auth = await authenticate(request);
+  const auth = await authenticateApi(request);
   if (auth.response) return auth.response;
 
   let body: unknown;

@@ -121,7 +121,10 @@ export function Header() {
                   <>
                     <Button asChild>
                       <Link href="/dashboard" onClick={() => setOpen(false)}>
-                        <LayoutDashboard className="size-4" strokeWidth={1.75} />
+                        <LayoutDashboard
+                          className="size-4"
+                          strokeWidth={1.75}
+                        />
                         {t("dashboard")}
                       </Link>
                     </Button>

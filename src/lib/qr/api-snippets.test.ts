@@ -71,7 +71,10 @@ describe("buildApiRequestBody", () => {
   });
 
   it("round-trips a pruned body back to the original config", () => {
-    const body = buildApiRequestBody({ payload: urlPayload, config: fullConfig });
+    const body = buildApiRequestBody({
+      payload: urlPayload,
+      config: fullConfig,
+    });
     expect(qrConfigSchema.parse(pickConfig(body))).toEqual(fullConfig);
   });
 
@@ -104,7 +107,10 @@ describe("buildApiRequestBody", () => {
   });
 
   it("keeps the full logo data URI", () => {
-    const body = buildApiRequestBody({ payload: urlPayload, config: fullConfig });
+    const body = buildApiRequestBody({
+      payload: urlPayload,
+      config: fullConfig,
+    });
     expect((body.logo as { dataUri: string }).dataUri).toBe(TINY_PNG);
   });
 });

@@ -8,17 +8,11 @@ import {
   jsonResponse,
 } from "@/lib/api-helpers";
 import { createUniqueDynamicQr } from "@/lib/dynamic-qr/create";
-import { buildRedirectUrl } from "@/lib/dynamic-qr/redirect-url";
+import { buildRedirectUrl, httpUrl } from "@/lib/dynamic-qr/redirect-url";
 
 export const runtime = "nodejs";
 
 const MAX_DYNAMIC_QRS = 100;
-
-const httpUrl = z
-  .string()
-  .url()
-  .max(2048)
-  .refine((u) => /^https?:\/\//i.test(u), "URL must be http(s)");
 
 const createBodySchema = z.object({
   title: z.string().min(1).max(80),

@@ -70,31 +70,17 @@ function modulePath(
       return `M${round(x)},${round(y)}h1v1h-1z`;
     case "dots":
       return circlePath(x + 0.5, y + 0.5, 0.44);
-    case "rounded": {
-      const r = 0.4;
-      return roundedRectPath(x, y, 1, 1, [
-        !n.top && !n.left ? r : 0,
-        !n.top && !n.right ? r : 0,
-        !n.bottom && !n.right ? r : 0,
-        !n.bottom && !n.left ? r : 0,
-      ]);
-    }
-    case "extra-rounded": {
-      const r = 0.5;
-      return roundedRectPath(x, y, 1, 1, [
-        !n.top && !n.left ? r : 0,
-        !n.top && !n.right ? r : 0,
-        !n.bottom && !n.right ? r : 0,
-        !n.bottom && !n.left ? r : 0,
-      ]);
-    }
+    case "rounded":
+    case "extra-rounded":
     case "classy": {
-      const r = 0.5;
+      // classy rounds only the TL/BR corners (diagonal accent)
+      const r = style === "rounded" ? 0.4 : 0.5;
+      const classy = style === "classy";
       return roundedRectPath(x, y, 1, 1, [
         !n.top && !n.left ? r : 0,
-        0,
+        !classy && !n.top && !n.right ? r : 0,
         !n.bottom && !n.right ? r : 0,
-        0,
+        !classy && !n.bottom && !n.left ? r : 0,
       ]);
     }
     case "vertical-line": {
@@ -175,26 +161,20 @@ function diamondPath(cx: number, cy: number, r: number): string {
 
 type Radii = [number, number, number, number];
 
-/** [outer, inner] radii of the finder ring per style. */
-function finderRadii(style: QrConfig["style"]["cornersSquare"]["style"]): {
-  out: Radii;
-  inn: Radii;
-} {
-  switch (style) {
-    case "square":
-      return { out: [0, 0, 0, 0], inn: [0, 0, 0, 0] };
-    case "rounded":
-      return { out: [1.9, 1.9, 1.9, 1.9], inn: [1.2, 1.2, 1.2, 1.2] };
-    case "extra-rounded":
-      return { out: [3, 3, 3, 3], inn: [2.2, 2.2, 2.2, 2.2] };
-    case "outpoint": // TL and BR pointed, TR and BL rounded (leaf/drop)
-      return { out: [0, 2.6, 0, 2.6], inn: [0, 1.8, 0, 1.8] };
-    case "inpoint": // mirrored: TR and BL pointed
-      return { out: [2.6, 0, 2.6, 0], inn: [1.8, 0, 1.8, 0] };
-    case "classy": // one pointed corner and the opposite one rounded
-      return { out: [0, 1.6, 0, 1.6], inn: [0, 1.1, 0, 1.1] };
-  }
-}
+/** [outer, inner] radii of the finder ring per style. outpoint: TL and BR
+ * pointed, TR and BL rounded (leaf/drop); inpoint mirrored; classy: one
+ * pointed corner and the opposite one rounded. */
+const FINDER_RADII: Record<
+  QrConfig["style"]["cornersSquare"]["style"],
+  { out: Radii; inn: Radii }
+> = {
+  square: { out: [0, 0, 0, 0], inn: [0, 0, 0, 0] },
+  rounded: { out: [1.9, 1.9, 1.9, 1.9], inn: [1.2, 1.2, 1.2, 1.2] },
+  "extra-rounded": { out: [3, 3, 3, 3], inn: [2.2, 2.2, 2.2, 2.2] },
+  outpoint: { out: [0, 2.6, 0, 2.6], inn: [0, 1.8, 0, 1.8] },
+  inpoint: { out: [2.6, 0, 2.6, 0], inn: [1.8, 0, 1.8, 0] },
+  classy: { out: [0, 1.6, 0, 1.6], inn: [0, 1.1, 0, 1.1] },
+};
 
 function cornerSquarePath(
   style: QrConfig["style"]["cornersSquare"]["style"],
@@ -202,7 +182,7 @@ function cornerSquarePath(
   y: number,
 ): string {
   // 7×7 ring with a 5×5 hole (fill-rule evenodd)
-  const { out, inn } = finderRadii(style);
+  const { out, inn } = FINDER_RADII[style];
   return (
     roundedRectPath(x, y, 7, 7, out) + roundedRectPath(x + 1, y + 1, 5, 5, inn)
   );
@@ -214,7 +194,7 @@ function finderPlatePath(
   x: number,
   y: number,
 ): string {
-  return roundedRectPath(x, y, 7, 7, finderRadii(style).out);
+  return roundedRectPath(x, y, 7, 7, FINDER_RADII[style].out);
 }
 
 function cornerDotPath(
@@ -519,7 +499,7 @@ export function renderQrSvg(
   return renderMatrixSvg(matrix, config, options);
 }
 
-export function renderMatrixSvg(
+function renderMatrixSvg(
   matrix: QrMatrix,
   config: QrConfig,
   options: RenderOptions = {},

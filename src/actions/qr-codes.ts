@@ -1,9 +1,7 @@
 "use server";
 
-import { headers } from "next/headers";
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { auth } from "@/lib/auth";
+import { requireSession, revalidateDashboard } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
   qrConfigSchema,
@@ -14,12 +12,6 @@ import { buildPayload } from "@/lib/qr/payloads";
 import type { QrContentType } from "@prisma/client";
 
 const MAX_SAVED_QRS = 100;
-
-async function requireSession() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) throw new Error("UNAUTHORIZED");
-  return session;
-}
 
 const saveQrInput = z.object({
   name: z.string().min(1).max(80),
@@ -47,7 +39,7 @@ export async function saveQrCode(input: z.infer<typeof saveQrInput>) {
       config: { payload: parsed.payload, config: parsed.config },
     },
   });
-  revalidatePath("/[locale]/dashboard", "layout");
+  revalidateDashboard();
   return { id: created.id };
 }
 
@@ -72,7 +64,7 @@ export async function updateSavedQr(
     },
   });
   if (result.count === 0) throw new Error("NOT_FOUND");
-  revalidatePath("/[locale]/dashboard", "layout");
+  revalidateDashboard();
 }
 
 export async function renameQrCode(id: string, name: string) {
@@ -83,7 +75,7 @@ export async function renameQrCode(id: string, name: string) {
     where: { id, userId: session.user.id },
     data: { name: clean },
   });
-  revalidatePath("/[locale]/dashboard", "layout");
+  revalidateDashboard();
 }
 
 export async function deleteQrCode(id: string) {
@@ -91,7 +83,7 @@ export async function deleteQrCode(id: string) {
   await prisma.qrCode.delete({
     where: { id, userId: session.user.id },
   });
-  revalidatePath("/[locale]/dashboard", "layout");
+  revalidateDashboard();
 }
 
 export async function duplicateQrCode(id: string) {
@@ -109,7 +101,7 @@ export async function duplicateQrCode(id: string) {
       config: original.config as object,
     },
   });
-  revalidatePath("/[locale]/dashboard", "layout");
+  revalidateDashboard();
 }
 
 /** Migrates the anonymous localStorage history into the account after login. */
@@ -134,6 +126,6 @@ export async function importHistory(
     });
     imported++;
   }
-  revalidatePath("/[locale]/dashboard", "layout");
+  revalidateDashboard();
   return { imported };
 }
