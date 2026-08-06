@@ -63,7 +63,7 @@ export function LanguageTabs({
   }
 
   return (
-    <div>
+    <div className="min-w-0">
       <div role="tablist" className="mb-3 flex gap-1.5">
         {tabs.map((tab, index) => (
           <button
