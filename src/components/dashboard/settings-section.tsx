@@ -111,11 +111,15 @@ function ChangePasswordCard() {
   const t = useTranslations("dashboard.settings");
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [revokeOthers, setRevokeOthers] = useState(true);
   const [busy, setBusy] = useState(false);
 
+  const mismatch = confirm.length > 0 && next !== confirm;
+
   async function submit(event: React.FormEvent) {
     event.preventDefault();
+    if (next !== confirm) return;
     setBusy(true);
     const { error } = await authClient.changePassword({
       currentPassword: current,
@@ -130,6 +134,7 @@ function ChangePasswordCard() {
     toast.success(t("passwordChanged"));
     setCurrent("");
     setNext("");
+    setConfirm("");
   }
 
   return (
@@ -165,6 +170,29 @@ function ChangePasswordCard() {
           {t("passwordHint")}
         </p>
       </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="set-confirm">{t("confirmNewPassword")}</Label>
+        <Input
+          id="set-confirm"
+          type="password"
+          autoComplete="new-password"
+          minLength={8}
+          value={confirm}
+          onChange={(e) => setConfirm(e.target.value)}
+          required
+          aria-invalid={mismatch}
+          aria-describedby={mismatch ? "set-confirm-error" : undefined}
+        />
+        {mismatch && (
+          <p
+            id="set-confirm-error"
+            role="alert"
+            className="text-sm text-destructive"
+          >
+            {t("passwordMismatch")}
+          </p>
+        )}
+      </div>
       <div className="flex items-center justify-between">
         <Label htmlFor="set-revoke">{t("revokeOthers")}</Label>
         <Switch
@@ -173,7 +201,7 @@ function ChangePasswordCard() {
           onCheckedChange={setRevokeOthers}
         />
       </div>
-      <Button type="submit" disabled={busy} className="self-start">
+      <Button type="submit" disabled={busy || mismatch} className="self-start">
         {busy && <Loader2 className="size-4 animate-spin" />}
         {t("changePassword")}
       </Button>
