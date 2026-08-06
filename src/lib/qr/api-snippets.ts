@@ -44,8 +44,7 @@ function deepEqual(a: unknown, b: unknown): boolean {
     const keysA = Object.keys(a).filter((k) => a[k] !== undefined);
     const keysB = Object.keys(b).filter((k) => b[k] !== undefined);
     return (
-      keysA.length === keysB.length &&
-      keysA.every((k) => deepEqual(a[k], b[k]))
+      keysA.length === keysB.length && keysA.every((k) => deepEqual(a[k], b[k]))
     );
   }
   return false;
@@ -84,7 +83,8 @@ export function buildApiRequestBody(
   body.format = "png";
   body.size = 512;
 
-  if (config.ecLevel !== DEFAULT_QR_CONFIG.ecLevel) body.ecLevel = config.ecLevel;
+  if (config.ecLevel !== DEFAULT_QR_CONFIG.ecLevel)
+    body.ecLevel = config.ecLevel;
   if (config.margin !== DEFAULT_QR_CONFIG.margin) body.margin = config.margin;
 
   const style = pruneDefaults(config.style, DEFAULT_QR_CONFIG.style);

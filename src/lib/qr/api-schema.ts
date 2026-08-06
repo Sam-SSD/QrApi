@@ -1,9 +1,5 @@
 import { z } from "zod";
-import {
-  MAX_QR_DATA_LENGTH,
-  payloadSchema,
-  qrConfigSchema,
-} from "./schema";
+import { MAX_QR_DATA_LENGTH, payloadSchema, qrConfigSchema } from "./schema";
 
 // Body/format schemas of the public POST /api/v1/qr endpoint, extracted from
 // the route file so the snippet builder and tests can validate against them
@@ -16,7 +12,12 @@ export const formatSchema = z
   .default("png")
   .transform((f) => (f === "jpg" ? "jpeg" : f));
 
-export const sizeSchema = z.coerce.number().int().min(64).max(2048).default(512);
+export const sizeSchema = z.coerce
+  .number()
+  .int()
+  .min(64)
+  .max(2048)
+  .default(512);
 
 export const postBodySchema = z
   .object({
@@ -35,5 +36,3 @@ export const postBodySchema = z
     message: "Provide exactly one of `data` or `payload`",
     path: ["data"],
   });
-
-export type ApiPostBody = z.input<typeof postBodySchema>;

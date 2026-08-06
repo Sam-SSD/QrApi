@@ -1,6 +1,8 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
+import { headers } from "next/headers";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { sendMail } from "@/lib/mail";
 import { verificationEmail } from "@/emails/verification";
@@ -67,11 +69,16 @@ export const auth = betterAuth({
   plugins: [nextCookies()],
 });
 
-export type Session = typeof auth.$Infer.Session;
+/** Session guard for Server Actions: throws when there is no session. */
+export async function requireSession() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) throw new Error("UNAUTHORIZED");
+  return session;
+}
 
-/** Whether email verification is enforced (server-only; pass to clients as prop). */
-export function isEmailVerificationRequired(): boolean {
-  return env.AUTH_REQUIRE_EMAIL_VERIFICATION;
+/** Revalidates the whole dashboard layout after a mutation. */
+export function revalidateDashboard() {
+  revalidatePath("/[locale]/dashboard", "layout");
 }
 
 /** OAuth providers active according to the env vars present. */

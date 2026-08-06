@@ -43,8 +43,6 @@ export interface QrPreviewProps {
   config: QrConfig;
   empty: boolean;
   invalid: boolean;
-  /** Callback with the last successfully rendered SVG. */
-  onRender?: (svg: string | null) => void;
   className?: string;
 }
 
@@ -53,7 +51,6 @@ export function QrPreview({
   config,
   empty,
   invalid,
-  onRender,
   className,
 }: QrPreviewProps) {
   const t = useTranslations("editor.preview");
@@ -66,10 +63,7 @@ export function QrPreview({
   const configKey = useMemo(() => JSON.stringify(config), [config]);
 
   useEffect(() => {
-    if (!data) {
-      onRender?.(null);
-      return;
-    }
+    if (!data) return;
     const token = ++tokenRef.current;
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
@@ -80,10 +74,8 @@ export function QrPreview({
         setSvg(next);
         setRenderError(false);
         setRenderId((id) => id + 1);
-        onRender?.(next);
       } catch {
         setRenderError(true);
-        onRender?.(null);
       }
     }, 120);
     return () => {

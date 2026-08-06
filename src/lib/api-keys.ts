@@ -2,7 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import type { ApiKey } from "@prisma/client";
 
-export const API_KEY_PREFIX = "qra_";
+const API_KEY_PREFIX = "qra_";
 
 /** Generates a new token. Shown in full only ONCE. */
 export function generateApiToken(): {
@@ -18,7 +18,7 @@ export function generateApiToken(): {
   };
 }
 
-export function hashApiToken(token: string): string {
+function hashApiToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
 }
 

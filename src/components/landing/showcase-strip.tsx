@@ -43,10 +43,7 @@ export function ShowcaseStrip() {
             <Reveal
               key={id}
               delay={index * 50}
-              className={cn(
-                "h-full",
-                index % 2 === 0 ? "lg:pb-8" : "lg:pt-8",
-              )}
+              className={cn("h-full", index % 2 === 0 ? "lg:pb-8" : "lg:pt-8")}
             >
               <Link
                 href={`/generator?preset=${id}`}

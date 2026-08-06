@@ -2,12 +2,13 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useFormatter, useTranslations } from "next-intl";
-import { Copy, Pencil, QrCode, Trash2 } from "lucide-react";
+import { Copy, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { QrExportMenu } from "./qr-export-menu";
+import { EmptyState } from "./empty-state";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,11 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { renderQrSvg } from "@/lib/qr/render-svg";
-import {
-  payloadSchema,
-  qrConfigSchema,
-  type QrConfig,
-} from "@/lib/qr/schema";
+import { payloadSchema, qrConfigSchema, type QrConfig } from "@/lib/qr/schema";
 import { ApiRequestDialog } from "@/components/qr/api-request-dialog";
 import {
   deleteQrCode,
@@ -216,23 +213,8 @@ function QrCard({ item }: { item: SavedQr }) {
 }
 
 export function QrGrid({ items }: { items: SavedQr[] }) {
-  const t = useTranslations("dashboard.qr");
-
   if (items.length === 0) {
-    return (
-      <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-line-strong px-6 py-16 text-center">
-        <div className="flex size-14 items-center justify-center rounded-2xl bg-brand-soft text-primary">
-          <QrCode className="size-7" strokeWidth={1.5} />
-        </div>
-        <div>
-          <p className="font-medium">{t("empty")}</p>
-          <p className="mt-1 text-sm text-muted-foreground">{t("emptyHint")}</p>
-        </div>
-        <Button asChild>
-          <Link href="/generator">{t("emptyCta")}</Link>
-        </Button>
-      </div>
-    );
+    return <EmptyState namespace="dashboard.qr" />;
   }
 
   return (

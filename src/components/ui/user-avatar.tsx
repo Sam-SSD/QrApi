@@ -32,7 +32,7 @@ export function UserAvatar({
     <span
       aria-hidden
       className={cn(
-        "flex shrink-0 select-none items-center justify-center rounded-full bg-brand-soft font-medium text-primary",
+        "flex shrink-0 items-center justify-center rounded-full bg-brand-soft font-medium text-primary select-none",
         className,
       )}
     >
