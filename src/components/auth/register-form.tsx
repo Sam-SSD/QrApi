@@ -23,16 +23,20 @@ export function RegisterForm({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+
+  const mismatch = confirm.length > 0 && password !== confirm;
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (password !== confirm) return;
     setError(null);
     setLoading(true);
 
     const form = new FormData(event.currentTarget);
     const name = String(form.get("name"));
     const email = String(form.get("email"));
-    const password = String(form.get("password"));
 
     const { error: authError } = await signUp.email({
       name,
@@ -88,6 +92,8 @@ export function RegisterForm({
             type="password"
             autoComplete="new-password"
             minLength={8}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
             aria-describedby="password-hint"
           />
@@ -95,12 +101,35 @@ export function RegisterForm({
             {t("passwordHint")}
           </p>
         </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="confirm-password">{t("confirmPassword")}</Label>
+          <Input
+            id="confirm-password"
+            type="password"
+            autoComplete="new-password"
+            minLength={8}
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            required
+            aria-invalid={mismatch}
+            aria-describedby={mismatch ? "confirm-password-error" : undefined}
+          />
+          {mismatch && (
+            <p
+              id="confirm-password-error"
+              role="alert"
+              className="text-sm text-destructive"
+            >
+              {t("passwordMismatch")}
+            </p>
+          )}
+        </div>
         {error && (
           <p role="alert" className="text-sm text-destructive">
             {error}
           </p>
         )}
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="w-full" disabled={loading || mismatch}>
           {loading && <Loader2 className="size-4 animate-spin" />}
           {loading ? t("submitting") : t("submit")}
         </Button>
