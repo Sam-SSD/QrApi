@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { UserAvatar } from "@/components/ui/user-avatar";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -19,6 +20,92 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+
+export interface SettingsUser {
+  name: string;
+  email: string;
+  image: string | null;
+}
+
+function ProfileCard({ user }: { user: SettingsUser }) {
+  const t = useTranslations("dashboard.settings");
+  const router = useRouter();
+  const [name, setName] = useState(user.name);
+  const [busy, setBusy] = useState(false);
+
+  const trimmed = name.trim();
+  const dirty = trimmed !== user.name;
+
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    if (!dirty || trimmed.length === 0) return;
+    setBusy(true);
+    const { error } = await authClient.updateUser({ name: trimmed });
+    setBusy(false);
+    if (error) {
+      toast.error(t("profileError"));
+      return;
+    }
+    toast.success(t("profileSaved"));
+    setName(trimmed);
+    router.refresh();
+  }
+
+  return (
+    <form
+      onSubmit={submit}
+      className="flex max-w-md flex-col gap-4 rounded-xl border border-line bg-surface p-5"
+    >
+      <h2 className="font-semibold">{t("profileTitle")}</h2>
+      <div className="flex items-center gap-3">
+        <UserAvatar
+          name={trimmed.length > 0 ? trimmed : user.name}
+          image={user.image}
+          className="size-12 text-base"
+        />
+        <div className="min-w-0">
+          <p className="truncate text-sm font-medium">{user.name}</p>
+          <p className="truncate text-xs text-muted-foreground">
+            {user.email}
+          </p>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="set-name">{t("nameLabel")}</Label>
+        <Input
+          id="set-name"
+          autoComplete="name"
+          maxLength={60}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="set-email">{t("emailLabel")}</Label>
+        <Input
+          id="set-email"
+          type="email"
+          value={user.email}
+          disabled
+          readOnly
+          aria-describedby="set-email-hint"
+        />
+        <p id="set-email-hint" className="text-xs text-ink-faint">
+          {t("emailHint")}
+        </p>
+      </div>
+      <Button
+        type="submit"
+        disabled={busy || !dirty || trimmed.length === 0}
+        className="self-start"
+      >
+        {busy && <Loader2 className="size-4 animate-spin" />}
+        {t("saveProfile")}
+      </Button>
+    </form>
+  );
+}
 
 function ChangePasswordCard() {
   const t = useTranslations("dashboard.settings");
@@ -165,9 +252,10 @@ function DangerZoneCard() {
   );
 }
 
-export function SettingsSection() {
+export function SettingsSection({ user }: { user: SettingsUser }) {
   return (
     <div className="flex flex-col gap-6">
+      <ProfileCard user={user} />
       <ChangePasswordCard />
       <DangerZoneCard />
     </div>

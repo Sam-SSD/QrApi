@@ -1,10 +1,11 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { LayoutDashboard, LogOut, UserRound } from "lucide-react";
+import { LayoutDashboard, LogOut } from "lucide-react";
 import { signOut, useSession } from "@/lib/auth-client";
 import { Link, useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { UserAvatar } from "@/components/ui/user-avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,9 +53,11 @@ export function UserMenu() {
             aria-label={session.user.name}
             className="rounded-full"
           >
-            <span className="flex size-7 items-center justify-center rounded-full bg-brand-soft text-primary">
-              <UserRound className="size-4" strokeWidth={1.75} />
-            </span>
+            <UserAvatar
+              name={session.user.name}
+              image={session.user.image}
+              className="size-7 text-xs"
+            />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-52">
