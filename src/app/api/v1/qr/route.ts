@@ -6,6 +6,7 @@ import {
   authenticateApi,
   errorResponse,
   rateLimitHeaders,
+  readJsonBody,
 } from "@/lib/api-helpers";
 import { renderQrSvg } from "@/lib/qr/render-svg";
 import { rasterizeSvg } from "@/lib/qr/rasterize";
@@ -20,12 +21,7 @@ import {
   hexColor,
   qrConfigSchema,
 } from "@/lib/qr/schema";
-import {
-  MAX_BODY_BYTES,
-  formatSchema,
-  postBodySchema,
-  sizeSchema,
-} from "@/lib/qr/api-schema";
+import { formatSchema, postBodySchema, sizeSchema } from "@/lib/qr/api-schema";
 
 export const runtime = "nodejs";
 
@@ -83,7 +79,19 @@ async function respondWithQr(
     });
   }
 
-  const buffer = await rasterizeSvg(svg, format);
+  let buffer: Buffer;
+  try {
+    buffer = await rasterizeSvg(svg, format);
+  } catch {
+    // sharp rejects oversized embedded images and times out on expensive ones.
+    // Without this the throw escapes as HTML with no CORS headers, so browser
+    // clients see an opaque CORS failure instead of the documented error shape.
+    return errorResponse(
+      422,
+      "render_failed",
+      "The QR could not be rasterized: the embedded logo or background image is too large",
+    );
+  }
   return new NextResponse(new Uint8Array(buffer), {
     status: 200,
     headers: {
@@ -146,22 +154,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const contentLength = Number(request.headers.get("content-length") ?? 0);
-  if (contentLength > MAX_BODY_BYTES) {
-    return errorResponse(413, "body_too_large", "Body must be under 1 MB");
-  }
-
   const auth = await authenticateApi(request);
   if (auth.response) return auth.response;
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return errorResponse(415, "invalid_json", "Body must be valid JSON");
-  }
+  const read = await readJsonBody(request);
+  if (read.response) return read.response;
 
-  const parsed = postBodySchema.safeParse(body);
+  const parsed = postBodySchema.safeParse(read.body);
   if (!parsed.success) {
     return errorResponse(
       400,

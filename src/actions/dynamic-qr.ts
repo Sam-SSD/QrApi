@@ -94,10 +94,10 @@ export async function toggleDynamicActive(id: string, active: boolean) {
 export async function setDynamicPassword(id: string, password: string | null) {
   const session = await requireSession();
   const clean =
-    password === null ? null : z.string().min(4).max(72).parse(password);
+    password === null ? null : z.string().min(8).max(72).parse(password);
   const result = await prisma.dynamicQr.updateMany({
     where: { id, userId: session.user.id },
-    data: { passwordHash: clean ? hashPassword(clean) : null },
+    data: { passwordHash: clean ? await hashPassword(clean) : null },
   });
   if (result.count === 0) throw new Error("NOT_FOUND");
   revalidateDashboard();

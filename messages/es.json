@@ -433,7 +433,7 @@
       "changePassword": "Actualizar contraseña",
       "passwordChanged": "Contraseña actualizada",
       "passwordError": "La contraseña actual no es correcta",
-      "revokeOthers": "Cerrar sesión en los demás dispositivos",
+      "revokeOthersNotice": "Al cambiarla se cerrará la sesión en los demás dispositivos.",
       "dangerTitle": "Zona de peligro",
       "deleteAccount": "Eliminar mi cuenta",
       "deleteTitle": "¿Eliminar tu cuenta?",
