@@ -1,30 +1,14 @@
 "use server";
 
-import { headers } from "next/headers";
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { auth } from "@/lib/auth";
+import { requireSession, revalidateDashboard } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { qrConfigSchema } from "@/lib/qr/schema";
 import { createUniqueDynamicQr } from "@/lib/dynamic-qr/create";
-import { buildRedirectUrl } from "@/lib/dynamic-qr/redirect-url";
+import { buildRedirectUrl, httpUrl } from "@/lib/dynamic-qr/redirect-url";
 import { hashPassword } from "@/lib/dynamic-qr/password";
 
 const MAX_DYNAMIC_QRS = 100;
-
-async function requireSession() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) throw new Error("UNAUTHORIZED");
-  return session;
-}
-
-// http/https only: `new URL()` (and z.url()) would accept javascript:/data:,
-// which must not live behind a public redirector under our domain.
-const httpUrl = z
-  .string()
-  .url()
-  .max(2048)
-  .refine((u) => /^https?:\/\//i.test(u), "URL debe ser http(s)");
 
 const createInput = z.object({
   title: z.string().min(1).max(80),
@@ -64,7 +48,7 @@ export async function createDynamicQr(input: z.infer<typeof createInput>) {
     },
   });
 
-  revalidatePath("/[locale]/dashboard", "layout");
+  revalidateDashboard();
   return { id: created.id, slug: dynamic.slug, redirectUrl: data };
 }
 
@@ -82,7 +66,7 @@ export async function updateDynamicDesign(qrCodeId: string, config: unknown) {
     data: { config: { dynamic: true, config: parsed } },
   });
   if (result.count === 0) throw new Error("NOT_FOUND");
-  revalidatePath("/[locale]/dashboard", "layout");
+  revalidateDashboard();
 }
 
 export async function updateDynamicTarget(id: string, targetUrl: string) {
@@ -93,7 +77,7 @@ export async function updateDynamicTarget(id: string, targetUrl: string) {
     data: { targetUrl: url },
   });
   if (result.count === 0) throw new Error("NOT_FOUND");
-  revalidatePath("/[locale]/dashboard", "layout");
+  revalidateDashboard();
 }
 
 export async function toggleDynamicActive(id: string, active: boolean) {
@@ -103,7 +87,7 @@ export async function toggleDynamicActive(id: string, active: boolean) {
     data: { active },
   });
   if (result.count === 0) throw new Error("NOT_FOUND");
-  revalidatePath("/[locale]/dashboard", "layout");
+  revalidateDashboard();
 }
 
 /** Protects (or unprotects, with null) a dynamic QR with a scan password. */
@@ -116,7 +100,7 @@ export async function setDynamicPassword(id: string, password: string | null) {
     data: { passwordHash: clean ? hashPassword(clean) : null },
   });
   if (result.count === 0) throw new Error("NOT_FOUND");
-  revalidatePath("/[locale]/dashboard", "layout");
+  revalidateDashboard();
 }
 
 export async function deleteDynamicQr(id: string) {
@@ -125,5 +109,5 @@ export async function deleteDynamicQr(id: string) {
     where: { id, userId: session.user.id },
   });
   if (result.count === 0) throw new Error("NOT_FOUND");
-  revalidatePath("/[locale]/dashboard", "layout");
+  revalidateDashboard();
 }

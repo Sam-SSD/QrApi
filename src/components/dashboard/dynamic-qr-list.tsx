@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useFormatter, useTranslations } from "next-intl";
-import { BarChart3, Copy, Link2, Pencil, QrCode, Trash2 } from "lucide-react";
+import { BarChart3, Copy, Link2, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import {
 import { renderQrSvg } from "@/lib/qr/render-svg";
 import { qrConfigSchema } from "@/lib/qr/schema";
 import { QrExportMenu } from "./qr-export-menu";
+import { EmptyState } from "./empty-state";
 import { buildRedirectUrl } from "@/lib/dynamic-qr/redirect-url";
 import {
   deleteDynamicQr,
@@ -216,23 +217,8 @@ function DynamicCard({ item }: { item: DynamicQrItem }) {
 }
 
 export function DynamicQrList({ items }: { items: DynamicQrItem[] }) {
-  const t = useTranslations("dashboard.dynamic");
-
   if (items.length === 0) {
-    return (
-      <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-line-strong px-6 py-16 text-center">
-        <div className="flex size-14 items-center justify-center rounded-2xl bg-brand-soft text-primary">
-          <QrCode className="size-7" strokeWidth={1.5} />
-        </div>
-        <div>
-          <p className="font-medium">{t("empty")}</p>
-          <p className="mt-1 text-sm text-muted-foreground">{t("emptyHint")}</p>
-        </div>
-        <Button asChild>
-          <Link href="/generator">{t("emptyCta")}</Link>
-        </Button>
-      </div>
-    );
+    return <EmptyState namespace="dashboard.dynamic" />;
   }
 
   return (

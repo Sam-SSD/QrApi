@@ -79,7 +79,7 @@ export const PAYLOAD_TYPES = [
 
 // ---------- Style ----------
 
-export const gradientSchema = z.object({
+const gradientSchema = z.object({
   type: z.enum(["linear", "radial"]).default("linear"),
   rotation: z.number().min(0).max(360).default(45),
   stops: z
@@ -136,7 +136,7 @@ export const FRAME_STYLES = [
 export const FRAME_POSITIONS = ["bottom", "top"] as const;
 export const EC_LEVELS = ["L", "M", "Q", "H"] as const;
 
-export const qrStyleSchema = z.object({
+const qrStyleSchema = z.object({
   dots: z
     .object({
       style: z.enum(DOT_STYLES).default("square"),
@@ -188,7 +188,7 @@ export const qrStyleSchema = z.object({
 
 export type QrStyle = z.infer<typeof qrStyleSchema>;
 
-export const logoSchema = z.object({
+const logoSchema = z.object({
   dataUri: z
     .string()
     .regex(
@@ -203,7 +203,7 @@ export const logoSchema = z.object({
 
 export type QrLogo = z.infer<typeof logoSchema>;
 
-export const frameSchema = z.object({
+const frameSchema = z.object({
   style: z.enum(FRAME_STYLES).default("modern"),
   text: z.string().max(30).default("ESCANÉAME"),
   color: hexColor.default("#4f46e5"),
@@ -213,7 +213,7 @@ export const frameSchema = z.object({
 
 export type QrFrame = z.infer<typeof frameSchema>;
 
-export const effectsSchema = z.object({
+const effectsSchema = z.object({
   invert: z.boolean().default(false),
   glow: z.boolean().default(false),
   opacity: z.number().min(0.1).max(1).default(1),

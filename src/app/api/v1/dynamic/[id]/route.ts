@@ -7,15 +7,9 @@ import {
   errorResponse,
   jsonResponse,
 } from "@/lib/api-helpers";
-import { buildRedirectUrl } from "@/lib/dynamic-qr/redirect-url";
+import { buildRedirectUrl, httpUrl } from "@/lib/dynamic-qr/redirect-url";
 
 export const runtime = "nodejs";
-
-const httpUrl = z
-  .string()
-  .url()
-  .max(2048)
-  .refine((u) => /^https?:\/\//i.test(u), "URL must be http(s)");
 
 const patchBodySchema = z
   .object({

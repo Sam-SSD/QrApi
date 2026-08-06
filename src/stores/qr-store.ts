@@ -41,7 +41,7 @@ export interface FieldsMap {
   crypto: { currency: "bitcoin" | "ethereum"; address: string; amount: string };
 }
 
-export const DEFAULT_FIELDS: FieldsMap = {
+const DEFAULT_FIELDS: FieldsMap = {
   text: { text: "" },
   url: { url: "" },
   email: { to: "", subject: "", body: "" },
@@ -175,192 +175,139 @@ interface QrEditorState {
   reset: () => void;
 }
 
-export const useQrStore = create<QrEditorState>((set) => ({
-  type: "url",
-  fields: structuredClone(DEFAULT_FIELDS),
-  config: structuredClone(DEFAULT_QR_CONFIG),
+export const useQrStore = create<QrEditorState>((set) => {
+  const patchConfig = (patch: Partial<QrConfig>) =>
+    set((s) => ({ config: { ...s.config, ...patch } }));
 
-  setType: (type) => set({ type }),
-
-  setField: (type, key, value) =>
-    set((s) => ({
-      fields: { ...s.fields, [type]: { ...s.fields[type], [key]: value } },
-    })),
-
-  setDotsStyle: (style) =>
-    set((s) => ({
-      config: {
-        ...s.config,
-        style: { ...s.config.style, dots: { ...s.config.style.dots, style } },
-      },
-    })),
-
-  setDotsColor: (color) =>
-    set((s) => ({
-      config: {
-        ...s.config,
-        style: { ...s.config.style, dots: { ...s.config.style.dots, color } },
-      },
-    })),
-
-  setBgColor: (color) =>
+  const patchStyle = <K extends keyof QrConfig["style"]>(
+    key: K,
+    patch: Partial<QrConfig["style"][K]>,
+  ) =>
     set((s) => ({
       config: {
         ...s.config,
         style: {
           ...s.config.style,
-          background: { ...s.config.style.background, color },
+          [key]: { ...s.config.style[key], ...patch },
         },
       },
-    })),
+    }));
 
-  setBgTransparent: (transparent) =>
-    set((s) => ({
-      config: {
-        ...s.config,
-        style: {
-          ...s.config.style,
-          background: { ...s.config.style.background, transparent },
+  return {
+    type: "url",
+    fields: structuredClone(DEFAULT_FIELDS),
+    config: structuredClone(DEFAULT_QR_CONFIG),
+
+    setType: (type) => set({ type }),
+
+    setField: (type, key, value) =>
+      set((s) => ({
+        fields: { ...s.fields, [type]: { ...s.fields[type], [key]: value } },
+      })),
+
+    setDotsStyle: (style) => patchStyle("dots", { style }),
+    setDotsColor: (color) => patchStyle("dots", { color }),
+    setGradient: (gradient) => patchStyle("dots", { gradient }),
+    setBgColor: (color) => patchStyle("background", { color }),
+    setBgTransparent: (transparent) =>
+      patchStyle("background", { transparent }),
+    setBgGradient: (gradient) => patchStyle("background", { gradient }),
+
+    setBgImage: (image) =>
+      set((s) => ({
+        config: {
+          ...s.config,
+          // When a background image is set, bump to EC=H for maximum
+          // scanability (mirrors the logo auto-bump); the render forces it too.
+          ecLevel: image && s.config.ecLevel !== "H" ? "H" : s.config.ecLevel,
+          style: {
+            ...s.config.style,
+            background: { ...s.config.style.background, image },
+          },
         },
-      },
-    })),
+      })),
 
-  setGradient: (gradient) =>
-    set((s) => ({
-      config: {
-        ...s.config,
-        style: {
-          ...s.config.style,
-          dots: { ...s.config.style.dots, gradient },
-        },
-      },
-    })),
-
-  setBgGradient: (gradient) =>
-    set((s) => ({
-      config: {
-        ...s.config,
-        style: {
-          ...s.config.style,
-          background: { ...s.config.style.background, gradient },
-        },
-      },
-    })),
-
-  setBgImage: (image) =>
-    set((s) => ({
-      config: {
-        ...s.config,
-        // When a background image is set, bump to EC=H for maximum
-        // scanability (mirrors the logo auto-bump); the render forces it too.
-        ecLevel: image && s.config.ecLevel !== "H" ? "H" : s.config.ecLevel,
-        style: {
-          ...s.config.style,
-          background: { ...s.config.style.background, image },
-        },
-      },
-    })),
-
-  patchBgImage: (patch) =>
-    set((s) =>
-      s.config.style.background.image
-        ? {
-            config: {
-              ...s.config,
-              style: {
-                ...s.config.style,
-                background: {
-                  ...s.config.style.background,
-                  image: { ...s.config.style.background.image, ...patch },
+    patchBgImage: (patch) =>
+      set((s) =>
+        s.config.style.background.image
+          ? {
+              config: {
+                ...s.config,
+                style: {
+                  ...s.config.style,
+                  background: {
+                    ...s.config.style.background,
+                    image: { ...s.config.style.background.image, ...patch },
+                  },
                 },
               },
-            },
-          }
-        : s,
-    ),
+            }
+          : s,
+      ),
 
-  setCornersSquare: (patch) =>
-    set((s) => ({
-      config: {
-        ...s.config,
-        style: {
-          ...s.config.style,
-          cornersSquare: { ...s.config.style.cornersSquare, ...patch },
+    setCornersSquare: (patch) => patchStyle("cornersSquare", patch),
+    setCornersDot: (patch) => patchStyle("cornersDot", patch),
+
+    setLogo: (logo) => patchConfig({ logo }),
+
+    patchLogo: (patch) =>
+      set((s) =>
+        s.config.logo
+          ? { config: { ...s.config, logo: { ...s.config.logo, ...patch } } }
+          : s,
+      ),
+
+    setFrame: (frame) => patchConfig({ frame }),
+
+    patchFrame: (patch) =>
+      set((s) =>
+        s.config.frame
+          ? { config: { ...s.config, frame: { ...s.config.frame, ...patch } } }
+          : s,
+      ),
+
+    patchEffects: (patch) =>
+      set((s) => ({
+        config: {
+          ...s.config,
+          effects: {
+            ...(s.config.effects ?? { invert: false, glow: false, opacity: 1 }),
+            ...patch,
+          },
         },
-      },
-    })),
+      })),
 
-  setCornersDot: (patch) =>
-    set((s) => ({
-      config: {
-        ...s.config,
-        style: {
-          ...s.config.style,
-          cornersDot: { ...s.config.style.cornersDot, ...patch },
-        },
-      },
-    })),
+    setEcLevel: (ecLevel) => patchConfig({ ecLevel }),
+    setMargin: (margin) => patchConfig({ margin }),
 
-  setLogo: (logo) => set((s) => ({ config: { ...s.config, logo } })),
+    applyTemplate: (template) =>
+      set((s) => {
+        const { type, ...payloadFields } = template.payload;
+        return {
+          type,
+          fields: {
+            ...s.fields,
+            [type]: { ...DEFAULT_FIELDS[type], ...payloadFields },
+          },
+          config: structuredClone(template.config),
+        };
+      }),
 
-  patchLogo: (patch) =>
-    set((s) =>
-      s.config.logo
-        ? { config: { ...s.config, logo: { ...s.config.logo, ...patch } } }
-        : s,
-    ),
-
-  setFrame: (frame) => set((s) => ({ config: { ...s.config, frame } })),
-
-  patchFrame: (patch) =>
-    set((s) =>
-      s.config.frame
-        ? { config: { ...s.config, frame: { ...s.config.frame, ...patch } } }
-        : s,
-    ),
-
-  patchEffects: (patch) =>
-    set((s) => ({
-      config: {
-        ...s.config,
-        effects: {
-          ...(s.config.effects ?? { invert: false, glow: false, opacity: 1 }),
-          ...patch,
-        },
-      },
-    })),
-
-  setEcLevel: (ecLevel) => set((s) => ({ config: { ...s.config, ecLevel } })),
-
-  setMargin: (margin) => set((s) => ({ config: { ...s.config, margin } })),
-
-  applyTemplate: (template) =>
-    set((s) => {
-      const { type, ...payloadFields } = template.payload;
-      return {
-        type,
+    loadSnapshot: (snapshot) =>
+      set(() => ({
+        type: snapshot.type,
         fields: {
-          ...s.fields,
-          [type]: { ...DEFAULT_FIELDS[type], ...payloadFields },
+          ...structuredClone(DEFAULT_FIELDS),
+          ...structuredClone(snapshot.fields),
         },
-        config: structuredClone(template.config),
-      };
-    }),
+        config: structuredClone(snapshot.config),
+      })),
 
-  loadSnapshot: (snapshot) =>
-    set(() => ({
-      type: snapshot.type,
-      fields: {
-        ...structuredClone(DEFAULT_FIELDS),
-        ...structuredClone(snapshot.fields),
-      },
-      config: structuredClone(snapshot.config),
-    })),
-
-  reset: () =>
-    set({
-      type: "url",
-      fields: structuredClone(DEFAULT_FIELDS),
-      config: structuredClone(DEFAULT_QR_CONFIG),
-    }),
-}));
+    reset: () =>
+      set({
+        type: "url",
+        fields: structuredClone(DEFAULT_FIELDS),
+        config: structuredClone(DEFAULT_QR_CONFIG),
+      }),
+  };
+});
