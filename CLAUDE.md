@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run db:migrate` — Prisma migrations · `npm run db:studio` — Prisma Studio
 - `npm test` — Vitest (QR engine tests decode real rasterized output with sharp + zxing-wasm)
 - `npm run typecheck` / `lint` / `format`
-- `npm run build && npm start` — production
+- `npm run build && npm start` — production. `npm start` runs with `NODE_ENV=production`, so `src/env.ts` refuses the dev defaults: to try a production build locally you must pass real values, e.g. `BETTER_AUTH_URL=https://example.test NEXT_PUBLIC_SITE_URL=https://example.test SCAN_IP_SECRET=<own-secret> npx next start`. `npm run build` alone works with the plain `.env`.
 
 `.env` is required (copy `.env.example`); `src/env.ts` validates env vars with zod at boot. UI strings live in `messages/es.json` / `messages/en.json` — every user-facing string needs both.
 
