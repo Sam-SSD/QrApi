@@ -13,7 +13,9 @@ const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "production" ? "" : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
+  // OAuth avatars are <img> tags pointing at the provider's CDN (see
+  // components/ui/user-avatar.tsx), so those hosts must be listed explicitly.
+  "img-src 'self' data: blob: https://lh3.googleusercontent.com https://avatars.githubusercontent.com",
   "font-src 'self' data:",
   "connect-src 'self'",
   "object-src 'none'",
