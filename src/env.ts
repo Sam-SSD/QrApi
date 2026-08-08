@@ -54,7 +54,48 @@ const envSchema = z.object({
     .default("dev-scan-ip-secret-change-in-production"),
 });
 
-const parsed = envSchema.safeParse(process.env);
+/**
+ * The defaults above keep `npm run dev` zero-config, but silently shipping them
+ * to production is a security failure, so refuse to boot instead:
+ *  - a non-https BETTER_AUTH_URL makes better-auth drop the `Secure` prefix on
+ *    the session cookie (and weakens the trusted-origin check with it);
+ *  - the literal SCAN_IP_SECRET makes scan IP hashes brute-forceable;
+ *  - a localhost NEXT_PUBLIC_SITE_URL gets baked into *printed* QR matrices.
+ *
+ * Runtime only: `next build` also runs with NODE_ENV=production, and a build on
+ * a dev machine must not need production secrets. During a local build (no CI /
+ * VERCEL marker) only NEXT_PUBLIC_SITE_URL matters, since Next inlines it.
+ */
+const isLocalBuild =
+  process.env.NEXT_PHASE === "phase-production-build" &&
+  !process.env.CI &&
+  !process.env.VERCEL;
+
+const productionEnvSchema = envSchema.superRefine((value, ctx) => {
+  if (value.NODE_ENV !== "production" || isLocalBuild) return;
+
+  const require = (path: string, ok: boolean, message: string) => {
+    if (!ok) ctx.addIssue({ code: "custom", path: [path], message });
+  };
+
+  require(
+    "BETTER_AUTH_URL",
+    value.BETTER_AUTH_URL.startsWith("https://"),
+    "debe usar https:// en producción (si no, la cookie de sesión pierde el flag Secure)",
+  );
+  require(
+    "SCAN_IP_SECRET",
+    !value.SCAN_IP_SECRET.startsWith("dev-"),
+    "define un valor propio en producción; el default es público",
+  );
+  require(
+    "NEXT_PUBLIC_SITE_URL",
+    !value.NEXT_PUBLIC_SITE_URL.includes("localhost"),
+    "no puede ser localhost en producción; se codifica en los QR impresos",
+  );
+});
+
+const parsed = productionEnvSchema.safeParse(process.env);
 
 if (!parsed.success) {
   console.error(

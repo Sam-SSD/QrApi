@@ -50,11 +50,10 @@ export function RegisterForm({
 
     if (authError) {
       setLoading(false);
-      setError(
-        authError.code === "USER_ALREADY_EXISTS"
-          ? t("emailTaken")
-          : (authError.message ?? tCommon("error")),
-      );
+      // No duplicate-email branch on purpose: with email verification on,
+      // sign-up answers identically for taken and free addresses so it cannot
+      // be used to probe which emails have an account.
+      setError(tCommon("error"));
       return;
     }
 

@@ -9,7 +9,6 @@ import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import {
   AlertDialog,
@@ -110,7 +109,6 @@ function ChangePasswordCard() {
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [revokeOthers, setRevokeOthers] = useState(true);
   const [busy, setBusy] = useState(false);
 
   const mismatch = confirm.length > 0 && next !== confirm;
@@ -122,7 +120,9 @@ function ChangePasswordCard() {
     const { error } = await authClient.changePassword({
       currentPassword: current,
       newPassword: next,
-      revokeOtherSessions: revokeOthers,
+      // Always: the usual reason to change a password is to lock someone out,
+      // so this must not be optional.
+      revokeOtherSessions: true,
     });
     setBusy(false);
     if (error) {
@@ -191,14 +191,7 @@ function ChangePasswordCard() {
           </p>
         )}
       </div>
-      <div className="flex items-center justify-between">
-        <Label htmlFor="set-revoke">{t("revokeOthers")}</Label>
-        <Switch
-          id="set-revoke"
-          checked={revokeOthers}
-          onCheckedChange={setRevokeOthers}
-        />
-      </div>
+      <p className="text-xs text-ink-faint">{t("revokeOthersNotice")}</p>
       <Button type="submit" disabled={busy || mismatch} className="self-start">
         {busy && <Loader2 className="size-4 animate-spin" />}
         {t("changePassword")}

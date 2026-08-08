@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { generateSlug } from "./slug";
 import { parseUserAgent } from "./parse-ua";
 import { buildRedirectUrl } from "./redirect-url";
+import { hashPassword, verifyPassword } from "./password";
 
 describe("generateSlug", () => {
   it("generates 8-char base62 slugs", () => {
@@ -65,5 +66,33 @@ describe("parseUserAgent", () => {
   it("empty UA → desktop with no data", () => {
     const r = parseUserAgent(null);
     expect(r).toEqual({ deviceType: "desktop", os: null, browser: null });
+  });
+});
+
+describe("scan password", () => {
+  it("accepts the right password and rejects everything else", async () => {
+    const stored = await hashPassword("correct horse battery");
+
+    expect(stored).toMatch(/^[0-9a-f]{32}:[0-9a-f]{64}$/);
+    await expect(verifyPassword("correct horse battery", stored)).resolves.toBe(
+      true,
+    );
+    await expect(verifyPassword("wrong", stored)).resolves.toBe(false);
+    await expect(verifyPassword("", stored)).resolves.toBe(false);
+  });
+
+  it("salts each hash, so equal passwords do not collide", async () => {
+    const [a, b] = await Promise.all([
+      hashPassword("same-password"),
+      hashPassword("same-password"),
+    ]);
+    expect(a).not.toBe(b);
+    await expect(verifyPassword("same-password", b)).resolves.toBe(true);
+  });
+
+  it("rejects malformed stored values instead of throwing", async () => {
+    for (const bad of ["", "nosalt", ":", "deadbeef:"]) {
+      await expect(verifyPassword("x", bad)).resolves.toBe(false);
+    }
   });
 });

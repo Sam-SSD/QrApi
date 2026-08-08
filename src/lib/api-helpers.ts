@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyApiToken } from "@/lib/api-keys";
 import { checkRateLimit, type RateLimitResult } from "@/lib/rate-limit";
+import { MAX_BODY_BYTES } from "@/lib/qr/api-schema";
 import type { ApiKey } from "@prisma/client";
 
 /**
@@ -37,6 +38,33 @@ export function rateLimitHeaders(
     "X-RateLimit-Remaining": String(rate.remaining),
     "X-RateLimit-Reset": String(rate.resetAt),
   };
+}
+
+/**
+ * Reads and parses the JSON body, enforcing the size cap on the bytes actually
+ * received. The Content-Length header alone is not a control: it is absent
+ * under chunked transfer encoding and `Number(null)` / `Number("abc")` compare
+ * falsely against any limit.
+ */
+export async function readJsonBody(
+  request: NextRequest,
+): Promise<{ body: unknown; response?: undefined } | { response: NextResponse }> {
+  const raw = await request.arrayBuffer().catch(() => null);
+  if (!raw) {
+    return { response: errorResponse(400, "invalid_body", "Unreadable body") };
+  }
+  if (raw.byteLength > MAX_BODY_BYTES) {
+    return {
+      response: errorResponse(413, "body_too_large", "Body must be under 1 MB"),
+    };
+  }
+  try {
+    return { body: JSON.parse(new TextDecoder().decode(raw)) };
+  } catch {
+    return {
+      response: errorResponse(415, "invalid_json", "Body must be valid JSON"),
+    };
+  }
 }
 
 export type ApiAuth =

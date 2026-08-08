@@ -6,6 +6,7 @@ import {
   authenticateApi,
   errorResponse,
   jsonResponse,
+  readJsonBody,
 } from "@/lib/api-helpers";
 import { buildRedirectUrl, httpUrl } from "@/lib/dynamic-qr/redirect-url";
 
@@ -93,13 +94,10 @@ export async function PATCH(
   if (auth.response) return auth.response;
   const { id } = await params;
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return errorResponse(415, "invalid_json", "Body must be valid JSON");
-  }
-  const parsed = patchBodySchema.safeParse(body);
+  const read = await readJsonBody(request);
+  if (read.response) return read.response;
+
+  const parsed = patchBodySchema.safeParse(read.body);
   if (!parsed.success) {
     return errorResponse(
       400,

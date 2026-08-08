@@ -174,3 +174,14 @@ model RateLimitWindow {
   @@unique([apiKeyId, kind, windowStart])
   @@map("rate_limit_window")
 }
+
+// better-auth's own rate limit store (auth.ts sets rateLimit.storage="database").
+// Separate from RateLimitWindow above: that one is ours, for the public API.
+model RateLimit {
+  id          String @id
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+
+  @@map("rateLimit")
+}

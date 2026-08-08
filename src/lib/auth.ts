@@ -20,6 +20,20 @@ export const auth = betterAuth({
     // Explicit: with verification off, sign-up starts a session right away.
     autoSignIn: true,
   },
+  account: {
+    accountLinking: {
+      // An unverified local account must never absorb an OAuth identity: a
+      // sign-up with someone else's address would otherwise keep authenticating
+      // that account after the real owner signs in with Google/GitHub. Set here
+      // rather than relying on requireLocalEmailVerified, whose guarantee the
+      // emailVerified databaseHook below can defeat.
+      disableImplicitLinking: true,
+    },
+  },
+  // Login/sign-up already get 3 requests / 10s from better-auth, but the
+  // default counter is in-memory: per instance and reset on every deploy.
+  rateLimit: { storage: "database" },
+  trustedOrigins: [env.BETTER_AUTH_URL, env.NEXT_PUBLIC_SITE_URL],
   user: {
     deleteUser: {
       enabled: true,

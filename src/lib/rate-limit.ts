@@ -14,23 +14,33 @@ export interface RateLimitResult {
 /**
  * Fixed window in Postgres with an atomic UPSERT. Self-contained (no Redis):
  * a single query per window, safe for multi-instance deployments.
+ *
+ * The `key` column is named "apiKeyId" for historical reasons but has no FK:
+ * any opaque string works, so non-API-key subjects (e.g. `r:{slug}` for the
+ * dynamic QR password form) share the same table.
  */
 async function bumpWindow(
-  apiKeyId: string,
+  key: string,
   kind: "minute" | "day",
   windowStart: Date,
 ): Promise<number> {
   const rows = await prisma.$queryRaw<Array<{ count: number }>>`
     INSERT INTO "rate_limit_window" ("id", "apiKeyId", "kind", "windowStart", "count")
-    VALUES (${randomUUID()}, ${apiKeyId}, ${kind}, ${windowStart}, 1)
+    VALUES (${randomUUID()}, ${key}, ${kind}, ${windowStart}, 1)
     ON CONFLICT ("apiKeyId", "kind", "windowStart")
     DO UPDATE SET "count" = "rate_limit_window"."count" + 1
     RETURNING "count"`;
   return rows[0]?.count ?? 1;
 }
 
+/**
+ * @param key    rate limit subject: an ApiKey id, or `r:{slug}` for /r routes.
+ * @param limits overrides the env defaults (used by the password form, which
+ *               needs a far stricter budget than the public API).
+ */
 export async function checkRateLimit(
-  apiKeyId: string,
+  key: string,
+  limits?: { perMinute: number; perDay: number },
 ): Promise<RateLimitResult> {
   const now = new Date();
   const minuteStart = new Date(Math.floor(now.getTime() / 60_000) * 60_000);
@@ -39,8 +49,8 @@ export async function checkRateLimit(
   );
 
   const [minuteCount, dayCount] = await Promise.all([
-    bumpWindow(apiKeyId, "minute", minuteStart),
-    bumpWindow(apiKeyId, "day", dayStart),
+    bumpWindow(key, "minute", minuteStart),
+    bumpWindow(key, "day", dayStart),
   ]);
 
   // Lazy cleanup: ~1 in 100 requests deletes old windows
@@ -51,8 +61,8 @@ export async function checkRateLimit(
       .catch(() => {});
   }
 
-  const minuteLimit = env.RATE_LIMIT_PER_MINUTE;
-  const dayLimit = env.RATE_LIMIT_PER_DAY;
+  const minuteLimit = limits?.perMinute ?? env.RATE_LIMIT_PER_MINUTE;
+  const dayLimit = limits?.perDay ?? env.RATE_LIMIT_PER_DAY;
 
   if (minuteCount > minuteLimit) {
     const resetAt = Math.ceil((minuteStart.getTime() + 60_000) / 1000);

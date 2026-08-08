@@ -6,10 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `npm run dev` — dev server (Turbopack) at http://localhost:3000
 - `npm run db:up` — start Postgres (host port **5433**, avoids native Postgres clash) + Mailpit (SMTP 1025, UI http://localhost:8025) via Docker Compose
-- `npm run db:migrate` — Prisma migrations · `npm run db:studio` — Prisma Studio
+- `npm run db:migrate` — Prisma migrations (dev: creates them) · `npm run db:deploy` — applies pending migrations (production; never generates or resets) · `npm run db:studio` — Prisma Studio
 - `npm test` — Vitest (QR engine tests decode real rasterized output with sharp + zxing-wasm)
 - `npm run typecheck` / `lint` / `format`
-- `npm run build && npm start` — production
+- `npm run build && npm start` — production. `npm start` is `prisma migrate deploy && next start`: pending migrations are applied on every boot, so a deploy that adds one needs no manual step, and a failed migration aborts the start instead of serving against a stale schema. It is a no-op when nothing is pending. This assumes one instance runs migrations at a time; with several replicas booting at once, move `db:deploy` to the platform's release/pre-deploy step and set `start` back to plain `next start`.
+- `npm start` runs with `NODE_ENV=production`, so `src/env.ts` refuses the dev defaults: to try a production build locally, pass real values, e.g. `BETTER_AUTH_URL=https://example.test NEXT_PUBLIC_SITE_URL=https://example.test SCAN_IP_SECRET=<own-secret> npm start`. `npm run build` alone works with the plain `.env`.
 
 `.env` is required (copy `.env.example`); `src/env.ts` validates env vars with zod at boot. UI strings live in `messages/es.json` / `messages/en.json` — every user-facing string needs both.
 
